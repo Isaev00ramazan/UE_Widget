@@ -132,10 +132,14 @@ def check_window(report):
 	"""Окно pywebview на Windows: снять пометку «из интернета» и загрузить .NET-часть (pythonnet + WinForms), без окна."""
 	import traceback
 	from . import window
-	out = {"unblocked": window.unblock(os.path.dirname(sys.executable)) if getattr(sys, "frozen", False) else 0}
+	out = {"unblocked": window.unblock(os.path.dirname(sys.executable)) if getattr(sys, "frozen", False) else 0,
+		   "stage": "до загрузки .NET"}
+	with open(report, "w", encoding="utf-8") as f:
+		json.dump(out, f, ensure_ascii=False)
 	try:
 		import webview.platforms.winforms  # noqa: F401 — тянет clr (pythonnet) и сборки WebView2
 		out["ok"] = True
+		out["stage"] = ".NET и WinForms загружены"
 	except Exception:  # noqa: BLE001
 		out["ok"] = False
 		out["error"] = traceback.format_exc()

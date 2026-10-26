@@ -20,6 +20,7 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -39,8 +40,13 @@ jobs:
       - name: Проверка собранного exe
         shell: pwsh
         run: |
-          $exe = "build/dist/UMGStudio/UMGStudio.exe"
-          $p = Start-Process -FilePath $exe -ArgumentList "smoke", "$PWD/smoke.json" -Wait -PassThru -WorkingDirectory $env:TEMP
+          $psi = New-Object System.Diagnostics.ProcessStartInfo
+          $psi.FileName = (Resolve-Path "build/dist/UMGStudio/UMGStudio.exe").Path
+          $psi.Arguments = "smoke `"$PWD\smoke.json`""
+          $psi.WorkingDirectory = $env:TEMP
+          $psi.UseShellExecute = $false
+          $p = [System.Diagnostics.Process]::Start($psi)
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); throw "smoke hung" }
           Get-Content smoke.json
           if ($p.ExitCode -ne 0) { throw "smoke failed: $($p.ExitCode)" }
 
@@ -51,7 +57,15 @@ jobs:
           Get-ChildItem build/dist/UMGStudio -Recurse -Include *.dll,*.exe,*.pyd | ForEach-Object {
             Set-Content -Path $_.FullName -Stream Zone.Identifier -Value "[ZoneTransfer]`r`nZoneId=3"
           }
-          $p = Start-Process -FilePath "build/dist/UMGStudio/UMGStudio.exe" -ArgumentList "check-window", "$PWD/check-window.json" -Wait -PassThru -WorkingDirectory $env:TEMP
+          # запуск без оболочки Windows (CreateProcess): иначе на помеченном exe всплывёт окно «Неизвестный издатель»,
+          # которое на CI некому нажать. У пользователя этот шаг — клик «Выполнить»; DLL всё равно остаются помеченными.
+          $psi = New-Object System.Diagnostics.ProcessStartInfo
+          $psi.FileName = (Resolve-Path "build/dist/UMGStudio/UMGStudio.exe").Path
+          $psi.Arguments = "check-window `"$PWD\check-window.json`""
+          $psi.WorkingDirectory = $env:TEMP
+          $psi.UseShellExecute = $false
+          $p = [System.Diagnostics.Process]::Start($psi)
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); throw "window check hung" }
           Get-Content check-window.json
           if ($p.ExitCode -ne 0) { throw "window check failed: $($p.ExitCode)" }
 
