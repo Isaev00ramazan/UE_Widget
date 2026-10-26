@@ -27,6 +27,7 @@ import os
 import queue
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -87,14 +88,33 @@ class Studio:
 		return os.path.getmtime(os.path.join(HERE, "umg.py"))
 
 	def run_spec(self, path, write=False):
+		"""Спецификация — в отдельном процессе (чистый umg и TEXT_NAMESPACE на каждый запуск, ошибка не роняет сервер).
+		Собранный exe запускает сам себя с --run-spec; результат — через временный файл (у оконного exe нет stdout)."""
 		env = dict(os.environ, PYTHONPATH=STUDIO_ROOT + os.pathsep + os.environ.get("PYTHONPATH", ""),
 				   PYTHONIOENCODING="utf-8")
-		cmd = [sys.executable, "-m", "umgstudio.runner", path] + (["--write"] if write else [])
-		p = subprocess.run(cmd, capture_output=True, cwd=os.path.dirname(path), env=env, timeout=60)
+		fd, out = tempfile.mkstemp(prefix="umgstudio-", suffix=".json")
+		os.close(fd)
+		if getattr(sys, "frozen", False):
+			cmd = [sys.executable, "--run-spec", path]
+		else:
+			cmd = [sys.executable, "-m", "umgstudio.runner", path]
+		cmd += ["--out", out] + (["--write"] if write else [])
+		flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 		try:
-			return json.loads(p.stdout.decode("utf-8"))
-		except ValueError:
-			return {"ok": False, "error": (p.stderr or p.stdout).decode("utf-8", "replace"), "log": ""}
+			p = subprocess.run(cmd, capture_output=True, cwd=os.path.dirname(path), env=env, timeout=60,
+							   creationflags=flags)
+			with open(out, encoding="utf-8") as f:
+				text = f.read()
+			if text:
+				return json.loads(text)
+			return {"ok": False, "error": (p.stderr or p.stdout or b"").decode("utf-8", "replace") or "спецификация не ответила", "log": ""}
+		except (ValueError, OSError, subprocess.SubprocessError) as e:
+			return {"ok": False, "error": "Не удалось выполнить спецификацию: %r" % e, "log": ""}
+		finally:
+			try:
+				os.remove(out)
+			except OSError:
+				pass
 
 	def render(self, src):
 		path = self.path_of(src)
@@ -407,6 +427,10 @@ def make_handler(studio):
 
 def serve(studio, port=8765, host="127.0.0.1"):
 	studio.watch()
-	httpd = ThreadingHTTPServer((host, port), make_handler(studio))
+	try:
+		httpd = ThreadingHTTPServer((host, port), make_handler(studio))
+	except OSError:
+		# порт занят (второе окно программы) — любой свободный
+		httpd = ThreadingHTTPServer((host, 0), make_handler(studio))
 	httpd.daemon_threads = True
 	return httpd

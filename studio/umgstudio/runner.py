@@ -33,11 +33,23 @@ def run(spec, write=False):
 	return {"ok": True, "widgets": widgets, "states": list(umg.STATES), "log": log.getvalue()}
 
 
-def main():
-	args = [a for a in sys.argv[1:] if not a.startswith("--")]
-	out = run(args[0], write="--write" in sys.argv)
-	sys.stdout.reconfigure(encoding="utf-8")
-	sys.stdout.write(json.dumps(out, ensure_ascii=False))
+def main(argv=None):
+	"""<spec.py> [--write] [--out файл.json] — без --out результат пишется в stdout."""
+	argv = sys.argv[1:] if argv is None else argv
+	out_path, rest, it = None, [], iter(argv)
+	for a in it:
+		if a == "--out":
+			out_path = next(it)
+		elif not a.startswith("--"):
+			rest.append(a)
+	out = run(rest[0], write="--write" in argv)
+	text = json.dumps(out, ensure_ascii=False)
+	if out_path:
+		with open(out_path, "w", encoding="utf-8") as f:
+			f.write(text)
+	else:
+		sys.stdout.reconfigure(encoding="utf-8")
+		sys.stdout.write(text)
 
 
 if __name__ == "__main__":

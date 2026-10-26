@@ -1,0 +1,57 @@
+# Релиз UMG Studio: Actions → release → Run workflow (версия-тег, например v0.2.0).
+# Собирает UMGStudio.exe на Windows, прогоняет тесты и проверку сборки, публикует GitHub Release с архивами.
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Версия (станет тегом), например v0.2.0"
+        required: true
+        default: "v0.2.0"
+      prerelease:
+        description: "Пометить как пре-релиз"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Зависимости
+        run: python -m pip install --upgrade pip pyinstaller pywebview
+
+      - name: Тесты
+        run: python -m unittest discover -s tests -v
+
+      - name: Сборка
+        run: python tools/build_release.py ${{ inputs.version }}
+
+      - name: Проверка собранного exe
+        shell: pwsh
+        run: |
+          $exe = "build/dist/UMGStudio/UMGStudio.exe"
+          $p = Start-Process -FilePath $exe -ArgumentList "smoke", "$PWD/smoke.json" -Wait -PassThru -WorkingDirectory $env:TEMP
+          Get-Content smoke.json
+          if ($p.ExitCode -ne 0) { throw "smoke failed: $($p.ExitCode)" }
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: UMG Studio ${{ inputs.version }}
+          body_path: dist/RELEASE_NOTES.md
+          target_commitish: ${{ github.sha }}
+          prerelease: ${{ inputs.prerelease }}
+          files: |
+            dist/UMGStudio-${{ inputs.version }}-win64.zip
+            dist/UMGStudio-Plugin-${{ inputs.version }}-UE5.8.zip
