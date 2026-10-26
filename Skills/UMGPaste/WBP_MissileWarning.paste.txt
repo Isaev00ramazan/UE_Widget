@@ -1,0 +1,164 @@
+Begin Object Class=/Script/UMG.CanvasPanel Name="MWRoot" ExportPath="/Script/UMG.CanvasPanel'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.MWRoot'"
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.MWRoot.CanvasPanelSlot_0'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.MWRoot.CanvasPanelSlot_0'"
+      LayoutData=(Offsets=(Left=960.000000,Top=700.000000,Right=640.000000,Bottom=640.000000),Anchors=(Minimum=(X=0.000000,Y=0.000000),Maximum=(X=0.000000,Y=0.000000)),Alignment=(X=0.500000,Y=0.500000))
+      Parent="/Script/UMG.CanvasPanel'MWRoot'"
+      Content="/Script/UMG.SizeBox'RingRoot'"
+   End Object
+   Slots(0)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_0" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_0'"
+   WidgetName="MWRoot"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="RingRoot" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingRoot'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingRoot.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingRoot.SizeBoxSlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.SizeBox'RingRoot'"
+      Content="/Script/UMG.CanvasPanel'RingCanvas'"
+   End Object
+   WidthOverride=640.000000
+   HeightOverride=640.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.CanvasPanel Name="RingCanvas" ExportPath="/Script/UMG.CanvasPanel'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas'"
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_1" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_2" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_3" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_3'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_0'"
+      LayoutData=(Offsets=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),Anchors=(Minimum=(X=0.000000,Y=0.000000),Maximum=(X=1.000000,Y=1.000000)),Alignment=(X=0.000000,Y=0.000000))
+      Parent="/Script/UMG.CanvasPanel'RingCanvas'"
+      Content="/Script/UMG.Image'RingTrack'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_1" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_1'"
+      LayoutData=(Offsets=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),Anchors=(Minimum=(X=0.000000,Y=0.000000),Maximum=(X=1.000000,Y=1.000000)),Alignment=(X=0.000000,Y=0.000000))
+      Parent="/Script/UMG.CanvasPanel'RingCanvas'"
+      Content="/Script/UMG.Image'ArcTemplate'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_2" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_2'"
+      LayoutData=(Offsets=(Left=320.000000,Top=16.000000,Right=0.000000,Bottom=0.000000),Anchors=(Minimum=(X=0.000000,Y=0.000000),Maximum=(X=0.000000,Y=0.000000)),Alignment=(X=0.500000,Y=0.500000))
+      bAutoSize=True
+      Parent="/Script/UMG.CanvasPanel'RingCanvas'"
+      Content="/Script/UMG.TextBlock'LabelTemplate'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_3" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingCanvas.CanvasPanelSlot_3'"
+      LayoutData=(Offsets=(Left=0.000000,Top=510.000000,Right=0.000000,Bottom=0.000000),Anchors=(Minimum=(X=0.500000,Y=0.000000),Maximum=(X=0.500000,Y=0.000000)),Alignment=(X=0.500000,Y=0.000000))
+      bAutoSize=True
+      ZOrder=10
+      Parent="/Script/UMG.CanvasPanel'RingCanvas'"
+      Content="/Script/UMG.Overlay'BadgeBox'"
+   End Object
+   Slots(0)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_0'"
+   Slots(1)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_1'"
+   Slots(2)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_2'"
+   Slots(3)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_3'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="RingTrack" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.RingTrack'"
+   Brush=(ImageType=FullColor,ImageSize=(X=640.000000,Y=640.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_WarnRing.MI_WarnRing'")
+End Object
+Begin Object Class=/Script/UMG.Image Name="ArcTemplate" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.ArcTemplate'"
+   Brush=(ImageType=FullColor,ImageSize=(X=640.000000,Y=640.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_WarnArc.MI_WarnArc'")
+   bIsVariable=True
+   Visibility=Collapsed
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="LabelTemplate" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.LabelTemplate'"
+   Text=NSLOCTEXT("MissileWarning", "LabelTemplate", "2.1s")
+   ColorAndOpacity=(SpecifiedColor=(R=1.000000,G=0.084376,B=0.054480,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=15.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   Justification=Center
+   bIsVariable=True
+   Visibility=Collapsed
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="BadgeBox" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeBox'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeBox.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeBox.OverlaySlot_1'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeBox.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'BadgeBox'"
+      Content="/Script/UMG.Image'BadgeBg'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeBox.OverlaySlot_1'"
+      Padding=(Left=12.000000,Top=6.000000,Right=12.000000,Bottom=6.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'BadgeBox'"
+      Content="/Script/UMG.HorizontalBox'BadgeRow'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="BadgeBg" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeBg'"
+   Brush=(ImageType=FullColor,ImageSize=(X=140.000000,Y=30.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_Panel_Warn.MI_Panel_Warn'")
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="BadgeRow" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow.HorizontalBoxSlot_2'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow.HorizontalBoxSlot_0'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'BadgeRow'"
+      Content="/Script/UMG.Image'BadgeIcon'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow.HorizontalBoxSlot_1'"
+      Padding=(Left=8.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'BadgeRow'"
+      Content="/Script/UMG.TextBlock'BadgeText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeRow.HorizontalBoxSlot_2'"
+      Padding=(Left=8.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'BadgeRow'"
+      Content="/Script/UMG.TextBlock'BadgeCount'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_2'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="BadgeIcon" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeIcon'"
+   Brush=(TintColor=(SpecifiedColor=(R=0.913099,G=0.558340,B=0.147027,A=1.000000)),ImageType=FullColor,ImageSize=(X=16.000000,Y=16.000000),ResourceObject="/Script/Engine.Texture2D'/Game/UI/HUD/Textures/T_Ico_Warn.T_Ico_Warn'")
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="BadgeText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeText'"
+   Text=NSLOCTEXT("MissileWarning", "BadgeText", "Missile")
+   ColorAndOpacity=(SpecifiedColor=(R=0.913099,G=0.558340,B=0.147027,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="BadgeCount" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_MissileWarning.WBP_MissileWarning:WidgetTree.BadgeCount'"
+   Text=NSLOCTEXT("MissileWarning", "BadgeCount", "×2")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896269,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=15.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   Visibility=Collapsed
+End Object

@@ -1,0 +1,100 @@
+Begin Object Class=/Script/UMG.CanvasPanel Name="PBRoot" ExportPath="/Script/UMG.CanvasPanel'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.PBRoot'"
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.PBRoot.CanvasPanelSlot_0'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.PBRoot.CanvasPanelSlot_0'"
+      LayoutData=(Offsets=(Left=0.000000,Top=48.000000,Right=0.000000,Bottom=0.000000),Anchors=(Minimum=(X=0.500000,Y=0.000000),Maximum=(X=0.500000,Y=0.000000)),Alignment=(X=0.500000,Y=0.000000))
+      bAutoSize=True
+      Parent="/Script/UMG.CanvasPanel'PBRoot'"
+      Content="/Script/UMG.Overlay'Banner'"
+   End Object
+   Slots(0)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_0" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_0'"
+   WidgetName="PBRoot"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="Banner" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Banner'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Banner.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Banner.OverlaySlot_1'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Banner.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Banner'"
+      Content="/Script/UMG.Image'Plate'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Banner.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Banner'"
+      Content="/Script/UMG.SizeBox'RowBox'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="Plate" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Plate'"
+   Brush=(ImageType=FullColor,ImageSize=(X=300.000000,Y=52.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_Chevron.MI_Chevron'")
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="RowBox" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.RowBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.RowBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.RowBox.SizeBoxSlot_0'"
+      Padding=(Left=40.000000,Top=0.000000,Right=40.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.SizeBox'RowBox'"
+      Content="/Script/UMG.HorizontalBox'Row'"
+   End Object
+   HeightOverride=52.000000
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="Row" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row.HorizontalBoxSlot_2'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row.HorizontalBoxSlot_0'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/UMG.Image'Icon'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row.HorizontalBoxSlot_1'"
+      Padding=(Left=12.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/UMG.TextBlock'Title'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Row.HorizontalBoxSlot_2'"
+      Padding=(Left=12.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/UMG.TextBlock'Value'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_2'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="Icon" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Icon'"
+   Brush=(ImageType=FullColor,ImageSize=(X=26.000000,Y=26.000000),ResourceObject="/Script/Engine.Texture2D'/Game/UI/HUD/Textures/T_Ico_PickupShield.T_Ico_PickupShield'")
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="Title" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Title'"
+   Text=NSLOCTEXT("PickupBanner", "Title", "SHIELD")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896269,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="BoldItalic",Size=22.500000,LetterSpacing=40)
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="Value" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_PickupBanner.WBP_PickupBanner:WidgetTree.Value'"
+   Text=NSLOCTEXT("PickupBanner", "Value", "5 SEC")
+   ColorAndOpacity=(SpecifiedColor=(R=0.623960,G=0.896269,B=1.000000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=12.000000,LetterSpacing=80)
+   bIsVariable=True
+End Object

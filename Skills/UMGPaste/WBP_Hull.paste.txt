@@ -1,0 +1,190 @@
+Begin Object Class=/Script/UMG.SizeBox Name="SizeBox_31" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.SizeBox_31'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.SizeBox_31.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.SizeBox_31.SizeBoxSlot_0'"
+      HorizontalAlignment=HAlign_Left
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.SizeBox'SizeBox_31'"
+      Content="/Script/UMG.Overlay'Overlay_29'"
+   End Object
+   WidthOverride=344.000000
+   HeightOverride=70.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_1" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_1'"
+   WidgetName="SizeBox_31"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="Overlay_29" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29.OverlaySlot_2'"
+   End Object
+   Begin Object Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29.OverlaySlot_2'"
+      Padding=(Top=-26.000000,Right=18.000000)
+      HorizontalAlignment=HAlign_Right
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.Overlay'Overlay_29'"
+      Content="/Script/UMG.TextBlock'HullGainText'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Overlay_29'"
+      Content="/Script/UMG.Image'ImageBg'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Overlay_29.OverlaySlot_0'"
+      Padding=(Left=12.000000,Top=8.000000,Right=12.000000,Bottom=8.000000)
+      Parent="/Script/UMG.Overlay'Overlay_29'"
+      Content="/Script/UMG.VerticalBox'VerticalBox_1'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(2)="/Script/UMG.OverlaySlot'OverlaySlot_2'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="ImageBg" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.ImageBg'"
+   Brush=(ImageType=FullColor,ImageSize=(X=344.000000,Y=70.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_Panel_Hull.MI_Panel_Hull'")
+   DisplayLabel="Image Bg"
+End Object
+Begin Object Class=/Script/UMG.VerticalBox Name="VerticalBox_1" ExportPath="/Script/UMG.VerticalBox'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.VerticalBox_1'"
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.VerticalBox_1.VerticalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.VerticalBox_1.VerticalBoxSlot_1'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.VerticalBox_1.VerticalBoxSlot_0'"
+      Parent="/Script/UMG.VerticalBox'VerticalBox_1'"
+      Content="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.VerticalBox_1.VerticalBoxSlot_1'"
+      Padding=(Left=7.000000,Top=6.000000)
+      Parent="/Script/UMG.VerticalBox'VerticalBox_1'"
+      Content="/Script/UMG.Image'HullBar'"
+   End Object
+   Slots(0)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_0'"
+   Slots(1)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="HorizontalBox_0" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_4'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_3'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_5'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_0'"
+      Padding=(Left=4.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+      Content="/Script/UMG.Image'HullIcon'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_1'"
+      Padding=(Left=6.500000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+      Content="/Script/UMG.TextBlock'HULL'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_4'"
+      Padding=(Left=14.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+      Content="/Script/UMG.TextBlock'CritText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_2'"
+      Size=(SizeRule=Fill)
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+      Content="/Script/UMG.Spacer'Spacer_76'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_3'"
+      Padding=(Right=6.000000)
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+      Content="/Script/UMG.TextBlock'HullValue'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HorizontalBox_0.HorizontalBoxSlot_5'"
+      Padding=(Bottom=2.500000)
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_0'"
+      Content="/Script/UMG.TextBlock'HullMax'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_4'"
+   Slots(3)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_2'"
+   Slots(4)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_3'"
+   Slots(5)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_5'"
+   bOverride_Cursor=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="HullIcon" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HullIcon'"
+   Brush=(TintColor=(SpecifiedColor=(R=1.000000,G=0.084376,B=0.054480,A=1.000000)),ImageType=FullColor,ImageSize=(X=18.000000,Y=18.000000),ResourceObject="/Script/Engine.Texture2D'/Game/UI/HUD/Textures/T_Ico_Hull.T_Ico_Hull'")
+   DisplayLabel="HullIcon"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="HULL" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HULL'"
+   Text=NSLOCTEXT("[34029F29008413EF13F8050CD022D854]", "39DC8B4342D7CFCE47EAE980AFBB2E6E", "HULL")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=140)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+   DisplayLabel="HULL"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="CritText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.CritText'"
+   Text=NSLOCTEXT("[34029F29008413EF13F8050CD022D854]", "FBD3D7484E900F350CD4EDA7CDD94E35", "CRITICAL")
+   ColorAndOpacity=(SpecifiedColor=(R=1.000000,G=0.084400,B=0.054500,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+   Visibility=Collapsed
+   DisplayLabel="CritText"
+End Object
+Begin Object Class=/Script/UMG.Spacer Name="Spacer_76" ExportPath="/Script/UMG.Spacer'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.Spacer_76'"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="HullValue" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HullValue'"
+   Text=NSLOCTEXT("[34029F29008413EF13F8050CD022D854]", "074B8939434CED952ECE0F8229519A61", "15,000")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896270,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=21.000000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   DisplayLabel="HullValue"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="HullMax" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HullMax'"
+   Text=NSLOCTEXT("[34029F29008413EF13F8050CD022D854]", "44019C7C438F57F7ECA5E49677A34AE1", "/15,000")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=105)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   DisplayLabel="HullMax"
+End Object
+Begin Object Class=/Script/UMG.Image Name="HullBar" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HullBar'"
+   Brush=(ImageType=FullColor,ImageSize=(X=304.000000,Y=9.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_SegBar_Hull.MI_SegBar_Hull'")
+   DisplayLabel="HullBar"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="HullGainText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Hull.WBP_Hull:WidgetTree.HullGainText'"
+   Text=NSLOCTEXT("RestoreChips", "HullGainText", "+30")
+   ColorAndOpacity=(SpecifiedColor=(R=0.107023,G=1.000000,B=0.337164,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=15.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   Visibility=Collapsed
+   DisplayLabel="HullGainText"
+End Object

@@ -1,0 +1,273 @@
+Begin Object Class=/Script/UMG.SizeBox Name="SizeBox_31" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_31'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_1" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_31.SizeBoxSlot_1'"
+   End Object
+   Begin Object Name="SizeBoxSlot_1" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_31.SizeBoxSlot_1'"
+      HorizontalAlignment=HAlign_Right
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.SizeBox'SizeBox_31'"
+      Content="/Script/UMG.VerticalBox'VerticalBox_90'"
+   End Object
+   WidthOverride=430.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_0" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_0'"
+   WidgetName="SizeBox_31"
+End Object
+Begin Object Class=/Script/UMG.VerticalBox Name="VerticalBox_90" ExportPath="/Script/UMG.VerticalBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90'"
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_2" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90.VerticalBoxSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90.VerticalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_5" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90.VerticalBoxSlot_5'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_2" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90.VerticalBoxSlot_2'"
+      Padding=(Top=12.000000,Bottom=1.000000)
+      Parent="/Script/UMG.VerticalBox'VerticalBox_90'"
+      Content="/Script/UMG.HorizontalBox'HorizontalBox'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90.VerticalBoxSlot_0'"
+      Padding=(Right=5.000000,Bottom=-8.000000)
+      HorizontalAlignment=HAlign_Right
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.VerticalBox'VerticalBox_90'"
+      Content="/Script/UMG.HorizontalBox'HorizontalBox_38'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_5" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_90.VerticalBoxSlot_5'"
+      Size=(SizeRule=Fill)
+      Padding=(Right=-3.000000,Bottom=3.000000)
+      HorizontalAlignment=HAlign_Right
+      Parent="/Script/UMG.VerticalBox'VerticalBox_90'"
+      Content="/Script/UMG.SizeBox'SizeBox_1'"
+   End Object
+   Slots(0)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_0'"
+   Slots(1)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_5'"
+   Slots(2)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_2'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="HorizontalBox_38" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38.HorizontalBoxSlot_4'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38.HorizontalBoxSlot_3'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38.HorizontalBoxSlot_1'"
+      Padding=(Left=2.000000,Right=2.000000)
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_38'"
+      Content="/Script/UMG.TextBlock'SpeedPad'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38.HorizontalBoxSlot_4'"
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_38'"
+      Content="/Script/UMG.TextBlock'SpeedValue'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox_38.HorizontalBoxSlot_3'"
+      Padding=(Left=13.000000,Top=30.000000,Right=-3.000000)
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox_38'"
+      Content="/Script/UMG.VerticalBox'VerticalBox_0'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_4'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_3'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="SpeedPad" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SpeedPad'"
+   Text=NSLOCTEXT("[22FE04694B3E1A886205DBE77B631604]", "06E97D8649E0F9E30F4C6FA8C8429361", "0")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=0.550000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="BoldItalic",Size=86.250000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   DisplayLabel="SpeedPad"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="SpeedValue" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SpeedValue'"
+   Text=NSLOCTEXT("[22FE04694B3E1A886205DBE77B631604]", "03E98FEC4A749EFE25696E8BC92AF566", "87")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896270,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="BoldItalic",Size=86.250000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   DisplayLabel="SpeedValue"
+End Object
+Begin Object Class=/Script/UMG.VerticalBox Name="VerticalBox_0" ExportPath="/Script/UMG.VerticalBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_0'"
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_0.VerticalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_0.VerticalBoxSlot_0'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_0.VerticalBoxSlot_1'"
+      Padding=(Top=2.000000)
+      HorizontalAlignment=HAlign_Left
+      Parent="/Script/UMG.VerticalBox'VerticalBox_0'"
+      Content="/Script/UMG.TextBlock'BoostText'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.VerticalBox_0.VerticalBoxSlot_0'"
+      Parent="/Script/UMG.VerticalBox'VerticalBox_0'"
+      Content="/Script/UMG.TextBlock'UnitText'"
+   End Object
+   Slots(0)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_0'"
+   Slots(1)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="UnitText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.UnitText'"
+   Text=NSLOCTEXT("[22FE04694B3E1A886205DBE77B631604]", "C307499A426B3CE934DB458342D38398", "KM/H")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=12.000000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   DisplayLabel="UnitText"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="BoostText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.BoostText'"
+   Text=NSLOCTEXT("[22FE04694B3E1A886205DBE77B631604]", "F8AACF2A48FA99FA879E8AB773AA5060", "BOOST")
+   ColorAndOpacity=(SpecifiedColor=(R=0.063000,G=0.577600,B=1.000000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+   Visibility=Collapsed
+   DisplayLabel="BoostText"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="SizeBox_1" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_1'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_1.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_1.SizeBoxSlot_0'"
+      Padding=(Left=-18.000000,Top=-10.000000,Right=-10.000000,Bottom=-10.000000)
+      Parent="/Script/UMG.SizeBox'SizeBox_1'"
+      Content="/Script/UMG.Image'SpeedBar'"
+   End Object
+   WidthOverride=430.000000
+   HeightOverride=24.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="SpeedBar" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SpeedBar'"
+   Brush=(ImageType=FullColor,ImageSize=(X=430.000000,Y=24.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_SegBar_Speed.MI_SegBar_Speed'")
+   DisplayLabel="SpeedBar"
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="HorizontalBox" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_6" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_6'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_3'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_5'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_0'"
+      Padding=(Right=7.500000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox'"
+      Content="/Script/UMG.Image'NitroIcon'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_1'"
+      Padding=(Right=4.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox'"
+      Content="/Script/UMG.TextBlock'NitroLabel'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_6" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_6'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox'"
+      Content="/Script/UMG.SizeBox'SizeBox_2'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_3'"
+      Padding=(Left=11.000000,Bottom=-1.000000)
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox'"
+      Content="/Script/UMG.Overlay'NitroPctBox'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.HorizontalBox.HorizontalBoxSlot_5'"
+      Padding=(Left=3.000000,Right=2.000000)
+      HorizontalAlignment=HAlign_Right
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'HorizontalBox'"
+      Content="/Game/UI/HUD/Widgets/WBP_Key.WBP_Key_C'WBP_Key'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_6'"
+   Slots(3)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_3'"
+   Slots(4)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_5'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="NitroIcon" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroIcon'"
+   Brush=(TintColor=(SpecifiedColor=(R=0.063010,G=0.577581,B=1.000000,A=1.000000)),ImageType=FullColor,ImageSize=(X=24.000000,Y=24.000000),ResourceObject="/Script/Engine.Texture2D'/Game/UI/HUD/Textures/T_Ico_Nitro.T_Ico_Nitro'")
+   DisplayLabel="NitroIcon"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="NitroLabel" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroLabel'"
+   Text=NSLOCTEXT("[22FE04694B3E1A886205DBE77B631604]", "1FE6319B4FF840B17878D2817D08700B", "NITRO")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896270,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=12.000000,LetterSpacing=120)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   DisplayLabel="NitroLabel"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="SizeBox_2" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_2'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_2.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.SizeBox_2.SizeBoxSlot_0'"
+      Padding=(Left=-16.000000,Top=-14.000000,Right=-14.000000,Bottom=-14.000000)
+      Parent="/Script/UMG.SizeBox'SizeBox_2'"
+      Content="/Script/UMG.Image'NitroBar'"
+   End Object
+   WidthOverride=300.000000
+   HeightOverride=14.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="NitroBar" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroBar'"
+   Brush=(ImageType=FullColor,ImageSize=(X=300.000000,Y=14.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_SegBar_Nitro.MI_SegBar_Nitro'")
+   DisplayLabel="NitroBar"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="NitroPctBox" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroPctBox'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroPctBox.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroPctBox.OverlaySlot_1'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroPctBox.OverlaySlot_0'"
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.Overlay'NitroPctBox'"
+      Content="/Script/UMG.TextBlock'NitroPct'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroPctBox.OverlaySlot_1'"
+      Padding=(Top=-28.000000)
+      HorizontalAlignment=HAlign_Left
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.Overlay'NitroPctBox'"
+      Content="/Script/UMG.TextBlock'NitroGainText'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="NitroPct" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroPct'"
+   Text=NSLOCTEXT("[22FE04694B3E1A886205DBE77B631604]", "E63D3E594852DE67DFFFCD9028089782", "76%")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896270,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=16.500000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   DisplayLabel="NitroPct"
+End Object
+Begin Object Class=/Game/UI/HUD/Widgets/WBP_Key.WBP_Key_C Name="WBP_Key" ExportPath="/Game/UI/HUD/Widgets/WBP_Key.WBP_Key_C'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.WBP_Key'"
+   InputAction="/Script/EnhancedInput.InputAction'/Game/Isaev_R/DemoLevelShip/Player/Blueprints/Inputs/IA_Nitro.IA_Nitro'"
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="NitroGainText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Drive.WBP_Drive:WidgetTree.NitroGainText'"
+   Text=NSLOCTEXT("RestoreChips", "NitroGainText", "+50")
+   ColorAndOpacity=(SpecifiedColor=(R=0.063010,G=0.577580,B=1.000000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=15.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+   Visibility=Collapsed
+   DisplayLabel="NitroGainText"
+End Object
