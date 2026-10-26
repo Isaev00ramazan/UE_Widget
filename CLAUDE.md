@@ -12,7 +12,7 @@
 | `studio/umgstudio/runner.py`, `server.py`, `__main__.py`, `window.py` | запуск спецификаций, локальный сервер, окно |
 | `studio/umgstudio/config.py` | настройки проекта (`umgstudio.json`): папки на диске, пути Content (`umg.set_content`) |
 | `studio/umgstudio/specedit.py` | правки из панели свойств → `.py`: прямо в словарь `W(...)` или строкой `tweak(...)` |
-| `studio/umgstudio/agent.py` | ИИ в программе: Claude Code пользователя (`claude -p --output-format stream-json`), запрос через stdin |
+| `studio/umgstudio/agent.py` | ИИ в программе: Claude Code (`claude -p --output-format stream-json`) или Codex (`codex exec --json`) пользователя, запрос через stdin |
 | `studio/umgstudio/codegen.py` | спецификация `.py` из дерева UE (copy.txt) — round-trip без отличий |
 | `studio/umgstudio/web/` | интерфейс: `slate.js` (раскладка по правилам Slate), `materials.js` (двойники мастер-материалов), `props.js` + `uevalue.js` (правка свойств), `app.js` |
 | `design/<Имя>/` | снимок дизайн-системы Claude Design (токены, шрифты, компоненты) — источник вида и шрифтов |
@@ -21,7 +21,7 @@
 | `ue/export_hud_assets.py` | выгрузка MI, текстур, списка ассетов из редактора |
 | `Materials/*.hlsl` | код UI-мастеров (превью переводит в GLSL, `web/shaders.js`) |
 | `UI/*.cpp` | C++ UI проекта (справка: VM_*, базы виджетов) |
-| `tests/mock_ue.py`, `tests/fake_claude.py` | имитация плагина и Claude Code для тестов |
+| `tests/mock_ue.py`, `tests/fake_claude.py`, `tests/fake_codex.py` | имитация плагина, Claude Code и Codex для тестов |
 | `tools/make_icon.py` | значок программы из `assets/logo.png` (маленькие кадры — BMP, иначе Проводник не покажет) |
 | `Skills/` | присланные пользователем скиллы и файлы проекта — справка, не править |
 

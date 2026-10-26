@@ -148,7 +148,7 @@ class EditAndUndo(unittest.TestCase):
 		log = os.path.join(HERE, "fake_claude.log.json")
 		if os.path.exists(log):
 			os.remove(log)
-		self.st.agent.claude = os.path.join(HERE, "fake_claude.py")
+		self.st.agent.paths["claude"] = os.path.join(HERE, "fake_claude.py")
 		self.assertTrue(self.st.agent.status()["ok"])
 		q = queue.Queue()
 		self.st.clients.append(q)
@@ -186,8 +186,66 @@ class EditAndUndo(unittest.TestCase):
 		self.assertEqual(self.read(), before)
 		os.remove(log)
 
+	def test_agent_model_choice(self):
+		log = os.path.join(HERE, "fake_claude.log.json")
+		self.st.agent.paths["claude"] = os.path.join(HERE, "fake_claude.py")
+		q = queue.Queue()
+		self.st.clients.append(q)
+		self.st.agent.configure(engine="claude", model="opus")
+		self.st.agent_send("Раз", "0/wb_key.py", "WBP_Key")
+		self.wait_done(q)
+		self.st.agent.configure(model="sonnet")   # другая модель — новый диалог (без --resume)
+		self.st.agent_send("Два", "0/wb_key.py", "WBP_Key")
+		self.wait_done(q)
+		with open(log, encoding="utf-8") as f:
+			calls = [json.loads(x) for x in f]
+		os.remove(log)
+		self.assertEqual(calls[0]["argv"][calls[0]["argv"].index("--model") + 1], "opus")
+		self.assertEqual(calls[1]["argv"][calls[1]["argv"].index("--model") + 1], "sonnet")
+		self.assertNotIn("--resume", calls[1]["argv"])
+		choices = self.st.agent.status()["choices"]
+		self.assertIn({"engine": "codex", "model": None, "label": "Codex — по умолчанию"}, choices)
+
+	def test_agent_codex(self):
+		log = os.path.join(HERE, "fake_codex.log.json")
+		if os.path.exists(log):
+			os.remove(log)
+		self.st.agent.configure(engine="codex", paths={"codex": os.path.join(HERE, "fake_codex.py")})
+		st = self.st.agent.status()
+		self.assertTrue(st["ok"], st)
+		self.assertEqual(st["title"], "Codex")
+		q = queue.Queue()
+		self.st.clients.append(q)
+		before = self.read()
+		self.assertTrue(self.st.agent_send("Сделай текст прозрачнее", "0/wb_key.py", "WBP_Key")["ok"])
+		ev = self.wait_done(q)
+		done = ev[-1]
+		self.assertNotIn("error", done, ev)
+		self.assertEqual(done["files"], ["wb_key.py"])
+		self.assertIn("A=0.250000))'", self.read())
+		self.assertIn("Готово: альфа 0.25.", [e.get("text") for e in ev])
+		self.assertIn("Команда", [e.get("name") for e in ev])
+		self.st.agent_send("Ещё", "0/wb_key.py", "WBP_Key")
+		self.wait_done(q)
+		self.st.agent_send("СЛОМАЙ", "0/wb_key.py", "WBP_Key")
+		bad = self.wait_done(q)[-1]
+		with open(log, encoding="utf-8") as f:
+			calls = [json.loads(x) for x in f]
+		os.remove(log)
+		a0, a1 = calls[0]["argv"], calls[1]["argv"]
+		self.assertEqual(a0[:2], ["exec", "--json"])
+		self.assertIn("workspace-write", a0)
+		self.assertEqual(a0[-1], "-")
+		self.assertNotIn("resume", a0)
+		self.assertEqual(a1[a1.index("resume") + 1], "thr-7")
+		self.assertIn("apply_patch", calls[0]["prompt"])
+		self.assertIn("codex login", bad["error"])
+		while self.st.undo()["ok"]:
+			pass
+		self.assertEqual(self.read(), before)
+
 	def test_agent_error_is_reported(self):
-		self.st.agent.claude = os.path.join(HERE, "fake_claude.py")
+		self.st.agent.paths["claude"] = os.path.join(HERE, "fake_claude.py")
 		q = queue.Queue()
 		self.st.clients.append(q)
 		self.st.agent_send("СЛОМАЙ", "0/wb_key.py", "WBP_Key")
@@ -200,7 +258,7 @@ class EditAndUndo(unittest.TestCase):
 			os.remove(log)
 
 	def test_agent_missing(self):
-		self.st.agent.claude = os.path.join(self.tmp, "нет-такого-claude.exe")
+		self.st.agent.paths["claude"] = os.path.join(self.tmp, "нет-такого-claude.exe")
 		self.assertFalse(self.st.agent.status()["ok"])
 		self.assertFalse(self.st.agent_send("привет", "0/wb_key.py", "WBP_Key")["ok"])
 

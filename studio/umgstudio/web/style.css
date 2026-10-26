@@ -216,3 +216,13 @@ button.primary.mini { padding: 2px 8px; }
 .pe-group.pe-inline > .pe-sub > .pe-lab { flex: none; width: auto; }
 .props .pe-inline input.pe-num { width: 64px; }
 .pe-group .pe-group:not(.pe-inline) > .pe-sub > .pe-lab { flex-basis: 60px; }
+
+/* спецификация ↔ открытый UE */
+.ue-sync { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid var(--line);
+  background: rgba(245, 197, 107, .08); color: var(--combat); font-size: 12px; }
+.ue-sync span { flex: 1; min-width: 200px; }
+.ue-sync code { font: 11px var(--mono); color: var(--ink); }
+.panel-tabs .ai-model { flex: 1; min-width: 0; text-transform: none; letter-spacing: 0; font-size: 12px; padding: 2px 4px; }
+.panel-tabs span:first-child + .ai-model { margin-left: 2px; }
+.ai .panel-tabs > span { flex: none; }
+.ai-sep { font-size: 11px; color: var(--faint); text-align: center; border-top: 1px dashed var(--line); padding-top: 4px; }

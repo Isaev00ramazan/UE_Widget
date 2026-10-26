@@ -21,14 +21,17 @@
 	POST /api/build   {src}      — записать *.paste.txt спецификации (как `py <экран>.py`)
 	POST /api/edit {src, wbp, edits} — правки из панели свойств → в .py (specedit: прямо в W(...) или tweak(...))
 	POST /api/undo               — отменить последнюю правку (свойства или ИИ): вернуть файлы как были
-	GET  /api/agent/status       — Claude Code найден? журнал диалога; POST /api/agent/send {text, src, wbp, selected},
-								   /api/agent/stop, /api/agent/reset — ИИ (ответ идёт событиями SSE {"agent": …})
+	GET  /api/agent/status       — ИИ (Claude Code / Codex) найден? выбор моделей, журнал диалога;
+								   POST /api/agent/send {text, src, wbp, selected}, /api/agent/config {engine, model},
+								   /api/agent/stop, /api/agent/reset — ответ идёт событиями SSE {"agent": …}
 	POST /api/clipboard {text}   — положить текст в буфер обмена (запасной путь, если браузер не дал)
 	GET  /api/diff?src=&wbp=     — отличия <WBP>.copy.txt (из UE) от источника
 	GET  /api/ue/status          — мост в редакторе UE (плагин ue/UMGStudio) на связи?
 	POST /api/ue/push {src, wbp} — «В UE»: создать/обновить WBP из текста вставки, скомпилировать, сохранить
 	POST /api/ue/pull {src, wbp} — «Забрать из UE»: дерево WBP → <WBP>.copy.txt рядом со спецификацией
 	POST /api/ue/open {src, wbp} — открыть WBP в редакторе
+	POST /api/ue/compare {src, wbp} — забрать из UE и сравнить (при открытии спецификации — сам)
+	POST /api/ue/adopt {src, wbp}   — «Взять из UE»: значения свойств и слотов из UE → в .py
 """
 import ast
 import json
@@ -56,6 +59,19 @@ WEB = os.path.join(HERE, "web")
 STUDIO_ROOT = os.path.dirname(HERE)
 mimetypes.add_type("font/woff2", ".woff2")
 mimetypes.add_type("text/javascript", ".js")
+
+
+def write_if_changed(path, text):
+	"""Не трогать файл, если текст тот же: иначе слежение за файлами примет сверку с UE за правку и сверит снова."""
+	try:
+		with open(path, encoding="utf-8", newline="") as f:
+			if f.read() == text:
+				return False
+	except OSError:
+		pass
+	with open(path, "w", encoding="utf-8", newline="") as f:
+		f.write(text)
+	return True
 
 
 def wbp_of(filename):
@@ -258,8 +274,23 @@ class Studio:
 		st = cls(cfg["specs"], cfg["textures"], cfg["setup_hud"], cfg["assets"], cfg["design"], cfg["materials"],
 				 cfg["ue"], cfg["content"], cfg["work_dir"])
 		st.settings = cfg.get("settings")
-		st.agent.claude, st.agent.model = cfg.get("claude") or None, cfg.get("claude_model") or None
+		st.agent_config(cfg)
 		return st
+
+	def agent_config(self, cfg):
+		self.agent.configure(engine=cfg.get("ai_engine") or "claude",
+							 paths={"claude": cfg.get("claude"), "codex": cfg.get("codex")},
+							 models={"claude": cfg.get("claude_model"), "codex": cfg.get("codex_model")})
+
+	def agent_choose(self, engine, model):
+		"""Выбор ИИ в окне чата: движок и модель — сразу и в umgstudio.json."""
+		self.agent.configure(engine=engine, model=model or "")
+		s = dict(self.settings or config.load_settings())
+		s["ai_engine"] = self.agent.engine
+		s["%s_model" % self.agent.engine] = self.agent.model or None
+		config.save_settings({k: s.get(k) for k in config.KEYS})
+		self.settings = s
+		return self.agent.status()
 
 	def apply(self, settings):
 		"""Новые настройки без перезапуска: пути, папки, адрес моста; кэш превью сбрасывается."""
@@ -272,7 +303,7 @@ class Studio:
 			self.ue_url, self.content, self.work_dir = cfg["ue"], cfg["content"], os.path.abspath(cfg["work_dir"])
 			self.settings = settings
 			self.cache = {}
-		self.agent.claude, self.agent.model = cfg["claude"] or None, cfg["claude_model"] or None
+		self.agent_config(cfg)
 		self.broadcast({"version": self.version, "files": [], "reload": False, "settings": True})
 		return cfg
 
@@ -482,8 +513,7 @@ class Studio:
 		wbp = asset.rsplit("/", 1)[1]
 		d = self.ensure_work_dir()
 		copy_path = os.path.join(d, wbp + ".copy.txt")
-		with open(copy_path, "w", encoding="utf-8", newline="") as f:
-			f.write(r["text"])
+		write_if_changed(copy_path, r["text"])
 		missing = [n["name"] for root in t3d.parse(r["text"]) for n, _ in t3d.walk(root) if n.get("missing")]
 		if missing:
 			return {"ok": False, "error": "UE отдал неполное дерево (нет %s) — обнови плагин: ue\\install_plugin.bat и пересборка" % ", ".join(missing[:5])}
@@ -546,8 +576,7 @@ class Studio:
 			return r
 		folder = os.path.dirname(self.path_of(src))
 		path = os.path.join(folder, wbp + ".copy.txt")
-		with open(path, "w", encoding="utf-8", newline="") as f:
-			f.write(r["text"])
+		write_if_changed(path, r["text"])
 		return {"ok": True, "path": path, "asset": asset}
 
 	def diff(self, src, wbp):
@@ -563,6 +592,47 @@ class Studio:
 			return {"ok": False, "error": "Пустое дерево"}
 		items = diff.diff(w["roots"][0], copy_roots[0])
 		return {"ok": True, "copy": os.path.basename(path), "items": items}
+
+	def ue_compare(self, src, wbp):
+		"""Забрать дерево из UE (copy.txt) и сравнить со спецификацией: {ok, items, adoptable, structural}."""
+		r = self.ue_pull(src, wbp)
+		if not r.get("ok"):
+			return r
+		d = self.diff(src, wbp)
+		if not d.get("ok"):
+			return d
+		items = d["items"]
+		adoptable = [i for i in items if i["kind"] in ("prop", "slot")]
+		d.update(adoptable=len(adoptable), structural=len(items) - len(adoptable))
+		return d
+
+	def ue_adopt(self, src, wbp):
+		"""«Взять из UE»: значения свойств и слотов из UE → в спецификацию (specedit). Новые/удалённые элементы, порядок
+		и классы так не переносятся — их даёт «Пересоздать .py из UE» или ИИ."""
+		d = self.ue_compare(src, wbp)
+		if not d.get("ok"):
+			return d
+		edits = {}
+		for i in d["items"]:
+			if i["kind"] not in ("prop", "slot"):
+				continue
+			e = edits.setdefault(i["name"], {"name": i["name"], "props": {}, "slot": {}})
+			if i["kind"] == "prop" and i["key"] == "bIsVariable":
+				e["var"] = i["ue"] == "True"
+			elif i["kind"] == "prop" and i["key"] == "Visibility" and "Collapsed" in (i["ue"], i["spec"]):
+				e["collapsed"] = i["ue"] == "Collapsed"
+				if i["ue"] not in (None, "Collapsed"):
+					e["props"]["Visibility"] = i["ue"]
+			else:
+				e["props" if i["kind"] == "prop" else "slot"][i["key"]] = i["ue"]
+		if not edits:
+			return {"ok": True, "applied": 0, "structural": d["structural"]}
+		r = self.edit(src, wbp, list(edits.values()))
+		if not r.get("ok"):
+			return r
+		self.history[-1]["label"] = "взять из UE: " + ", ".join(sorted(edits))[:60]
+		return {"ok": True, "applied": d["adoptable"], "structural": d["structural"], "report": r["report"],
+				"tweaks": r["tweaks"], "undo": self.history[-1]["label"]}
 
 	def ue_open(self, src, wbp):
 		_, asset = self.widget(src, wbp)
@@ -732,8 +802,9 @@ def make_handler(studio):
 					r = studio.run_spec(path, write=True)
 					return self.send(200, {"ok": r.get("ok"), "error": r.get("error"),
 										   "written": [w["path"] for w in r.get("widgets", [])]})
-				if u.path in ("/api/ue/push", "/api/ue/pull", "/api/ue/open"):
-					fn = {"push": studio.ue_push, "pull": studio.ue_pull, "open": studio.ue_open}[u.path.rsplit("/", 1)[1]]
+				if u.path in ("/api/ue/push", "/api/ue/pull", "/api/ue/open", "/api/ue/compare", "/api/ue/adopt"):
+					fn = {"push": studio.ue_push, "pull": studio.ue_pull, "open": studio.ue_open, "compare": studio.ue_compare,
+						  "adopt": studio.ue_adopt}[u.path.rsplit("/", 1)[1]]
 					try:
 						return self.send(200, fn(body["src"], body["wbp"]))
 					except ValueError as e:
@@ -756,6 +827,8 @@ def make_handler(studio):
 				if u.path == "/api/agent/send":
 					return self.send(200, studio.agent_send(body.get("text", ""), body.get("src"), body.get("wbp"),
 															body.get("selected")))
+				if u.path == "/api/agent/config":
+					return self.send(200, studio.agent_choose(body.get("engine"), body.get("model")))
 				if u.path == "/api/agent/stop":
 					studio.agent.stop()
 					return self.send(200, {"ok": True})

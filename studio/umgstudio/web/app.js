@@ -82,6 +82,7 @@ async function selectSource(id, keep = false) {
   await render();
   updateEditBar();
   aiContext();
+  if (!keep || !$("ueSync").hidden) ueCheck();
 }
 
 function renderTabs() {
@@ -483,13 +484,39 @@ async function aiStatus() {
   AI.status = r;
   const st = $("aiStatus");
   st.className = "ai-status" + (r.ok ? "" : " bad");
-  st.textContent = r.ok ? `Claude Code ${r.version || ""}`.trim() : r.error;
+  st.textContent = r.ok ? (r.version || r.title) : r.error;
   st.title = r.path || "";
+  fillModels(r);
   $("bAiSend").disabled = !r.ok;
   if (!$("aiLog").childElementCount && r.log && r.log.length) r.log.forEach(aiItem);
   aiRunning(r.running);
   setUndo(!!r.undo, r.undo);
 }
+// выбор ИИ: Claude Code (по умолчанию / Opus / Sonnet / Haiku / своя) или Codex
+function modelKey(engine, model) { return engine + ":" + (model || ""); }
+function fillModels(r) {
+  const sel = $("aiModel");
+  const cur = modelKey(r.engine, r.model);
+  const groups = { claude: "Claude Code", codex: "Codex (OpenAI)" };
+  sel.innerHTML = Object.entries(groups).map(([e, title]) => `<optgroup label="${title}">` +
+    (r.choices || []).filter((c) => c.engine === e).map((c) => `<option value="${escapeHtml(modelKey(c.engine, c.model))}">${escapeHtml(c.label)}</option>`).join("") +
+    `<option value="${e}:*">${e === "codex" ? "Codex" : "Claude"} — своя модель…</option></optgroup>`).join("");
+  sel.value = cur;
+}
+$("aiModel").addEventListener("change", async () => {
+  let [engine, model] = $("aiModel").value.split(/:(.*)/s);
+  if (model === "*") {
+    model = (prompt(engine === "codex" ? "Модель Codex (как в `codex --model`):" : "Модель Claude (opus, sonnet, haiku или полное имя):") || "").trim();
+    if (!model) return aiStatus();
+  }
+  if (AI.running) { toast("ИИ ещё отвечает — смена модели после ответа", 3000); return aiStatus(); }
+  const r = await api("/api/agent/config", { engine, model });
+  const sep = document.createElement("div");
+  sep.className = "ai-sep";
+  sep.textContent = `Теперь отвечает ${(r.choices || []).find((c) => modelKey(c.engine, c.model) === modelKey(r.engine, r.model))?.label || r.title} — новый диалог`;
+  $("aiLog").appendChild(sep);
+  aiStatus();
+});
 function aiContext() {
   const box = $("aiCtx");
   if (!box) return;
@@ -513,7 +540,7 @@ function mdLite(t) {
 function aiItem(it) {
   const log = $("aiLog");
   const div = document.createElement("div");
-  if (it.kind === "user") { div.className = "ai-msg me"; div.textContent = it.text; aiRunning(true); }
+  if (it.kind === "user") { div.className = "ai-msg me"; div.textContent = it.text; div.title = (it.engine || "") + (it.model ? " · " + it.model : ""); aiRunning(true); }
   else if (it.kind === "text") { div.className = "ai-msg"; div.innerHTML = mdLite(it.text); }
   else if (it.kind === "tool") { div.className = "ai-tool"; div.textContent = `${TOOL[it.name] || it.name} ${it.target || ""}`; }
   else if (it.kind === "done") {
@@ -580,6 +607,8 @@ async function ueStatus() {
   ueOnline = !!r.ok;
   $("ueBlock").hidden = !ueOnline;
   if (ueOnline && (!was || r.adopted)) loadUeList();
+  if (ueOnline && !was) ueCheck();
+  if (!ueOnline) $("ueSync").hidden = true;
   return r.ok;
 }
 
@@ -700,6 +729,7 @@ $("bPush").onclick = async () => {
   const head = r.ok ? `${w.wbp} ${r.created ? "создан" : "обновлён"} в UE: ${r.widgets} элементов, корень ${r.root}`
     : `${w.wbp}: ${r.error}`;
   toast(head + (r.backup ? " · копия в Saved/UMGStudio/Backups" : ""), 6000);
+  if (r.ok) $("ueSync").hidden = true;
   showMessages("UE: " + head, (r.messages || []).filter((m) => !m.startsWith("Инфо")));
 };
 $("bPull").onclick = async () => {
@@ -726,6 +756,67 @@ async function showDiff() {
   if (root) fit(stageSize());
 }
 $("bDiff").onclick = showDiff;
+
+// ─── спецификация ↔ открытый UE: при открытии экрана сверяем сами и предлагаем взять значения из UE ───
+function shortVal(v) {
+  if (v === null || v === undefined) return "—";
+  const m = /^-?\d+\.\d+$/.test(v) ? String(+parseFloat(v).toFixed(3)) : String(v);
+  return m.length > 36 ? m.slice(0, 34) + "…" : m;
+}
+// отличие составного значения UE — до поля: Font (…Size=10.5…) / (…Size=15…) → «KeyText.Font.Size 10.5 → 15»
+function fieldDiff(i) {
+  const out = [];
+  const walkDiff = (a, b, path) => {
+    const obj = (x) => x && typeof x === "object" && !Array.isArray(x) && !("$text" in x);
+    if (obj(a) && obj(b)) {
+      for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) walkDiff(a[k], b[k], path + "." + k);
+    } else if (JSON.stringify(a) !== JSON.stringify(b)) {
+      const show = (x) => (x === undefined ? null : x && typeof x === "object" ? ("$text" in x ? x.$text : JSON.stringify(x)) : String(x));
+      out.push([path, show(a), show(b)]);
+    }
+  };
+  if (i.spec != null && i.ue != null) walkDiff(valueOf(i.spec), valueOf(i.ue), `${i.name}.${i.key}`);
+  return out.length ? out : [[`${i.name}.${i.key}`, i.spec, i.ue]];
+}
+let ueCheckSeq = 0;
+async function ueCheck() {
+  const bar = $("ueSync");
+  const src = S.sources.find((x) => x.id === S.src);
+  const w = currentWidget();
+  const seq = ++ueCheckSeq;
+  if (!ueOnline || !src || src.kind !== "spec" || !w || w.fragment) { bar.hidden = true; return; }
+  const r = await api("/api/ue/compare", { src: S.src, wbp: w.wbp });
+  if (seq !== ueCheckSeq) return;
+  // нет в UE (новый виджет) или нет связи — молчим
+  if (!r.ok || !r.items.length) { bar.hidden = true; return; }
+  const vals = r.items.filter((i) => i.kind === "prop" || i.kind === "slot").flatMap(fieldDiff).slice(0, 3)
+    .map(([path, a, b]) => `<code>${escapeHtml(path)}</code> ${escapeHtml(shortVal(a))} → ${escapeHtml(shortVal(b))}`);
+  bar.innerHTML = `<span>⚠ В UE ${escapeHtml(w.wbp)} отличается от .py (${r.items.length}): ${vals.join(", ")}${r.items.length > vals.length ? ", …" : ""}</span>`;
+  const btn = (label, title, fn, primary) => {
+    const b = document.createElement("button");
+    b.className = "mini" + (primary ? " primary" : ""); b.textContent = label; b.title = title; b.onclick = fn;
+    bar.appendChild(b);
+  };
+  btn("Показать", "Таблица отличий", showDiff);
+  if (r.adoptable) btn("Взять из UE в .py", "Значения свойств и слотов из UE записать в спецификацию", adoptFromUe, true);
+  if (r.structural && src.generated) btn("Пересоздать .py из UE", "В UE добавлены/удалены/переставлены элементы — собрать .py заново (старый → .py.bak)", () => $("bRegen").click());
+  else if (r.structural) btn("Попросить ИИ", "Перенести в спецификацию новые/удалённые/переставленные элементы", () => { aiToggle(true); aiSend("Перенеси в спецификацию отличия из UE (файл <WBP>.copy.txt рядом — это дерево из редактора, оно правда): новые, удалённые и переставленные элементы и их свойства."); });
+  btn("✕", "Скрыть (в .py останется как есть; «В UE ▶» перезапишет UE по .py)", () => { bar.hidden = true; });
+  bar.hidden = false;
+}
+async function adoptFromUe() {
+  const w = currentWidget();
+  if (!w) return;
+  if (editCount() && !confirm("Несохранённые правки свойств пропадут. Взять значения из UE?")) return;
+  S.edits = {}; updateEditBar();
+  const r = await api("/api/ue/adopt", { src: S.src, wbp: w.wbp });
+  if (!r.ok) return toast(r.error, 7000);
+  $("ueSync").hidden = true;
+  setUndo(!!r.undo, r.undo);
+  toast(`Из UE в .py: ${r.applied} знач.` + (r.structural ? ` · ещё ${r.structural} отличий в составе дерева — «Пересоздать .py из UE» или ИИ` : ""), 6000);
+  if (!$("diffPane").hidden) setTimeout(showDiff, 800);
+}
+$("bAdopt").onclick = adoptFromUe;
 $("bDiffClose").onclick = () => { $("diffPane").hidden = true; if (root) fit(stageSize()); };
 
 $("bBuild").onclick = async () => {

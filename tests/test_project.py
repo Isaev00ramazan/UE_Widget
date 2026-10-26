@@ -104,6 +104,26 @@ class NewProject(unittest.TestCase):
 		self.assertEqual(push["received"]["parent"], "/Script/TestUE.KeyBase")
 		self.assertEqual(push["received"]["designSize"], [120.0, 40.0])
 
+	def test_compare_and_adopt_from_ue(self):
+		# спецификация забрана из UE, потом в UE поменяли значения — программа видит это и переносит в .py
+		self.st.adopt_project(self.proj)
+		r = self.st.ue_fetch("/Game/Test/WBP_Key")
+		self.assertEqual(self.st.ue_compare(r["src"], "WBP_Key")["items"], [])
+		text = mock_ue.STORE["/Game/Test/WBP_Key"]
+		text = text.replace("Size=10.500000", "Size=15.000000").replace("   bIsVariable=True\n", "", 1)
+		mock_ue.STORE["/Game/Test/WBP_Key"] = text
+		d = self.st.ue_compare(r["src"], "WBP_Key")
+		self.assertTrue(d["ok"], d)
+		self.assertGreaterEqual(d["adoptable"], 2)
+		self.assertEqual(d["structural"], 0)
+		a = self.st.ue_adopt(r["src"], "WBP_Key")
+		self.assertTrue(a["ok"], a)
+		self.assertEqual(self.st.ue_compare(r["src"], "WBP_Key")["items"], [])
+		with open(r["path"], encoding="utf-8") as f:
+			self.assertIn("Size=15.000000", f.read())
+		self.assertTrue(self.st.undo()["ok"])
+		self.assertNotEqual(self.st.ue_compare(r["src"], "WBP_Key")["items"], [])
+
 	def test_texture_from_ue(self):
 		png = b"\x89PNG\r\n\x1a\nfake"
 		mock_ue.TEXTURES["/Game/Art/T_Mage"] = png

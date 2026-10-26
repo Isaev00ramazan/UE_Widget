@@ -14,8 +14,9 @@
 	design            снимок дизайн-системы Claude Design
 	ue                адрес моста в редакторе (плагин UMG Studio Bridge)
 	window            auto | webview | edge | browser
-	claude            путь к Claude Code (claude.exe / claude.cmd) для ИИ в программе; пусто — найти самому
-	claude_model      модель для ИИ (sonnet, opus…); пусто — как в Claude Code
+	ai_engine         ИИ в программе: claude (Claude Code) | codex (OpenAI Codex CLI) — выбирается и в окне чата
+	claude, codex     пути к CLI (claude.exe / claude.cmd, codex.cmd); пусто — найти самому
+	claude_model      модель Claude (opus, sonnet, haiku…), codex_model — модель Codex; пусто — как в самом CLI
 """
 import json
 import os
@@ -31,7 +32,8 @@ CONTENT_DEFAULTS = {
 	"textures_content": "/Game/UI/HUD/Textures",
 }
 KEYS = ("project", "specs", "widgets", "font", "materials_content", "textures_content", "materials", "setup_hud",
-		"assets", "textures", "design", "ue", "window", "port", "claude", "claude_model")
+		"assets", "textures", "design", "ue", "window", "port", "claude", "claude_model", "codex",
+		"codex_model", "ai_engine")
 LISTS = ("specs", "textures")
 
 
@@ -105,6 +107,9 @@ def resolve(s):
 	cfg["port"] = int(s.get("port") or 8765)
 	cfg["claude"] = s.get("claude") or ""
 	cfg["claude_model"] = s.get("claude_model") or ""
+	cfg["codex"] = s.get("codex") or ""
+	cfg["codex_model"] = s.get("codex_model") or ""
+	cfg["ai_engine"] = s.get("ai_engine") or "claude"
 	cfg["project"] = proj
 	cfg["content"] = {k: (s.get(k) or v).rstrip("/") for k, v in CONTENT_DEFAULTS.items()}
 	return cfg

@@ -13,7 +13,7 @@
   <div class="crumbs"><span id="srcTitle">—</span><nav id="wbpTabs" class="tabs" aria-label="Виджеты источника"></nav></div>
   <div class="actions">
     <button id="bUndo" title="Отменить последнюю правку (свойства или ИИ) — файлы вернутся как были" hidden>↶ Отменить</button>
-    <button id="bAi" aria-pressed="false" title="ИИ (Claude Code на этом компьютере): опиши, что поменять — он правит .py, превью обновится">✦ ИИ</button>
+    <button id="bAi" aria-pressed="false" title="ИИ (Claude Code или Codex на этом компьютере): опиши, что поменять — он правит .py, превью обновится">✦ ИИ</button>
     <button id="bSettings" title="Проект: папка проекта UE, где хранить спецификации, пути виджетов/шрифта/материалов в Content">⚙ Проект</button>
     <span id="ueStatus" class="ue-status" title="Мост в редакторе UE (плагин UMG Studio Bridge)">UE: …</span>
     <button id="bPush" class="primary" title="Создать/обновить WBP в открытом редакторе UE: дерево, Is Variable, размер превью, родитель; компиляция и сохранение (резервная копия — Saved/UMGStudio/Backups)">В UE ▶</button>
@@ -83,6 +83,7 @@
       </label>
       <span id="dims" class="dims"></span>
     </div>
+    <div id="ueSync" class="ue-sync" role="status" hidden></div>
     <div id="viewport" class="viewport bg-scene">
       <div id="stageWrap" class="stage-wrap"><div id="stage" class="stage"></div><iframe id="designOver" class="design-over" title="Макет поверх превью" hidden></iframe></div>
       <pre id="error" class="error" hidden></pre>
@@ -92,7 +93,7 @@
       <div id="designReadme" class="design-readme"></div>
     </div>
     <div id="diffPane" class="diff-pane" hidden>
-      <div class="diff-head"><span id="diffTitle">Отличия</span><button id="bDiffClose" class="mini">Закрыть</button></div>
+      <div class="diff-head"><span id="diffTitle">Отличия</span><button id="bAdopt" class="mini primary" title="Значения свойств и слотов из UE записать в спецификацию .py">Взять из UE в .py</button><button id="bDiffClose" class="mini">Закрыть</button></div>
       <div id="diffBody" class="diff-body"></div>
     </div>
     <div id="states" class="states" hidden></div>
@@ -107,7 +108,7 @@
   </aside>
 
   <aside id="aiPanel" class="ai" hidden>
-    <div class="panel-tabs"><span>ИИ · Claude Code</span><button id="bAiNew" class="mini" title="Начать новый диалог (ИИ забудет предыдущие сообщения)">Новый</button><button id="bAiClose" class="mini" title="Скрыть">×</button></div>
+    <div class="panel-tabs"><span>ИИ</span><select id="aiModel" class="ai-model" title="Кто отвечает: Claude Code или Codex и модель (смена — новый диалог)" aria-label="ИИ и модель"></select><button id="bAiNew" class="mini" title="Начать новый диалог (ИИ забудет предыдущие сообщения)">Новый</button><button id="bAiClose" class="mini" title="Скрыть">×</button></div>
     <div id="aiStatus" class="ai-status">…</div>
     <div id="aiLog" class="ai-log" aria-live="polite"></div>
     <form id="aiForm" class="ai-form">
@@ -147,7 +148,11 @@
       <legend>Связь и окно</legend>
       <label>Мост в редакторе<input name="ue"></label>
       <label>Claude Code для ИИ (путь к claude.exe / claude.cmd; пусто — найти самому)<input name="claude" placeholder="claude"></label>
-      <label>Модель ИИ (sonnet, opus…; пусто — как в Claude Code)<input name="claude_model"></label>
+      <label>Модель Claude (opus, sonnet, haiku или полное имя; пусто — как в Claude Code)<input name="claude_model"></label>
+      <label>Codex для ИИ (путь к codex.cmd / codex.exe; пусто — найти самому)<input name="codex" placeholder="codex"></label>
+      <label>Модель Codex (пусто — как в Codex)<input name="codex_model"></label>
+      <label>ИИ по умолчанию
+        <select name="ai_engine"><option value="">Claude Code</option><option value="codex">Codex</option></select></label>
       <label>Окно программы
         <select name="window"><option value="">авто (окно → Edge → браузер)</option><option value="webview">окно (WebView2)</option><option value="edge">Edge отдельным окном</option><option value="browser">браузер</option></select></label>
     </fieldset>

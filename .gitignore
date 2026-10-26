@@ -4,3 +4,4 @@ umgstudio.json
 build/
 dist/
 tests/fake_claude.log.json
+tests/fake_codex.log.json
