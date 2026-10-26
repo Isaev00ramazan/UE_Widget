@@ -1,0 +1,35 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; background: var(--surface); }
+  svg { display: block; width: 960px; height: 288px; background: var(--surface); }
+  .combat { fill: var(--combat); } .hp { fill: var(--hp); } .race { fill: var(--race); }
+  .player { fill: var(--player); } .nitro { fill: var(--nitro); }
+  .seg { fill: var(--track); } .seg.lit { fill: var(--race); }
+  .name { font-family: var(--font-hud); font-weight: 700; font-style: italic; font-size: 92px; fill: var(--ink); }
+  .tag { font-family: var(--font-hud); font-weight: 600; font-size: 14px; letter-spacing: 0.12em; fill: var(--ink-muted); }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 960 288" role="img" aria-label="Racing HUD">
+  <!--
+    blocks: combat 184×128, hp 96×128, race 200×208 (bleeds off the right edge), player 72×72, nitro 208×72; gaps space-2 (8px)
+    arrangement: a modular grid of chamfered panels, corners cut by the cut token (12px), warm combat colours left, cool race colours right
+    pattern: the speed bar — 16 skewed segments (skew -20deg) ramping in height, 11 lit in race; chosen because the segmented, slanted bar is the signature of the HUD
+    steps: gap space-2, segment pitch 26px, cut 12px
+  -->
+  <polygon class="combat" points="508,32 680,32 680,148 668,160 496,160 496,44"/>
+  <polygon class="hp" points="700,32 784,32 784,148 772,160 688,160 688,44"/>
+  <polygon class="race" points="804,32 992,32 992,228 980,240 792,240 792,44"/>
+  <polygon class="player" points="508,168 568,168 568,228 556,240 496,240 496,180"/>
+  <polygon class="nitro" points="588,168 784,168 784,228 772,240 576,240 576,180"/>
+  <rect class="seg lit" x="500" y="264.0" width="20" height="8.0" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="526" y="262.8" width="20" height="9.2" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="552" y="261.6" width="20" height="10.4" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="578" y="260.4" width="20" height="11.6" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="604" y="259.2" width="20" height="12.8" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="630" y="258.0" width="20" height="14.0" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="656" y="256.8" width="20" height="15.2" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="682" y="255.6" width="20" height="16.4" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="708" y="254.4" width="20" height="17.6" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="734" y="253.2" width="20" height="18.8" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg lit" x="760" y="252.0" width="20" height="20.0" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg" x="786" y="250.8" width="20" height="21.2" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg" x="812" y="249.6" width="20" height="22.4" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg" x="838" y="248.4" width="20" height="23.6" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg" x="864" y="247.2" width="20" height="24.8" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/><rect class="seg" x="890" y="246.0" width="20" height="26.0" transform="skewX(-20)" style="transform-box:fill-box;transform-origin:50% 100%"/>
+  <text class="name" x="40" y="206">Racing HUD</text>
+  <text class="tag" x="42" y="238">RACE ON THE RIGHT · COMBAT ON THE LEFT</text>
+</svg>
+</body>
+</html>

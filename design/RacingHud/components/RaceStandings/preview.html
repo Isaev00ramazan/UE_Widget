@@ -1,0 +1,160 @@
+<!-- @dsCard group="Race" height=380 subtitle="Круги и топ-5, вставленные в радар" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{margin:0;background:var(--surface)}</style>
+</head>
+<body>
+<div class="hud pv-scene" style="background-position:right top"><div class="pv">
+  <div class="pv-case"><span class="pv-tag">Круг 2 из 3, игрок 3-й</span>
+    <div class="standings">
+      <div class="zone-race lb">
+        <div class="lb__head">
+          <div class="lap"><span class="t-label lap__label">Lap</span><span class="lap__value"><span class="t-num-md">2</span><span class="t-num-sm lap__total">/3</span></span></div>
+          <div class="lap__prog"><div class="pips"><i class="pip done"></i><i class="pip now" style="--lp:45%"></i><i class="pip"></i></div><span class="lap__left">1 lap left</span></div>
+        </div>
+        <div class="lb__rows">
+          <div class="lb__row"><span class="lb__pos">1</span><span class="t-name">Dmitry</span></div>
+          <div class="lb__row"><span class="lb__pos">2</span><span class="t-name">Denis</span></div>
+          <div class="lb__row lb__row--you"><span class="lb__pos">3</span><span class="t-name">You</span></div>
+          <div class="lb__row"><span class="lb__pos">4</span><span class="t-name">Egor</span></div>
+          <div class="lb__row"><span class="lb__pos">5</span><span class="t-name">Pavel</span></div>
+        </div>
+      </div>
+      <div class="radar">
+  <svg viewBox="0 0 320 320" role="img" aria-label="Radar">
+    <path class="rd-land" d="M0 0 H70 C40 60 90 110 60 170 C40 210 20 250 0 270 Z"/>
+    <path class="rd-land" d="M320 140 C280 150 250 200 270 240 C285 270 320 280 320 300 Z"/>
+    <path class="rd-land" d="M205 190 c18 -6 34 4 30 18 c-4 14 -26 16 -36 8 c-8 -7 -4 -22 6 -26z"/>
+    <path class="rd-track" id="trk" d="M120 360 C130 280 160 230 160 160 C160 100 215 85 225 40 C232 10 200 -20 180 -40"/>
+    <path class="rd-track-line" d="M120 360 C130 280 160 230 160 160 C160 100 215 85 225 40 C232 10 200 -20 180 -40"/>
+    <circle class="rd-ring" cx="160" cy="160" r="56"/>
+    <circle class="rd-ring" cx="160" cy="160" r="106"/>
+    <circle class="rd-ring" cx="160" cy="160" r="152"/>
+    <path class="rd-ring" d="M160 8 V312 M8 160 H312"/>
+    <g class="rd-ticks"></g>
+    <rect class="rd-pickup" x="-6" y="-6" width="12" height="12" transform="translate(186 116) rotate(45)"/>
+    <rect class="rd-pickup" x="-6" y="-6" width="12" height="12" transform="translate(116 236) rotate(45)"/>
+    <circle class="rd-rival" r="7" data-at="0.76"/>
+    <text class="rd-tag" data-tag="0.76" dx="13" dy="6">P1</text>
+    <circle class="rd-rival" r="7" data-at="0.66"/>
+    <circle class="rd-behind" r="6" data-at="0.36"/>
+    <circle class="rd-behind" r="6" data-at="0.14"/>
+    <path class="rd-you" d="M160 140 L174 174 L160 166 L146 174 Z"/>
+  </svg>
+  <div class="radar__sweep" aria-hidden="true"></div>
+</div>
+
+    </div>
+  </div>
+  <div class="pv-case"><span class="pv-tag">Финальный круг, игрок лидирует</span>
+    <div class="standings">
+      <div class="zone-race lb">
+        <div class="lb__head">
+          <div class="lap"><span class="t-label lap__label">Lap</span><span class="lap__value"><span class="t-num-md">3</span><span class="t-num-sm lap__total">/3</span></span></div>
+          <div class="lap__prog"><div class="pips"><i class="pip done"></i><i class="pip done"></i><i class="pip now" style="--lp:70%"></i></div><span class="lap__left final">Final lap</span></div>
+        </div>
+        <div class="lb__rows">
+          <div class="lb__row lb__row--you"><span class="lb__pos">1</span><span class="t-name">You</span></div>
+          <div class="lb__row"><span class="lb__pos">2</span><span class="t-name">Dmitry</span></div>
+          <div class="lb__row"><span class="lb__pos">3</span><span class="t-name">Denis</span></div>
+          <div class="lb__row"><span class="lb__pos">4</span><span class="t-name">Egor</span></div>
+          <div class="lb__row"><span class="lb__pos">5</span><span class="t-name">Ruslan</span></div>
+        </div>
+      </div>
+      <div class="radar">
+  <svg viewBox="0 0 320 320" role="img" aria-label="Radar">
+    <path class="rd-land" d="M0 0 H70 C40 60 90 110 60 170 C40 210 20 250 0 270 Z"/>
+    <path class="rd-land" d="M320 140 C280 150 250 200 270 240 C285 270 320 280 320 300 Z"/>
+    <path class="rd-land" d="M205 190 c18 -6 34 4 30 18 c-4 14 -26 16 -36 8 c-8 -7 -4 -22 6 -26z"/>
+    <path class="rd-track" id="trk" d="M120 360 C130 280 160 230 160 160 C160 100 215 85 225 40 C232 10 200 -20 180 -40"/>
+    <path class="rd-track-line" d="M120 360 C130 280 160 230 160 160 C160 100 215 85 225 40 C232 10 200 -20 180 -40"/>
+    <circle class="rd-ring" cx="160" cy="160" r="56"/>
+    <circle class="rd-ring" cx="160" cy="160" r="106"/>
+    <circle class="rd-ring" cx="160" cy="160" r="152"/>
+    <path class="rd-ring" d="M160 8 V312 M8 160 H312"/>
+    <g class="rd-ticks"></g>
+    <rect class="rd-pickup" x="-6" y="-6" width="12" height="12" transform="translate(186 116) rotate(45)"/>
+    <rect class="rd-pickup" x="-6" y="-6" width="12" height="12" transform="translate(116 236) rotate(45)"/>
+    <circle class="rd-rival" r="7" data-at="0.76"/>
+    <text class="rd-tag" data-tag="0.76" dx="13" dy="6">P1</text>
+    <circle class="rd-rival" r="7" data-at="0.66"/>
+    <circle class="rd-behind" r="6" data-at="0.36"/>
+    <circle class="rd-behind" r="6" data-at="0.14"/>
+    <path class="rd-you" d="M160 140 L174 174 L160 166 L146 174 Z"/>
+  </svg>
+  <div class="radar__sweep" aria-hidden="true"></div>
+</div>
+
+    </div>
+  </div>
+  <div class="pv-case"><span class="pv-tag">Игрок вне топ-5: его строка заменяет 5-ю</span>
+    <div class="standings">
+      <div class="zone-race lb">
+        <div class="lb__head">
+          <div class="lap"><span class="t-label lap__label">Lap</span><span class="lap__value"><span class="t-num-md">1</span><span class="t-num-sm lap__total">/3</span></span></div>
+          <div class="lap__prog"><div class="pips"><i class="pip now" style="--lp:60%"></i><i class="pip"></i><i class="pip"></i></div><span class="lap__left">2 laps left</span></div>
+        </div>
+        <div class="lb__rows">
+          <div class="lb__row"><span class="lb__pos">1</span><span class="t-name">Dmitry</span></div>
+          <div class="lb__row"><span class="lb__pos">2</span><span class="t-name">Denis</span></div>
+          <div class="lb__row"><span class="lb__pos">3</span><span class="t-name">Egor</span></div>
+          <div class="lb__row"><span class="lb__pos">4</span><span class="t-name">Pavel</span></div>
+          <div class="lb__row lb__row--you"><span class="lb__pos">7</span><span class="t-name">You</span></div>
+        </div>
+      </div>
+      <div class="radar">
+  <svg viewBox="0 0 320 320" role="img" aria-label="Radar">
+    <path class="rd-land" d="M0 0 H70 C40 60 90 110 60 170 C40 210 20 250 0 270 Z"/>
+    <path class="rd-land" d="M320 140 C280 150 250 200 270 240 C285 270 320 280 320 300 Z"/>
+    <path class="rd-land" d="M205 190 c18 -6 34 4 30 18 c-4 14 -26 16 -36 8 c-8 -7 -4 -22 6 -26z"/>
+    <path class="rd-track" id="trk" d="M120 360 C130 280 160 230 160 160 C160 100 215 85 225 40 C232 10 200 -20 180 -40"/>
+    <path class="rd-track-line" d="M120 360 C130 280 160 230 160 160 C160 100 215 85 225 40 C232 10 200 -20 180 -40"/>
+    <circle class="rd-ring" cx="160" cy="160" r="56"/>
+    <circle class="rd-ring" cx="160" cy="160" r="106"/>
+    <circle class="rd-ring" cx="160" cy="160" r="152"/>
+    <path class="rd-ring" d="M160 8 V312 M8 160 H312"/>
+    <g class="rd-ticks"></g>
+    <rect class="rd-pickup" x="-6" y="-6" width="12" height="12" transform="translate(186 116) rotate(45)"/>
+    <rect class="rd-pickup" x="-6" y="-6" width="12" height="12" transform="translate(116 236) rotate(45)"/>
+    <circle class="rd-rival" r="7" data-at="0.76"/>
+    <text class="rd-tag" data-tag="0.76" dx="13" dy="6">P1</text>
+    <circle class="rd-rival" r="7" data-at="0.66"/>
+    <circle class="rd-behind" r="6" data-at="0.36"/>
+    <circle class="rd-behind" r="6" data-at="0.14"/>
+    <path class="rd-you" d="M160 140 L174 174 L160 166 L146 174 Z"/>
+  </svg>
+  <div class="radar__sweep" aria-hidden="true"></div>
+</div>
+
+    </div>
+  </div>
+</div></div>
+<script>
+  (function () {
+    document.querySelectorAll('.radar svg').forEach(function (svg) {
+      var trk = svg.querySelector('#trk'), len = trk.getTotalLength();
+      svg.querySelectorAll('[data-at]').forEach(function (el) {
+        var p = trk.getPointAtLength(len * parseFloat(el.getAttribute('data-at')));
+        el.setAttribute('cx', p.x); el.setAttribute('cy', p.y);
+      });
+      svg.querySelectorAll('[data-tag]').forEach(function (el) {
+        var p = trk.getPointAtLength(len * parseFloat(el.getAttribute('data-tag')));
+        el.setAttribute('x', p.x); el.setAttribute('y', p.y);
+      });
+      var g = svg.querySelector('.rd-ticks'), ns = 'http://www.w3.org/2000/svg';
+      for (var a = 0; a < 360; a += 15) {
+        var r1 = a % 45 === 0 ? 144 : 150, rad = a * Math.PI / 180, l = document.createElementNS(ns, 'line');
+        l.setAttribute('class', 'rd-tick');
+        l.setAttribute('x1', 160 + r1 * Math.sin(rad)); l.setAttribute('y1', 160 - r1 * Math.cos(rad));
+        l.setAttribute('x2', 160 + 157 * Math.sin(rad)); l.setAttribute('y2', 160 - 157 * Math.cos(rad));
+        g.appendChild(l);
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!-- @dsCard group="Screen" width=1280 height=720 page subtitle="Экран результатов после финиша: место, таблица заезда, личная сводка, награды" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; background: var(--surface); }
+  #wrap { position: relative; width: 100%; overflow: hidden; }
+  #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="wrap">
+ <div id="stage" class="hud rs">
+  <div class="rs-bg pv-scene"></div><div class="rs-dim"></div>
+
+  <header class="rs-head">
+    <div class="rs-head__flag"><svg class="gi" viewBox="0 0 512 512" aria-hidden="true"><path fill="currentColor" d="m375.7 20.11l-15.6 3.53c5.5 24.18 10.9 48.4 16.4 72.61c-12.4-1.91-22.7-3.61-34-5.36l6.5 28.91c12.4 1.6 22.6 3.6 34 5.3l7.6 33.6c9.4 41.6 18.9 83.3 28.3 124.9c-12.4-1.9-22.6-3.7-34-5.4l6.5 28.8c12.3 2.1 22.7 3.4 34 5.4c13.6 59.8 27 119.7 40.6 179.5l15.6-3.7c-37.4-162.5-73.8-328.9-105.9-468.09M391.4 307c-12.9-1.9-23.9-3.4-33.7-4l7.4 32.9h.4c12.2 1.3 22.5 3.1 33.5 4.7zm-33.7-4l-6.7-29.5c-14.4-1.5-24.2-1.5-32.7.3l7 31.3c10.4-2.4 20.6-2.9 32.4-2.1m-32.4 2.1c-10.3 2.4-19.7 6.3-30.1 12l7.4 32.7c9.8-5.2 20.1-11.2 29.8-13.4zm-30.1 12l-6.6-29.5c-7.8 4.8-17.2 11.1-28.6 18.8l6.5 28.9c10.8-7.4 20.2-13.4 28.7-18.2m-28.7 18.2c-10.3 7-18.9 13-28.4 19.5l7.6 33.2c10-7.2 18.8-13.1 28.3-19.6zm-28.4 19.5l-6.5-28.9c-10.8 7.4-20.1 13.4-28.7 18.2l6.7 29.5c7.8-4.8 17.2-11.1 28.5-18.8m-28.5 18.8c-12.3 7.5-21.2 11.7-29.7 13.7l7 31.2c10.4-2.4 19.8-6.4 30.1-12.1zm-29.7 13.7l-7.1-31.2c-10.3 2.3-20.5 2.8-32.3 2.1l6.7 29.5c14.3 1.5 24.1 1.5 32.7-.4m-32.7.4c-9.1-.9-20.3-2.6-33.9-4.7l7.6 33.6s16 2.9 33.7 4zm-33.9-4.7l-6.5-28.8c-12.35-2-22.71-3.4-34.02-5.4l6.53 28.8c12.36 1.8 22.69 3.8 33.99 5.4m-6.5-28.8c12.9 1.9 23.9 3.4 33.7 4l-7.5-32.9c-9.1-1-20.2-2.6-33.8-4.7zm-7.6-33.6l-6.52-28.9c-12.39-1.8-22.66-3.7-34.02-5.3l6.52 28.8c12.35 2 22.71 3.4 34.02 5.4m-6.52-28.9c12.82 2 23.92 3.5 33.72 4.1l-7.5-32.9c-9.1-1-20.19-2.6-33.82-4.7zm-7.6-33.6l-6.52-28.9c-12.38-1.8-22.66-3.6-34.02-5.2l6.52 28.8c12.38 1.9 22.64 3.7 34.02 5.3m-6.52-28.9c12.89 2 23.94 3.5 33.74 4.1l-7.5-33c-9.07-.9-20.22-2.5-33.84-4.7zm-7.6-33.6l-6.52-28.8c-12.33-2.1-22.71-3.3-34.02-5.3l6.52 28.9c12.36 1.9 22.66 3.6 34.02 5.2m-6.52-28.8c12.89 2 23.93 3.5 33.72 4l-7.45-32.9c-11.72-2.1-24.9-3.3-33.87-4.7zm33.72 4l6.64 29.5c14.4 1.6 24.2 1.5 32.7-.4l-7-31.2c-10.4 2.4-20.6 2.9-32.34 2.1m32.24-2.1c10.4-2.3 19.8-6.3 30.2-12l-7.5-32.9c-12.3 7.5-21.2 11.7-29.7 13.7zm-7-31.2q-.15 0 0 0m37.2 19.2l6.6 29.5c7.8-4.8 17.2-11 28.6-18.8l-6.6-28.8c-10.7 7.3-20.1 13.4-28.6 18.1m28.6-18.1c10.3-7 18.9-13.1 28.5-19.4l-7.6-33.66c-10.4 7.05-19 13.01-28.5 19.56zm28.5-19.4l6.5 28.7c10.8-7.3 20.1-13.4 28.7-18.1l-6.7-29.5c-7.8 4.8-17.2 11.1-28.5 18.9m28.5-18.9c12.3-7.55 21.2-11.74 29.7-13.68l-7-31.2c-11.1 3-21.8 7.36-30.1 11.95zm29.7-13.68l7.1 31.28c10.3-2.4 20.5-2.9 32.3-2.2l-6.7-29.53c-14.3-1.51-24.1-1.48-32.7.45m32.7-.45c9.1.97 20.3 2.59 33.9 4.72l-7.6-33.59s-16.1-2.91-33.7-4.03zm6.7 29.53l7.4 32.8c9.2 1 20.3 2.6 33.9 4.8l-7.6-33.5c-12.9-2-23.9-3.5-33.7-4.1m41.3 37.6l6.5 28.8c12.4 1.9 22.7 3.7 34.1 5.3l-6.6-28.8c-12.4-1.9-22.7-3.7-34-5.3m6.5 28.8c-12.8-2-23.9-3.5-33.7-4l7.5 33c9.1.9 20.2 2.5 33.8 4.6zm7.6 33.6l6.6 28.9c12.4 2 22.7 3.4 34 5.3l-6.5-28.9c-12.4-1.8-22.7-3.7-34.1-5.3m6.6 28.9c-12.9-2-24-3.5-33.8-4l7.5 32.9c9.1.8 20.2 2.6 33.9 4.7zm-33.8-4l-6.6-29.5c-14.4-1.6-24.2-1.5-32.7.4l7 31.1c10.3-2.3 20.6-2.8 32.3-2m-32.3 2c-10.3 2.5-19.8 6.4-30.1 12l7.5 33c12.3-7.5 21.1-11.8 29.7-13.8zm-30.1 12l-6.7-29.5c-7.8 4.9-17.1 11-28.5 18.9l6.5 28.8c10.8-7.3 20.1-13.5 28.7-18.2m-28.7 18.2c-10.5 6.9-18.7 13.2-28.4 19.5l7.6 33.6c10.4-7 19-13 28.4-19.5zM224 292.2l-6.5-28.8c-10.8 7.3-20.1 13.4-28.7 18.2l6.7 29.5c7.8-4.8 17.1-11.1 28.5-18.9m-28.5 18.9c-12.3 7.5-21.2 11.7-29.7 13.6l7 31.4c10.3-2.4 19.8-6.4 30.1-12zm-29.7 13.6l-7.1-31.1c-10.3 2.3-20.5 2.8-32.2 2.1l6.5 29.5c14.4 1.5 24.2 1.5 32.8-.5m-7.1-31.1c10.3-2.4 19.8-6.2 30.1-11.9l-7.4-33.1c-12.3 7.7-21.2 11.9-29.8 13.7zm-7.1-31.3l-7-31.2c-10.3 2.4-20.5 3-32.2 2.2l6.6 29.5c14.3 1.5 24.1 1.5 32.6-.5m-7-31.2c10.3-2.3 19.7-6.3 30.1-12l-7.5-32.9c-12.3 7.6-21.1 11.9-29.7 13.7zm30.1-12l6.7 29.5c7.8-4.6 17.1-11 28.5-18.8l-6.5-28.8c-10.8 7.3-20.1 13.4-28.7 18.1m28.7-18c10.2-7.2 18.9-13 28.4-19.5l-7.6-33.7c-10.3 7.2-19 13.1-28.4 19.6zm28.4-19.5l6.5 28.8c10.8-7.3 20.1-13.4 28.7-18.1l-6.7-29.5c-7.8 4.7-17.1 11-28.5 18.8m28.5-18.9c12.3-7.6 21.2-11.8 29.7-13.6l-7-31.2c-10.3 2.2-19.8 6.1-30.1 11.8zm29.7-13.6l7.1 31.1c10.3-2.3 20.5-2.9 32.3-2.1l-6.7-29.5c-14.3-1.6-24.1-1.5-32.7.5m7.1 31.1c-10.3 2.4-19.8 6.4-30.1 12l7.4 32.9c12.3-7.5 21.2-11.8 29.8-13.6zm-58.8 30.1c-10.3 7.1-19 13-28.4 19.5l7.6 33.7c10.3-7.2 18.9-13 28.4-19.5z"/></svg><span class="t-title">Race complete</span><span class="rs-dot"></span><span class="t-title muted">Harbor Run · 3 laps</span></div>
+    <div class="rs-place">
+      <span class="rs-place__num">2</span><span class="rs-place__suf">nd</span>
+      <div class="rs-place__meta"><span class="t-title">Place</span><span class="rs-place__of">of 8</span><span class="rs-place__delta">▲ 1 on final lap</span></div>
+    </div>
+  </header>
+
+  <div class="rs-close"><span class="t-label">Race closes in</span><span class="t-num-md">0:24</span><div class="rs-close__bar"><i style="--p:40%"></i></div></div>
+
+  <section class="panel zone-race rs-table">
+    <div class="rs-row rs-row--head t-label"><span>Pos</span><span>Racer</span><span>Time</span><span>Gap</span><span>Best lap</span><span class="rs-kills"><svg class="gi" viewBox="0 0 512 512" aria-hidden="true"><path fill="currentColor" d="M247 32v23.21C143.25 59.8 59.798 143.25 55.21 247H32v18h23.21C59.8 368.75 143.25 452.202 247 456.79V480h18v-23.21C368.75 452.2 452.202 368.75 456.79 265H480v-18h-23.21C452.2 143.25 368.75 59.798 265 55.21V32zm0 41.223V128h18V73.223C359 77.76 434.24 153 438.777 247H384v18h54.777C434.24 359 359 434.24 265 438.777V384h-18v54.777C153 434.24 77.76 359 73.223 265H128v-18H73.223C77.76 153 153 77.76 247 73.223M247 224v23h-23v18h23v23h18v-23h23v-18h-23v-23z"/></svg></span><span class="rs-pts">Pts</span></div>
+    <div class="rs-row rs-row--p1"><span class="rs-pos">1</span><span class="rs-racer"><span class="t-name rs-name">Dmitry</span></span><span class="rs-time">4:10.552</span><span class="rs-gap rs-gap--lead">Leader</span><span class="rs-best">1:22.904</span><span class="rs-kills">2</span><span class="rs-pts">+25</span></div><div class="rs-row rs-row--you rs-row--p2"><span class="rs-pos">2</span><span class="rs-racer"><span class="t-name rs-name">Ramazan</span><span class="rs-tag rs-tag--you">You</span></span><span class="rs-time">4:12.386</span><span class="rs-gap">+1.834</span><span class="rs-best">1:22.871<span class="rs-tag rs-tag--pb">PB</span></span><span class="rs-kills">3</span><span class="rs-pts">+18</span></div><div class="rs-row rs-row--p3"><span class="rs-pos">3</span><span class="rs-racer"><span class="t-name rs-name">Denis</span></span><span class="rs-time">4:13.672</span><span class="rs-gap">+3.120</span><span class="rs-best">1:22.511<span class="rs-tag rs-tag--fl">Fastest</span></span><span class="rs-kills">1</span><span class="rs-pts">+15</span></div><div class="rs-row"><span class="rs-pos">4</span><span class="rs-racer"><span class="t-name rs-name">Egor</span></span><span class="rs-time">4:20.429</span><span class="rs-gap">+9.877</span><span class="rs-best">1:24.130</span><span class="rs-kills">4</span><span class="rs-pts">+12</span></div><div class="rs-row"><span class="rs-pos">5</span><span class="rs-racer"><span class="t-name rs-name">Pavel</span></span><span class="rs-time">4:25.954</span><span class="rs-gap">+15.402</span><span class="rs-best">1:25.066</span><span class="rs-kills">0</span><span class="rs-pts">+10</span></div><div class="rs-row rs-row--live"><span class="rs-pos">6</span><span class="rs-racer"><span class="t-name rs-name">Artem</span></span><span class="rs-live"><span class="t-label rs-live__st">On track</span><span class="rs-live__lap t-label">Lap 3/3</span><span class="rs-live__bar"><i style="--p:78%"></i></span></span><span class="rs-gap muted">—</span><span class="rs-best">1:25.870</span><span class="rs-kills">1</span><span class="rs-pts muted">—</span></div><div class="rs-row rs-row--live"><span class="rs-pos">7</span><span class="rs-racer"><span class="t-name rs-name">Maks</span></span><span class="rs-live"><span class="t-label rs-live__st">On track</span><span class="rs-live__lap t-label">Lap 3/3</span><span class="rs-live__bar"><i style="--p:41%"></i></span></span><span class="rs-gap muted">—</span><span class="rs-best">1:26.214</span><span class="rs-kills">2</span><span class="rs-pts muted">—</span></div><div class="rs-row rs-row--live"><span class="rs-pos">8</span><span class="rs-racer"><span class="t-name rs-name">Kirill</span></span><span class="rs-live"><span class="t-label rs-live__st">Wrecked · respawn</span><span class="rs-live__lap t-label">Lap 2/3</span><span class="rs-live__bar"><i style="--p:64%"></i></span></span><span class="rs-gap muted">—</span><span class="rs-best">1:28.402</span><span class="rs-kills">0</span><span class="rs-pts muted">—</span></div>
+  </section>
+
+  <aside class="rs-side">
+    <div class="panel zone-combat rs-card">
+      <div class="panel__head"><span class="t-title">Your race</span></div>
+      <div class="rs-stats">
+        <div class="rs-stat"><span class="t-label">Total time</span><span class="t-num-md">4:12.386</span></div>
+        <div class="rs-stat"><span class="t-label">Best lap</span><span class="t-num-md">1:22.871<span class="rs-tag rs-tag--pb">PB</span></span></div>
+        <div class="rs-stat"><span class="t-label">Top speed</span><span class="t-num-md">118<span class="t-label muted"> km/h</span></span></div>
+        <div class="rs-stat"><span class="t-label">Kills</span><span class="t-num-md">3</span></div>
+        <div class="rs-stat"><span class="t-label">Damage dealt</span><span class="t-num-md">8,450</span></div>
+        <div class="rs-stat"><span class="t-label">Wrecked</span><span class="t-num-md">1</span></div>
+      </div>
+    </div>
+    <div class="panel zone-race rs-card rs-rewards">
+      <div class="panel__head"><span class="t-title">Rewards</span></div>
+      <div class="rs-rew">
+        <div class="rs-rew__line"><span class="t-label">Finish · 2nd</span><span class="t-num-sm">+180</span></div>
+        <div class="rs-rew__line"><span class="t-label">Kills × 3</span><span class="t-num-sm">+45</span></div>
+        <div class="rs-rew__line"><span class="t-label">Personal best</span><span class="t-num-sm">+25</span></div>
+        <div class="rs-xp"><span class="t-label">Level 14</span><span class="rs-xp__val"><span class="t-num-md">+250</span><span class="t-label muted">XP</span></span></div>
+        <div class="rs-xp__bar"><i class="old" style="--p:52%"></i><i class="gain" style="--a:52%;--p:21%"></i></div>
+        <div class="rs-xp__foot t-label muted"><span>1,830 / 2,500</span><span>670 to level 15</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <footer class="rs-foot">
+    <span class="rs-act"><span class="key key--wide">Space</span><span class="t-label">Continue</span></span>
+    <span class="rs-act"><span class="key">R</span><span class="t-label">Vote rematch</span><span class="t-label muted">3/8</span></span>
+    <span class="rs-act"><span class="key">Tab</span><span class="t-label">Spectate</span></span>
+    <span class="rs-act rs-act--right"><span class="t-label muted">Next race</span><span class="t-label">Reef Loop</span><span class="t-num-sm">0:15</span></span>
+  </footer>
+ </div>
+</div>
+<script>
+  var wrap = document.getElementById('wrap'), stage = document.getElementById('stage');
+  function fit() { var s = wrap.clientWidth / 1920; stage.style.transform = 'scale(' + s + ')'; wrap.style.height = Math.round(1080 * s) + 'px'; }
+  window.addEventListener('resize', fit); fit();
+</script>
+</body>
+</html>

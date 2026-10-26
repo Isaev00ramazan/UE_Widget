@@ -1,0 +1,104 @@
+/* F_HUD (шрифты дизайна + кириллица Fira, как Composite Font в UE) — /fonts.css от сервера */
+@import url("/fonts.css");
+
+:root {
+  --bg: #071114; --panel: #0e2026; --panel-2: #0a171c; --line: rgba(190, 235, 235, 0.14);
+  --ink: #f3f6f2; --muted: #a8bec0; --faint: #6f8a8d; --race: #54e6c6; --combat: #f5c56b; --hp: #ff5242;
+  --ui: "Segoe UI", system-ui, -apple-system, sans-serif; --mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.4 var(--ui); }
+body { display: flex; flex-direction: column; overflow: hidden; }
+button, select, input { font: inherit; color: var(--ink); }
+button { background: var(--panel); border: 1px solid var(--line); padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+button:hover { border-color: var(--race); }
+button.primary { background: rgba(84, 230, 198, 0.14); border-color: var(--race); color: var(--race); font-weight: 600; }
+button.mini { padding: 2px 8px; font-size: 12px; }
+button:disabled { opacity: .4; cursor: default; }
+select, input[type=number] { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; }
+input[type=number] { width: 70px; }
+:focus-visible { outline: 2px solid var(--combat); outline-offset: 1px; }
+
+.top { display: flex; align-items: center; gap: 16px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+.brand { font: italic 600 20px/1 "F_HUD", var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.brand b { color: var(--race); font-weight: 700; }
+.crumbs { flex: 1; display: flex; align-items: center; gap: 12px; min-width: 0; }
+#srcTitle { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tabs button { padding: 3px 10px; font-size: 12px; }
+.tabs button[aria-pressed=true] { border-color: var(--race); color: var(--race); }
+.actions { display: flex; gap: 8px; }
+
+.main { flex: 1; display: grid; grid-template-columns: 230px minmax(0, 1fr) 340px; min-height: 0; }
+.side, .panel { background: var(--panel-2); border-right: 1px solid var(--line); overflow: auto; min-height: 0; }
+.panel { border-right: 0; border-left: 1px solid var(--line); display: grid; grid-template-rows: auto minmax(120px, 1fr) auto minmax(120px, 1fr); }
+.side-head, .panel-tabs { padding: 8px 12px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); display: flex; gap: 6px; align-items: center; }
+.panel-tabs span { flex: 1; }
+.sources .grp { padding: 10px 12px 4px; font-size: 11px; color: var(--faint); }
+.sources button { display: block; width: 100%; text-align: left; border: 0; border-radius: 0; background: none; padding: 5px 12px 5px 18px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sources button:hover { background: var(--panel); color: var(--ink); }
+.sources button[aria-current=true] { background: rgba(84, 230, 198, 0.12); color: var(--race); }
+
+.view { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 6px 12px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.toolbar label { display: flex; align-items: center; gap: 6px; }
+.toolbar .sep { flex: 1; }
+.dims { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+.viewport { flex: 1; position: relative; overflow: auto; min-height: 0; }
+.bg-dark { background: #0b1a1f; }
+.bg-checker { background: #222 repeating-conic-gradient(#2c2c2c 0 25%, #222 0 50%) 0 0 / 24px 24px; }
+.bg-scene { background: #0b1a1f; }
+.bg-scene .stage { background: #0d2a33 url("/design/assets/scene.jpg") center / cover; }
+.stage-wrap { position: relative; transform-origin: 0 0; margin: 0; }
+.stage { position: absolute; left: 0; top: 0; overflow: hidden; }
+.bg-dark .stage { background: #0b1a1f; }
+.safe { position: absolute; inset: 48px; border: 1px dashed rgba(245, 197, 107, .6); pointer-events: none; }
+.error { position: absolute; inset: 16px; margin: 0; padding: 14px; background: rgba(40, 6, 4, .94); border: 1px solid var(--hp); color: #ffb3aa; font: 12px/1.5 var(--mono); white-space: pre-wrap; overflow: auto; z-index: 5; }
+.states, .warnings { padding: 6px 12px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--muted); font-size: 12px; max-height: 120px; overflow: auto; }
+.warnings { color: var(--combat); flex-direction: column; align-items: flex-start; gap: 2px; }
+
+/* виджеты на сцене */
+.w { position: absolute; }
+.w .txt { position: absolute; left: 0; top: 0; right: 0; white-space: pre; }
+.w canvas.fill { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ph-mat { background: repeating-linear-gradient(135deg, rgba(84,230,198,.10) 0 6px, rgba(84,230,198,.03) 6px 12px); outline: 1px dashed rgba(84,230,198,.5); outline-offset: -1px; }
+.ph-tex { background: var(--tint); -webkit-mask: radial-gradient(circle at 50% 50%, #000 0 34%, transparent 35%), linear-gradient(#000 0 0) center / 70% 2px no-repeat; mask: radial-gradient(circle at 50% 50%, #000 0 34%, transparent 35%); }
+.ph-user { outline: 1px dashed var(--combat); background: rgba(245,197,107,.08); }
+.ph-label { position: absolute; left: 3px; top: 2px; font: 10px/1.2 var(--mono); color: rgba(220, 255, 245, .75); white-space: nowrap; pointer-events: none; text-shadow: 0 1px 1px #000; }
+.outline .w { outline: 1px solid rgba(84, 230, 198, .35); outline-offset: -1px; }
+.vars .w.is-var { outline: 1px solid rgba(245, 197, 107, .8); outline-offset: -1px; }
+.w.hl { outline: 2px solid #ff8c1a !important; outline-offset: -1px; z-index: 1; }
+.w.sel { outline: 2px solid var(--combat) !important; outline-offset: -1px; }
+
+/* дерево */
+.tree { overflow: auto; padding-bottom: 8px; font-size: 12px; }
+.row { display: flex; align-items: center; gap: 4px; padding: 1px 8px; cursor: pointer; white-space: nowrap; }
+.row:hover { background: var(--panel); }
+.row.sel { background: rgba(245, 197, 107, .14); }
+.row .cls { color: var(--faint); font-size: 11px; }
+.row .nm { color: var(--ink); }
+.row.collapsed .nm { color: var(--faint); text-decoration: line-through; }
+.row .var { color: var(--combat); }
+.row .eye { margin-left: auto; border: 0; background: none; padding: 0 4px; color: var(--faint); font-size: 12px; }
+.row .eye.on { color: var(--race); }
+.props { overflow: auto; padding: 4px 12px 12px; font-size: 12px; }
+.props h4 { margin: 10px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); font-weight: 600; }
+.props dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 2px 8px; margin: 0; }
+.props dt { color: var(--muted); }
+.props dd { margin: 0; font-family: var(--mono); font-size: 11px; word-break: break-word; }
+.sw { display: inline-block; width: 10px; height: 10px; border: 1px solid var(--line); vertical-align: -1px; margin-right: 4px; }
+.hint { color: var(--faint); }
+.toast { position: fixed; right: 16px; bottom: 16px; background: var(--panel); border: 1px solid var(--race); color: var(--ink); padding: 8px 14px; border-radius: 4px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 520px; }
+.toast.show { opacity: 1; }
+.chip { border: 1px solid var(--line); border-radius: 12px; padding: 2px 10px; background: var(--panel); cursor: pointer; }
+.chip[aria-pressed=true] { border-color: var(--race); color: var(--race); }
+
+/* макет из Claude Design */
+.design-over { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: transparent; }
+.design-over.diff { mix-blend-mode: difference; }
+.only-design .stage > * { visibility: hidden; }
+.design-pane { height: 42%; min-height: 200px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; border-top: 1px solid var(--line); }
+.design-pane iframe { width: 100%; height: 100%; border: 0; background: #0a171c; }
+.design-readme { overflow: auto; padding: 8px 12px; font-size: 12px; color: var(--muted); border-left: 1px solid var(--line); white-space: pre-wrap; }
+#rngDOp { width: 90px; }

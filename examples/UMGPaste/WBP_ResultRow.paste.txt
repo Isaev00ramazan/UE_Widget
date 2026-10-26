@@ -1,0 +1,417 @@
+Begin Object Class=/Script/UMG.SizeBox Name="RowRoot" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowRoot'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowRoot.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowRoot.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'RowRoot'"
+      Content="/Script/UMG.Overlay'RowOverlay'"
+   End Object
+   WidthOverride=1160.000000
+   HeightOverride=62.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_0" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_0'"
+   WidgetName="RowRoot"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="RowOverlay" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_3'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'RowOverlay'"
+      Content="/Script/UMG.Image'RowBg'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Left
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'RowOverlay'"
+      Content="/Script/UMG.Image'YouStripe'"
+   End Object
+   Begin Object Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_2'"
+      Padding=(Left=24.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      HorizontalAlignment=HAlign_Left
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.Overlay'RowOverlay'"
+      Content="/Script/UMG.Image'Divider'"
+   End Object
+   Begin Object Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowOverlay.OverlaySlot_3'"
+      Padding=(Left=24.000000,Top=0.000000,Right=28.000000,Bottom=0.000000)
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'RowOverlay'"
+      Content="/Script/UMG.HorizontalBox'RowCols'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Slots(2)="/Script/UMG.OverlaySlot'OverlaySlot_2'"
+   Slots(3)="/Script/UMG.OverlaySlot'OverlaySlot_3'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="RowBg" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowBg'"
+   Brush=(ImageType=FullColor,ImageSize=(X=1160.000000,Y=62.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_Gradient_YouRow.MI_Gradient_YouRow'")
+   bIsVariable=True
+   Visibility=Collapsed
+End Object
+Begin Object Class=/Script/UMG.Image Name="YouStripe" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.YouStripe'"
+   Brush=(TintColor=(SpecifiedColor=(R=1.000000,G=0.262251,B=0.010330,A=1.000000)),ImageType=FullColor,ImageSize=(X=3.000000,Y=62.000000))
+   bIsVariable=True
+   Visibility=Collapsed
+End Object
+Begin Object Class=/Script/UMG.Image Name="Divider" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.Divider'"
+   Brush=(TintColor=(SpecifiedColor=(R=0.514918,G=0.830770,B=0.830770,A=0.080000)),ImageType=FullColor,ImageSize=(X=1108.000000,Y=1.000000))
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="RowCols" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_3'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_4'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_5'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_0'"
+      Padding=(Left=-16.000000,Top=-16.000000,Right=-16.000000,Bottom=-16.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'RowCols'"
+      Content="/Script/UMG.RetainerBox'PosGlow'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_1'"
+      Size=(SizeRule=Fill)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'RowCols'"
+      Content="/Script/UMG.HorizontalBox'Racer'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_2'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'RowCols'"
+      Content="/Script/UMG.SizeBox'TimeCol'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_3'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'RowCols'"
+      Content="/Script/UMG.SizeBox'GapCol'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_4'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'RowCols'"
+      Content="/Script/UMG.SizeBox'BestCol'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.RowCols.HorizontalBoxSlot_5'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'RowCols'"
+      Content="/Script/UMG.SizeBox'KillsCol'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_2'"
+   Slots(3)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_3'"
+   Slots(4)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_4'"
+   Slots(5)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_5'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.RetainerBox Name="PosGlow" ExportPath="/Script/UMG.RetainerBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosGlow'"
+   Begin Object Class=/Script/UMG.PanelSlot Name="PanelSlot_0" ExportPath="/Script/UMG.PanelSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosGlow.PanelSlot_0'"
+   End Object
+   Begin Object Name="PanelSlot_0" ExportPath="/Script/UMG.PanelSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosGlow.PanelSlot_0'"
+      Parent="/Script/UMG.RetainerBox'PosGlow'"
+      Content="/Script/UMG.SizeBox'PosBox'"
+   End Object
+   bRetainRender=False
+   EffectMaterial="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_TextGlow_P1.MI_TextGlow_P1'"
+   TextureParameter="Texture"
+   Slots(0)="/Script/UMG.PanelSlot'PanelSlot_0'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="PosBox" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosBox.SizeBoxSlot_0'"
+      Padding=(Left=16.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      HorizontalAlignment=HAlign_Left
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.SizeBox'PosBox'"
+      Content="/Script/UMG.TextBlock'PosText'"
+   End Object
+   WidthOverride=104.000000
+   HeightOverride=94.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="PosText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.PosText'"
+   Text=NSLOCTEXT("RaceResults", "PosText", "1")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="BoldItalic",Size=22.500000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="Racer" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.Racer'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.Racer.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.Racer.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.Racer.HorizontalBoxSlot_0'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Racer'"
+      Content="/Script/UMG.TextBlock'NameText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.Racer.HorizontalBoxSlot_1'"
+      Padding=(Left=12.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Racer'"
+      Content="/Script/UMG.Border'YouTag'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="NameText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.NameText'"
+   Text=NSLOCTEXT("RaceResults", "NameText", "Dmitry")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896269,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="Medium",Size=16.500000,LetterSpacing=40)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.Border Name="YouTag" ExportPath="/Script/UMG.Border'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.YouTag'"
+   Begin Object Class=/Script/UMG.BorderSlot Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.YouTag.BorderSlot_0'"
+   End Object
+   Begin Object Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.YouTag.BorderSlot_0'"
+      Padding=(Left=6.000000,Top=4.000000,Right=6.000000,Bottom=3.000000)
+      Parent="/Script/UMG.Border'YouTag'"
+      Content="/Script/UMG.TextBlock'YouTagText'"
+   End Object
+   BrushColor=(R=1.000000,G=0.262251,B=0.010330,A=1.000000)
+   Padding=(Left=6.000000,Top=4.000000,Right=6.000000,Bottom=3.000000)
+   Slots(0)="/Script/UMG.BorderSlot'BorderSlot_0'"
+   bIsVariable=True
+   Visibility=Collapsed
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="YouTagText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.YouTagText'"
+   Text=NSLOCTEXT("RaceResults", "YouTagText", "You")
+   ColorAndOpacity=(SpecifiedColor=(R=0.002125,G=0.006995,B=0.009134,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="Bold",Size=9.000000,LetterSpacing=80)
+   TextTransformPolicy=ToUpper
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="TimeCol" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeCol'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeCol.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeCol.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'TimeCol'"
+      Content="/Script/UMG.Overlay'TimeOverlay'"
+   End Object
+   WidthOverride=210.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="TimeOverlay" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeOverlay'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeOverlay.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeOverlay.OverlaySlot_1'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeOverlay.OverlaySlot_0'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'TimeOverlay'"
+      Content="/Script/UMG.TextBlock'TimeText'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeOverlay.OverlaySlot_1'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'TimeOverlay'"
+      Content="/Script/UMG.VerticalBox'LiveBox'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="TimeText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.TimeText'"
+   Text=NSLOCTEXT("RaceResults", "TimeText", "4:10.552")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896269,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=18.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.VerticalBox Name="LiveBox" ExportPath="/Script/UMG.VerticalBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveBox'"
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveBox.VerticalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveBox.VerticalBoxSlot_1'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveBox.VerticalBoxSlot_0'"
+      Parent="/Script/UMG.VerticalBox'LiveBox'"
+      Content="/Script/UMG.HorizontalBox'LiveTop'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveBox.VerticalBoxSlot_1'"
+      Padding=(Left=0.000000,Top=7.000000,Right=0.000000,Bottom=0.000000)
+      Parent="/Script/UMG.VerticalBox'LiveBox'"
+      Content="/Script/UMG.Image'LiveBar'"
+   End Object
+   Slots(0)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_0'"
+   Slots(1)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_1'"
+   bIsVariable=True
+   Visibility=Collapsed
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="LiveTop" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveTop'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveTop.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveTop.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveTop.HorizontalBoxSlot_0'"
+      Parent="/Script/UMG.HorizontalBox'LiveTop'"
+      Content="/Script/UMG.TextBlock'LiveStatus'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveTop.HorizontalBoxSlot_1'"
+      Padding=(Left=10.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      Parent="/Script/UMG.HorizontalBox'LiveTop'"
+      Content="/Script/UMG.TextBlock'LiveLap'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="LiveStatus" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveStatus'"
+   Text=NSLOCTEXT("RaceResults", "LiveStatus", "On track")
+   ColorAndOpacity=(SpecifiedColor=(R=0.088656,G=0.791298,B=0.564712,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="LiveLap" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveLap'"
+   Text=NSLOCTEXT("RaceResults", "LiveLap", "Lap 3/3")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBold",Size=10.500000,LetterSpacing=80)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   TextTransformPolicy=ToUpper
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.Image Name="LiveBar" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.LiveBar'"
+   Brush=(ImageType=FullColor,ImageSize=(X=160.000000,Y=4.000000),ResourceObject="/Script/Engine.MaterialInstanceConstant'/Game/UI/HUD/Materials/MI_SegBar_Live.MI_SegBar_Live'")
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="GapCol" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.GapCol'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.GapCol.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.GapCol.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'GapCol'"
+      Content="/Script/UMG.TextBlock'GapText'"
+   End Object
+   WidthOverride=130.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="GapText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.GapText'"
+   Text=NSLOCTEXT("RaceResults", "GapText", "+1.834")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=15.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="BestCol" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestCol'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestCol.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestCol.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'BestCol'"
+      Content="/Script/UMG.HorizontalBox'BestBox'"
+   End Object
+   WidthOverride=220.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="BestBox" ExportPath="/Script/UMG.HorizontalBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestBox'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestBox.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestBox.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestBox.HorizontalBoxSlot_0'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'BestBox'"
+      Content="/Script/UMG.TextBlock'BestText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestBox.HorizontalBoxSlot_1'"
+      Padding=(Left=10.000000,Top=0.000000,Right=0.000000,Bottom=0.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'BestBox'"
+      Content="/Script/UMG.Border'FastestTag'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="BestText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.BestText'"
+   Text=NSLOCTEXT("RaceResults", "BestText", "1:22.904")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=15.000000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   bIsVariable=True
+End Object
+Begin Object Class=/Script/UMG.Border Name="FastestTag" ExportPath="/Script/UMG.Border'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.FastestTag'"
+   Begin Object Class=/Script/UMG.BorderSlot Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.FastestTag.BorderSlot_0'"
+   End Object
+   Begin Object Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.FastestTag.BorderSlot_0'"
+      Padding=(Left=6.000000,Top=4.000000,Right=6.000000,Bottom=3.000000)
+      Parent="/Script/UMG.Border'FastestTag'"
+      Content="/Script/UMG.TextBlock'FastestText'"
+   End Object
+   Background=(DrawAs=RoundedBox,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.088656,G=0.791298,B=0.564712,A=0.600000)),Width=1.000000,RoundingType=FixedRadius))
+   BrushColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000)
+   Padding=(Left=6.000000,Top=4.000000,Right=6.000000,Bottom=3.000000)
+   Slots(0)="/Script/UMG.BorderSlot'BorderSlot_0'"
+   bIsVariable=True
+   Visibility=Collapsed
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="FastestText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.FastestText'"
+   Text=NSLOCTEXT("RaceResults", "FastestText", "Fastest")
+   ColorAndOpacity=(SpecifiedColor=(R=0.088656,G=0.791298,B=0.564712,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="Bold",Size=9.000000,LetterSpacing=80)
+   TextTransformPolicy=ToUpper
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="KillsCol" ExportPath="/Script/UMG.SizeBox'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.KillsCol'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.KillsCol.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.KillsCol.SizeBoxSlot_0'"
+      HorizontalAlignment=HAlign_Center
+      Parent="/Script/UMG.SizeBox'KillsCol'"
+      Content="/Script/UMG.TextBlock'KillsText'"
+   End Object
+   WidthOverride=64.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="KillsText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_ResultRow.WBP_ResultRow:WidgetTree.KillsText'"
+   Text=NSLOCTEXT("RaceResults", "KillsText", "2")
+   ColorAndOpacity=(SpecifiedColor=(R=0.896269,G=0.921582,B=0.887923,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="SemiBoldItalic",Size=16.500000)
+   ShadowOffset=(X=0.000000,Y=1.000000)
+   ShadowColorAndOpacity=(R=0.000000,G=0.000000,B=0.000000,A=0.700000)
+   Justification=Center
+   bIsVariable=True
+End Object

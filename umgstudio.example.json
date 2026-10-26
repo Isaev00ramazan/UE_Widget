@@ -1,0 +1,8 @@
+{
+  "specs": ["D:/MadWater/SourceArt/UI/HUD/UMGPaste"],
+  "textures": ["D:/MadWater/Saved/UMGStudio/Textures"],
+  "assets": "D:/MadWater/Saved/UMGStudio/hud_assets.json",
+  "setup_hud": "D:/MadWater/Scripts/ue_setup_hud.py",
+  "design": "design/RacingHud",
+  "port": 8765
+}
