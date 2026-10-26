@@ -11,15 +11,16 @@ import sys
 if "--version" in sys.argv:
 	print("9.9.9 (Claude Code, подделка для тестов)")
 	sys.exit(0)
-prompt = sys.stdin.read()
+# как у настоящего Claude Code (Node.js): stdin и stdout — UTF-8 независимо от кодировки Windows
+prompt = sys.stdin.buffer.read().decode("utf-8")
 here = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(here, "fake_claude.log.json"), "a", encoding="utf-8") as f:
 	f.write(json.dumps({"argv": sys.argv[1:], "prompt": prompt, "cwd": os.getcwd()}, ensure_ascii=False) + "\n")
 
 
 def out(ev):
-	sys.stdout.write(json.dumps(ev, ensure_ascii=False) + "\n")
-	sys.stdout.flush()
+	sys.stdout.buffer.write((json.dumps(ev, ensure_ascii=False) + "\n").encode("utf-8"))
+	sys.stdout.buffer.flush()
 
 
 sid = "sess-1"
