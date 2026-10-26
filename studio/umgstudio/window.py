@@ -56,7 +56,8 @@ def _webview(url):
 			log("снята пометка «из интернета» с %d файлов" % n)
 	import webview  # noqa: импорт здесь — ошибка .NET ловится выше
 	webview.create_window("UMG Studio", url, width=1600, height=980, min_size=(1000, 640), background_color="#071114")
-	webview.start()
+	icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web", "favicon.png")
+	webview.start(icon=icon)  # на Windows значок окна берётся из exe; icon — для GTK/Qt
 
 
 def find_app_browser():

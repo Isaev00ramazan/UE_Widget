@@ -24,6 +24,8 @@ input[type=number] { width: 70px; }
 .top { display: flex; align-items: center; gap: 16px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
 .brand { font: italic 600 20px/1 "F_HUD", var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .brand b { color: var(--race); font-weight: 700; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand img { display: block; }
 .crumbs { flex: 1; display: flex; align-items: center; gap: 12px; min-width: 0; }
 #srcTitle { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tabs { display: flex; gap: 4px; flex-wrap: wrap; }

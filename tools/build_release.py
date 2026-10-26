@@ -26,7 +26,8 @@ def pyinstaller():
 		   "--specpath", BUILD, "--paths", os.path.join(ROOT, "studio"),
 		   "--add-data", os.path.join(pkg, "web") + sep + "umgstudio/web",
 		   "--add-data", os.path.join(pkg, "umg.py") + sep + "umgstudio",
-		   "--hidden-import", "umgstudio.runner"]
+		   "--hidden-import", "umgstudio.runner",
+		   "--icon", os.path.join(ROOT, "assets", "UMGStudio.ico")]
 	# стандартные модули, которые могут понадобиться спецификациям экранов
 	for mod in ("json", "math", "re", "collections", "itertools", "functools", "copy", "textwrap", "colorsys"):
 		cmd += ["--hidden-import", mod]
