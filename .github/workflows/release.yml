@@ -80,8 +80,11 @@ jobs:
           $psi.UseShellExecute = $false
           $p = [System.Diagnostics.Process]::Start($psi)
           if (-not $p.WaitForExit(240000)) { $p.Kill(); Get-Content "$env:LOCALAPPDATA\UMGStudio\log.txt" -ErrorAction SilentlyContinue; throw "window selftest hung" }
-          Get-Content selftest-window.json
-          if ($p.ExitCode -ne 0) { throw "window selftest failed: $($p.ExitCode)" }
+          if (Test-Path selftest-window.json) { Get-Content selftest-window.json }
+          if ($p.ExitCode -ne 0) {
+            Get-Content "$env:LOCALAPPDATA\UMGStudio\log.txt" -ErrorAction SilentlyContinue
+            throw "window selftest failed: $($p.ExitCode)"
+          }
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2

@@ -86,8 +86,10 @@ def _webview(url, ready, timeout):
 			os._exit(0)
 
 	threading.Thread(target=watchdog, daemon=True).start()
-	icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web", "favicon.png")
-	webview.start(icon=icon)  # на Windows значок окна берётся из exe; icon — для GTK/Qt
+	# WinForms принимает значок только .ico: PNG роняет процесс исключением .NET в потоке окна (v0.2.2)
+	icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web",
+						"favicon.ico" if sys.platform == "win32" else "favicon.png")
+	webview.start(icon=icon if os.path.isfile(icon) else None)
 	returned.set()
 	return ready.is_set()
 
