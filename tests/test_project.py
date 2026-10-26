@@ -104,6 +104,33 @@ class NewProject(unittest.TestCase):
 		self.assertEqual(push["received"]["parent"], "/Script/TestUE.KeyBase")
 		self.assertEqual(push["received"]["designSize"], [120.0, 40.0])
 
+	def test_texture_from_ue(self):
+		png = b"\x89PNG\r\n\x1a\nfake"
+		mock_ue.TEXTURES["/Game/Art/T_Mage"] = png
+		self.assertEqual(self.st.texture_bytes("T_Mage", "/Game/Art/T_Mage"), png)
+		self.assertIsNone(self.st.texture_bytes("T_None", "/Game/Art/T_None"))
+
+	def test_incomplete_tree_refused(self):
+		text = mock_ue.STORE["/Game/Test/WBP_Key"]
+		# как старый плагин: только корень, без объектов детей
+		mock_ue.STORE["/Game/Test/WBP_Root"] = text.split("Begin Object Class=/Script/UMG.Overlay")[0]
+		r = self.st.ue_fetch("/Game/Test/WBP_Root")
+		self.assertFalse(r["ok"])
+		self.assertIn("неполное дерево", r["error"])
+
+	def test_regenerate_keeps_backup(self):
+		self.st.adopt_project(self.proj)
+		r = self.st.ue_fetch("/Game/Test/WBP_Key")
+		with open(r["path"], "a", encoding="utf-8") as f:
+			f.write("# правка\n")
+		r2 = self.st.ue_fetch("/Game/Test/WBP_Key", regenerate=True)
+		self.assertTrue(r2["ok"] and r2["created"])
+		self.assertEqual(r2["path"], r["path"])
+		self.assertTrue(os.path.isfile(r["path"] + ".bak"))
+		with open(r["path"], encoding="utf-8") as f:
+			self.assertNotIn("# правка", f.read())
+		self.assertTrue(any(s["generated"] for s in self.st.sources() if s["kind"] == "spec"))
+
 	def test_fetch_bad_path(self):
 		self.assertFalse(self.st.ue_fetch("WBP_Key")["ok"])
 

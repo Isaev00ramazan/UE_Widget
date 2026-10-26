@@ -10,6 +10,7 @@ import re
 from . import t3d
 
 SKIP = {"bExpandedInDesigner", "DisplayLabel", "bIsVariable"}
+MARK = "спецификация, собранная UMG Studio из дерева в UE"
 
 
 def snake(wbp):
@@ -67,7 +68,7 @@ def spec_from_text(text, wbp, folder, parent=None, design=None, source=""):
 	if design:
 		extra += ", design=%r" % (tuple(design) if isinstance(design, list) else design,)
 	return '''"""
-%(wbp)s — спецификация, собранная UMG Studio из дерева в UE%(source)s.
+%(wbp)s — %(mark)s%(source)s.
 Правьте здесь и жмите «В UE ▶»: виджет в редакторе обновится по этому файлу.
 Свойства пока в формате UE (W(...)); их можно постепенно заменить фабриками umg.py: text(), image(), box()…
 """
@@ -81,4 +82,4 @@ from umg import *  # noqa: E402,F401,F403
 root = %(tree)s
 
 save(root, %(wbp)r, os.path.dirname(os.path.abspath(__file__)), folder=%(folder)r%(extra)s)
-''' % {"wbp": wbp, "source": (" (" + source + ")") if source else "", "tree": _node(root, 0), "folder": folder, "extra": extra}
+''' % {"mark": MARK, "wbp": wbp, "source": (" (" + source + ")") if source else "", "tree": _node(root, 0), "folder": folder, "extra": extra}

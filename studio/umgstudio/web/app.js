@@ -64,6 +64,7 @@ async function selectSource(id, keep = false) {
   $("srcTitle").textContent = src ? src.file : id;
   $("bBuild").disabled = !src || src.kind !== "spec";
   $("bMakeSpec").hidden = !src || src.kind === "spec";
+  $("bRegen").hidden = !src || !src.generated;
   $("diffPane").hidden = true;
   S.result = await api("/api/render?src=" + encodeURIComponent(id));
   if (keep && prefs.wbpName) {
@@ -90,12 +91,12 @@ function renderTabs() {
 // ─── подготовка: вложенные виджеты и текстуры ───
 function walk(n, fn) { fn(n); n.children.forEach((c) => walk(c, fn)); }
 async function prepare(root) {
-  const need = new Set(), tex = new Set();
+  const need = new Set(), tex = new Map();   // текстура: имя → пакет (/Game/…/T_X) — чтобы взять из открытого UE
   const scan = (r) => walk(r, (n) => {
     if (n.path && n.path.startsWith("/") && !n.path.startsWith("/Script/")) need.add(n.path);
     for (const k of ["Brush", "Background"]) {
       const a = n.props[k] && assetName(n.props[k].ResourceObject);
-      if (a && a.kind === "Texture2D") tex.add(a.name);
+      if (a && a.kind === "Texture2D") tex.set(a.name, a.path.split(".")[0]);
     }
   });
   scan(root);
@@ -110,11 +111,11 @@ async function prepare(root) {
       if (S.nested[nm]) scan(S.nested[nm]);
     }));
   }
-  await Promise.all([...tex].filter((t) => !(t in S.images)).map((t) => new Promise((res) => {
+  await Promise.all([...tex].filter(([t]) => !(t in S.images)).map(([t, asset]) => new Promise((res) => {
     const img = new Image();
     img.onload = () => { S.images[t] = img; res(); };
     img.onerror = () => { S.images[t] = null; res(); };
-    img.src = "/api/texture?name=" + encodeURIComponent(t);
+    img.src = `/api/texture?name=${encodeURIComponent(t)}&asset=${encodeURIComponent(asset)}`;
   })));
 }
 
@@ -142,6 +143,7 @@ async function render() {
   stage.style.width = size[0] + "px"; stage.style.height = size[1] + "px";
   engine.paint(root, stage);
   const safe = document.createElement("div"); safe.className = "safe"; safe.hidden = !$("cSafe").checked; stage.appendChild(safe);
+  walk(root, (n) => { if (n.missing) engine.warnings.push(`${n.name}: объекта нет в тексте — дерево неполное (старый плагин выгружал только корень: обнови плагин и «Пересоздать .py из UE»)`); });
   if (w.roots.length > 1) engine.warnings.push(`В тексте ${w.roots.length} корня — показан первый (${w.roots[0].name})`);
   $("dims").textContent = `${w.wbp} · ${Math.round(size[0])}×${Math.round(size[1])}`;
   fit(size);
@@ -401,6 +403,16 @@ $("ueFilter").addEventListener("input", renderUeList);
 $("bUeRefresh").onclick = loadUeList;
 $("bUeFetch").onclick = () => { const p = $("uePath").value.trim(); if (p) fetchFromUe(p); };
 $("uePath").addEventListener("keydown", (e) => { if (e.key === "Enter") $("bUeFetch").click(); });
+$("bRegen").onclick = async () => {
+  const w = currentWidget();
+  const asset = w && w.asset;
+  if (!asset) return toast("Не знаю путь виджета в UE", 4000);
+  if (!confirm(`Пересоздать ${S.sources.find((x) => x.id === S.src).file} из ${asset}? Старый файл сохранится как .py.bak`)) return;
+  const r = await api("/api/ue/fetch", { asset, regenerate: true });
+  if (!r.ok) return toast(r.error, 7000);
+  toast("Пересоздано из UE: " + r.path.split(/[\\/]/).pop(), 5000);
+  await openSource(r.src);
+};
 $("bMakeSpec").onclick = async () => {
   const r = await api("/api/spec-from-copy", { src: S.src });
   if (!r.ok) return toast(r.error, 6000);

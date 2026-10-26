@@ -3,6 +3,9 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "Engine/Blueprint.h"
+#include "Engine/Texture2D.h"
+#include "ImageCore.h"
+#include "ImageUtils.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/PanelWidget.h"
@@ -321,8 +324,12 @@ bool UMGStudio::ExportWidgetText(const FString& AssetPath, FString& OutText, FSt
 		OutError = FString::Printf(TEXT("%s: пустое дерево"), *AssetPath);
 		return false;
 	}
-	TArray<UWidget*> Roots{ BP->WidgetTree->RootWidget };
-	FWidgetBlueprintEditorUtils::ExportWidgetsToText(Roots, OutText);
+	// Все виджеты дерева, корень первым: ExportWidgetsToText сам детей не добавляет (это делает Ctrl+C в Designer)
+	TArray<UWidget*> All;
+	BP->WidgetTree->GetAllWidgets(All);
+	All.Remove(BP->WidgetTree->RootWidget);
+	All.Insert(BP->WidgetTree->RootWidget, 0);
+	FWidgetBlueprintEditorUtils::ExportWidgetsToText(All, OutText);
 	return true;
 }
 
@@ -377,6 +384,40 @@ TArray<UMGStudio::FWidgetAssetInfo> UMGStudio::ListWidgets()
 	}
 	Out.Sort([](const FWidgetAssetInfo& A, const FWidgetAssetInfo& B) { return A.Asset < B.Asset; });
 	return Out;
+}
+
+bool UMGStudio::ExportTexturePng(const FString& AssetPath, int32 MaxSize, TArray<uint8>& OutPng, FString& OutError)
+{
+	const FString ObjectPath = AssetPath.Contains(TEXT(".")) ? AssetPath : AssetPath + TEXT(".") + AssetNameOf(AssetPath);
+	UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath, nullptr, LOAD_NoWarn);
+	if (!Texture)
+	{
+		OutError = FString::Printf(TEXT("Нет текстуры %s"), *AssetPath);
+		return false;
+	}
+	// Исходник текстуры (как импортировали), не сжатые мипы: цвет совпадает с тем, что видно в Content Browser
+	FImage Image;
+	if (!Texture->Source.IsValid() || !Texture->Source.GetMipImage(Image, 0, 0, 0))
+	{
+		OutError = FString::Printf(TEXT("У %s нет исходника (текстура из cooked-пакета?)"), *AssetPath);
+		return false;
+	}
+	if (MaxSize > 0 && FMath::Max(Image.SizeX, Image.SizeY) > MaxSize)
+	{
+		const float K = float(MaxSize) / float(FMath::Max(Image.SizeX, Image.SizeY));
+		FImage Small;
+		Image.ResizeTo(Small, FMath::Max(1, FMath::RoundToInt(Image.SizeX * K)), FMath::Max(1, FMath::RoundToInt(Image.SizeY * K)),
+			ERawImageFormat::BGRA8, EGammaSpace::sRGB);
+		Image = MoveTemp(Small);
+	}
+	TArray64<uint8> Png;
+	if (!FImageUtils::CompressImage(Png, TEXT("png"), Image))
+	{
+		OutError = TEXT("Не удалось сжать PNG");
+		return false;
+	}
+	OutPng = TArray<uint8>(Png.GetData(), int32(Png.Num()));
+	return true;
 }
 
 bool UMGStudio::OpenWidgetEditor(const FString& AssetPath)

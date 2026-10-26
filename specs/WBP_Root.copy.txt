@@ -1,0 +1,22 @@
+Begin Object Class=/Script/UMG.Border Name="Border_46" ExportPath="/Script/UMG.Border'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Border_46'"
+   Begin Object Class=/Script/UMG.BorderSlot Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Border_46.BorderSlot_0'"
+   End Object
+   Begin Object Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Border_46.BorderSlot_0'"
+      Padding=(Left=5.000000,Right=5.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Border'Border_46'"
+      Content="/Script/UMG.Overlay'Overlay_0'"
+   End Object
+   HorizontalAlignment=HAlign_Center
+   VerticalAlignment=VAlign_Center
+   Padding=(Left=5.000000,Right=5.000000)
+   Background=(DrawAs=RoundedBox,ImageSize=(X=22.000000,Y=20.000000),OutlineSettings=(CornerRadii=(X=3.000000,Y=3.000000,Z=3.000000,W=3.000000),Color=(SpecifiedColor=(R=0.514918,G=0.830770,B=0.830770,A=0.200000)),Width=1.000000,RoundingType=FixedRadius))
+   BrushColor=(R=0.002400,G=0.008000,B=0.011000,A=0.860000)
+   Slots(0)="/Script/UMG.BorderSlot'BorderSlot_0'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_0" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_0'"
+   WidgetName="Border_46"
+End Object

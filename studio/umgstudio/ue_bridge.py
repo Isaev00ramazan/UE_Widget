@@ -26,6 +26,16 @@ def call(base, path, body=None, timeout=60):
 		return {"ok": False, "offline": True, "error": "Нет связи с редактором: %r" % e}
 
 
+def get_bytes(base, path, query, timeout=20):
+	"""GET с параметрами → тело ответа (bytes) или None (нет связи / 404)."""
+	from urllib.parse import urlencode
+	try:
+		with urllib.request.urlopen(base.rstrip("/") + path + "?" + urlencode(query), timeout=timeout) as r:
+			return r.read()
+	except (urllib.error.URLError, OSError, ValueError):
+		return None
+
+
 def asset_from_text(text):
 	"""Путь ассета из ExportPath текста буфера: …'/Game/UI/HUD/Widgets/WBP_X.WBP_X:WidgetTree.Root' → /Game/…/WBP_X"""
 	m = _EXPORT_PATH.search(text)

@@ -85,8 +85,15 @@ class Studio:
 				kind = "spec" if f.endswith(".py") else "copy" if f.endswith(".copy.txt") else \
 					"paste" if f.endswith(".paste.txt") else None
 				if kind and not f.startswith("__") and f != "umg.py":
-					out.append({"id": "%d/%s" % (i, f), "kind": kind, "file": f, "dir": d,
-								"wbp": None if kind == "spec" else wbp_of(f)})
+					item = {"id": "%d/%s" % (i, f), "kind": kind, "file": f, "dir": d,
+							"wbp": None if kind == "spec" else wbp_of(f)}
+					if kind == "spec":
+						try:
+							with open(os.path.join(d, f), encoding="utf-8", errors="replace") as fh:
+								item["generated"] = codegen.MARK in fh.read(400)
+						except OSError:
+							pass
+					out.append(item)
 		return out
 
 	def path_of(self, src):
@@ -196,6 +203,23 @@ class Studio:
 				if os.path.isfile(p):
 					return p
 		return None
+
+	def texture_bytes(self, name, asset=None):
+		"""PNG текстуры: из папок textures, иначе прямо из открытого UE (плагин /umgstudio/texture), с кэшем."""
+		p = self.texture(name)
+		if p:
+			with open(p, "rb") as f:
+				return f.read()
+		if not asset or not asset.startswith("/Game/"):
+			return None
+		key = ("tex", asset)
+		with self.lock:
+			if key in self.cache:
+				return self.cache[key]
+		data = ue_bridge.get_bytes(self.ue_url, "/umgstudio/texture", {"asset": asset, "max": 1024})
+		with self.lock:
+			self.cache[key] = data
+		return data
 
 	def materials(self):
 		"""{"masters": {M_UI_X: {параметр: значение}}, "instances": {MI_X: {"parent", "params"}}}"""
@@ -334,8 +358,9 @@ class Studio:
 			w["spec"] = self.src_id(spec) if spec else None
 		return r
 
-	def ue_fetch(self, asset):
-		"""Забрать WBP из UE по пути: copy.txt в рабочую папку + спецификация .py, если её ещё нет."""
+	def ue_fetch(self, asset, regenerate=False):
+		"""Забрать WBP из UE по пути: copy.txt в рабочую папку + спецификация .py, если её ещё нет.
+		regenerate — пересоздать .py из дерева UE (старый файл сохраняется как .py.bak)."""
 		asset = asset.strip().split(".")[0]
 		if not asset.startswith("/Game/"):
 			return {"ok": False, "error": "Путь ассета вида /Game/Папка/WBP_Имя (в Content Browser: ПКМ → Copy Reference)"}
@@ -347,8 +372,16 @@ class Studio:
 		copy_path = os.path.join(d, wbp + ".copy.txt")
 		with open(copy_path, "w", encoding="utf-8", newline="") as f:
 			f.write(r["text"])
+		missing = [n["name"] for root in t3d.parse(r["text"]) for n, _ in t3d.walk(root) if n.get("missing")]
+		if missing:
+			return {"ok": False, "error": "UE отдал неполное дерево (нет %s) — обнови плагин: ue\\install_plugin.bat и пересборка" % ", ".join(missing[:5])}
 		spec = self.spec_for(wbp)
-		created = False
+		created, old_spec = False, None
+		if spec and regenerate:
+			import shutil
+			shutil.copy2(spec, spec + ".bak")
+			os.remove(spec)
+			old_spec, spec = spec, None
 		if not spec:
 			design = None
 			mode, size = r.get("designSizeMode") or "", r.get("designSize") or [0, 0]
@@ -362,6 +395,9 @@ class Studio:
 			if parent and parent.endswith(".UserWidget"):
 				parent = None
 			spec = self.write_spec(r["text"], wbp, asset, parent=parent, design=design, source="забран из UE")
+			if old_spec and old_spec != spec:
+				os.replace(spec, old_spec)
+				spec = old_spec
 			created = True
 		with self.lock:
 			self.cache = {}
@@ -531,11 +567,10 @@ def make_handler(studio):
 					r = studio.find_wbp(q["name"]) or studio.find_wbp_ue(q.get("asset", ""))
 					return self.send(200 if r else 404, r or {"error": "нет такого виджета"})
 				if u.path == "/api/texture":
-					p = studio.texture(q["name"])
-					if not p:
+					data = studio.texture_bytes(q["name"], q.get("asset"))
+					if not data:
 						return self.send(404, {"error": "нет текстуры"})
-					with open(p, "rb") as f:
-						return self.send(200, f.read(), "image/png")
+					return self.send(200, data, "image/png")
 				if u.path == "/api/materials":
 					return self.send(200, studio.materials())
 				if u.path == "/api/design":
@@ -591,7 +626,7 @@ def make_handler(studio):
 				if u.path == "/api/settings":
 					return self.send(200, studio.save_settings(body.get("settings") or {}))
 				if u.path == "/api/ue/fetch":
-					return self.send(200, studio.ue_fetch(body.get("asset", "")))
+					return self.send(200, studio.ue_fetch(body.get("asset", ""), bool(body.get("regenerate"))))
 				if u.path == "/api/spec-from-copy":
 					return self.send(200, studio.spec_from_copy(body["src"]))
 				if u.path == "/api/log":

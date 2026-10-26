@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Версия (станет тегом), например v0.3.0"
+        description: "Версия (станет тегом), например v0.3.1"
         required: true
-        default: "v0.3.0"
+        default: "v0.3.1"
       prerelease:
         description: "Пометить как пре-релиз"
         type: boolean

@@ -58,5 +58,8 @@ namespace UMGStudio
 	/** Все Widget Blueprint проекта (/Game/…), без Editor Utility Widget */
 	TArray<FWidgetAssetInfo> ListWidgets();
 
+	/** Текстура проекта → PNG (для превью в программе); MaxSize — ограничение большей стороны, 0 — как есть */
+	bool ExportTexturePng(const FString& AssetPath, int32 MaxSize, TArray<uint8>& OutPng, FString& OutError);
+
 	bool OpenWidgetEditor(const FString& AssetPath);
 }

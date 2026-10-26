@@ -15,6 +15,7 @@ from umgstudio import t3d  # noqa: E402
 STORE = {}
 PROJECT_DIR = None   # тест подставляет временную папку проекта
 META = {}            # asset → {"parent", "designSizeMode", "designSize"}
+TEXTURES = {}        # asset → PNG bytes
 
 
 class H(BaseHTTPRequestHandler):
@@ -35,6 +36,16 @@ class H(BaseHTTPRequestHandler):
 		if self.path == "/umgstudio/list":
 			return self.reply({"ok": True, "widgets": [{"asset": a, "name": a.rsplit("/", 1)[1],
 														"parent": META.get(a, {}).get("parent", "/Script/UMG.UserWidget")} for a in sorted(STORE)]})
+		if self.path.startswith("/umgstudio/texture?"):
+			from urllib.parse import parse_qs, urlparse
+			asset = parse_qs(urlparse(self.path).query).get("asset", [""])[0]
+			if asset in TEXTURES:
+				self.send_response(200)
+				self.send_header("Content-Type", "image/png")
+				self.send_header("Content-Length", str(len(TEXTURES[asset])))
+				self.end_headers()
+				self.wfile.write(TEXTURES[asset])
+				return
 		self.send_error(404)
 
 	def do_POST(self):

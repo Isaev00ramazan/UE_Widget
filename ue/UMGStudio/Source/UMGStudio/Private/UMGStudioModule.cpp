@@ -4,6 +4,7 @@
 //   GET  /umgstudio/list                     → {"ok", "widgets": [{asset, name, parent}]} — все WBP проекта
 //   POST /umgstudio/import  {asset, text, parent?, designSizeMode?, designSize?, backup?, open?}
 //   POST /umgstudio/export  {asset}          → {"ok", "text", "parent", "designSizeMode", "designSize"}
+//   GET  /umgstudio/texture?asset=/Game/…/T_X&max=1024 → PNG (превью текстур в программе)
 //   POST /umgstudio/open    {asset}
 //
 // Порт: [UMGStudio] Port=30110 в Config/DefaultEditorPerProjectUserSettings.ini (по умолчанию 30110).
@@ -91,6 +92,7 @@ public:
 		Bind(TEXT("/umgstudio/import"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleImport);
 		Bind(TEXT("/umgstudio/export"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleExport);
 		Bind(TEXT("/umgstudio/open"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleOpen);
+		Bind(TEXT("/umgstudio/texture"), EHttpServerRequestVerbs::VERB_GET, &FUMGStudioModule::HandleTexture);
 		Http.StartAllListeners();
 		UE_LOG(LogUMGStudio, Display, TEXT("[UMGStudio] мост слушает http://127.0.0.1:%d/umgstudio"), Port);
 	}
@@ -127,7 +129,7 @@ private:
 		Object->SetStringField(TEXT("engine"), FEngineVersion::Current().ToString());
 		Object->SetStringField(TEXT("project"), FApp::GetProjectName());
 		Object->SetStringField(TEXT("projectDir"), FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()));
-		Object->SetNumberField(TEXT("version"), 2);
+		Object->SetNumberField(TEXT("version"), 3);
 		Reply(OnComplete, Object);
 		return true;
 	}
@@ -215,6 +217,23 @@ private:
 		TArray<TSharedPtr<FJsonValue>> Size{ MakeShared<FJsonValueNumber>(DesignSize.X), MakeShared<FJsonValueNumber>(DesignSize.Y) };
 		Out->SetArrayField(TEXT("designSize"), Size);
 		Reply(OnComplete, Out);
+		return true;
+	}
+
+	bool HandleTexture(const FHttpServerRequest& Request, const FHttpResultCallback& OnComplete)
+	{
+		const FString* Asset = Request.QueryParams.Find(TEXT("asset"));
+		const FString* Max = Request.QueryParams.Find(TEXT("max"));
+		TArray<uint8> Png;
+		FString Error;
+		if (!Asset || !UMGStudio::ExportTexturePng(*Asset, Max ? FCString::Atoi(**Max) : 1024, Png, Error))
+		{
+			TUniquePtr<FHttpServerResponse> Response = FHttpServerResponse::Create(Asset ? Error : TEXT("Нужен ?asset="), TEXT("text/plain; charset=utf-8"));
+			Response->Code = EHttpServerResponseCodes::NotFound;
+			OnComplete(MoveTemp(Response));
+			return true;
+		}
+		OnComplete(FHttpServerResponse::Create(MoveTemp(Png), TEXT("image/png")));
 		return true;
 	}
 
