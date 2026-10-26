@@ -35,7 +35,7 @@ input[type=number] { width: 70px; }
 
 .main { flex: 1; display: grid; grid-template-columns: 230px minmax(0, 1fr) 340px; min-height: 0; }
 .side, .panel { background: var(--panel-2); border-right: 1px solid var(--line); overflow: auto; min-height: 0; }
-.panel { border-right: 0; border-left: 1px solid var(--line); display: grid; grid-template-rows: auto minmax(120px, 1fr) auto minmax(120px, 1fr); }
+.panel { border-right: 0; border-left: 1px solid var(--line); display: grid; grid-template-rows: auto minmax(100px, 2fr) auto minmax(160px, 3fr); }
 .side-head, .panel-tabs { padding: 8px 12px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); display: flex; gap: 6px; align-items: center; }
 .panel-tabs span { flex: 1; }
 .sources .grp { padding: 10px 12px 4px; font-size: 11px; color: var(--faint); }
@@ -150,3 +150,69 @@ dialog.settings::backdrop { background: rgba(0, 0, 0, .55); }
 .settings .row2 { display: flex; gap: 6px; align-items: center; }
 .settings .row2 input { flex: 1; }
 .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+
+/* правка свойств */
+.edit-bar { display: flex; gap: 6px; align-items: center; flex: none !important; text-transform: none; letter-spacing: 0; }
+.edit-bar b { color: var(--combat); font-weight: 600; }
+button.primary.mini { padding: 2px 8px; }
+#bUndo { color: var(--combat); }
+.pe-flags { display: flex; gap: 14px; margin: 6px 0 2px; color: var(--muted); }
+.pe-row { border-top: 1px solid var(--line); padding: 3px 0; }
+.pe-head { display: flex; align-items: center; gap: 6px; min-height: 24px; }
+.pe-key { color: var(--muted); flex: 0 0 104px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pe-head > :not(.pe-key):not(.pe-tools) { flex: 1; min-width: 0; }
+.pe-tools { margin-left: auto; display: flex; gap: 2px; opacity: .35; }
+.pe-row:hover .pe-tools, .pe-row.raw .pe-tools { opacity: 1; }
+.pe-btn { padding: 0 5px; font: 11px/18px var(--mono); border-radius: 3px; }
+.pe-row.raw .pe-btn:first-child { border-color: var(--combat); color: var(--combat); }
+.pe-body { padding-left: 10px; }
+.pe-group { display: flex; flex-direction: column; gap: 2px; }
+.pe-sub { display: flex; align-items: center; gap: 6px; min-height: 22px; }
+.pe-sub > .pe-lab { flex: 0 0 82px; color: var(--faint); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pe-sub > .pe-group { flex: 1; border-left: 1px solid var(--line); padding-left: 6px; }
+.pe-sub > :not(.pe-lab) { min-width: 0; }
+.props input.pe-num, .props input.pe-text, .props input.pe-hex, .props select.pe-sel, .props textarea.pe-raw {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; font: 11px/18px var(--mono); color: var(--ink); }
+.props input.pe-num { width: 78px; }
+.props input.pe-text { width: 100%; }
+.props input.pe-hex { width: 64px; text-transform: uppercase; }
+.props select.pe-sel { max-width: 100%; }
+.props textarea.pe-raw { width: 100%; resize: vertical; white-space: pre-wrap; word-break: break-all; }
+.props input:focus { border-color: var(--race); outline: none; }
+.pe-color { display: inline-flex; align-items: center; gap: 3px; font: 11px var(--mono); color: var(--faint); }
+.pe-color input[type=color] { width: 26px; height: 20px; padding: 0; border: 1px solid var(--line); background: none; border-radius: 3px; }
+.pe-color .pe-num { width: 56px !important; }
+.pe-pair { display: inline-flex; align-items: center; gap: 4px; color: var(--faint); font-size: 11px; }
+.pe-pair .pe-num { width: 64px !important; }
+.pe-add { padding: 6px 0 2px; border-top: 1px solid var(--line); }
+.pe-add select { width: 100%; color: var(--muted); }
+
+/* ИИ */
+.main.ai-open { grid-template-columns: 230px minmax(0, 1fr) 340px 380px; }
+#bAi[aria-pressed=true] { border-color: var(--race); color: var(--race); }
+.ai { background: var(--panel-2); border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.ai-status { padding: 0 12px 6px; font-size: 11px; color: var(--faint); white-space: pre-wrap; }
+.ai-status.bad { color: var(--combat); font-size: 12px; }
+.ai-log { flex: 1; overflow: auto; padding: 4px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; min-height: 0; }
+.ai-msg { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; line-height: 1.45; word-wrap: break-word; }
+.ai-msg.me { align-self: flex-end; background: rgba(84, 230, 198, .1); border-color: rgba(84, 230, 198, .35); white-space: pre-wrap; max-width: 90%; }
+.ai-msg code { font: 12px var(--mono); background: var(--bg); padding: 0 3px; border-radius: 3px; }
+.ai-tool { font: 11px var(--mono); color: var(--faint); padding-left: 4px; }
+.ai-tool::before { content: "› "; color: var(--race); }
+.ai-done { font-size: 12px; color: var(--race); white-space: pre-wrap; }
+.ai-done.bad { color: var(--combat); }
+.ai.busy .ai-log::after { content: "ИИ работает…"; color: var(--faint); font-size: 12px; animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+.ai-form { border-top: 1px solid var(--line); padding: 8px 12px 10px; display: flex; flex-direction: column; gap: 6px; }
+.ai-ctx { display: flex; gap: 8px; align-items: center; font-size: 11px; color: var(--faint); }
+.ai-ctx span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ai-ctx b { color: var(--muted); font-weight: 600; }
+.ai-ctx .chk { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+.ai-form textarea { width: 100%; resize: vertical; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; font: 13px/1.4 var(--ui); color: var(--ink); }
+.ai-form textarea:focus { border-color: var(--race); outline: none; }
+.ai-actions { display: flex; gap: 6px; align-items: center; }
+.ai-actions .sep { flex: 1; }
+.pe-inline { flex-direction: row !important; flex-wrap: wrap; gap: 4px 10px !important; border-left: 0 !important; padding-left: 0 !important; }
+.pe-group.pe-inline > .pe-sub > .pe-lab { flex: none; width: auto; }
+.props .pe-inline input.pe-num { width: 64px; }
+.pe-group .pe-group:not(.pe-inline) > .pe-sub > .pe-lab { flex-basis: 60px; }

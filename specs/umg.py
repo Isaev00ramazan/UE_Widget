@@ -333,6 +333,39 @@ def export(root, wbp, folder=None):
 WRITE = True
 SAVED = []
 STATES = []
+TWEAKS = []
+
+
+def tweak(wbp, name, props=None, slot=None, var=None, collapsed=None):
+	"""Правка из панели свойств UMG Studio поверх фабрик: props/slot — строки UE (None — убрать свойство),
+	var/collapsed — флаги (None — не трогать). Применяется в save() этого WBP; «встроить» в вызовы — просьба к ИИ."""
+	TWEAKS.append({"wbp": wbp, "name": name, "props": dict(props or {}), "slot": dict(slot or {}),
+				   "var": var, "collapsed": collapsed})
+
+
+def _apply_tweaks(root, wbp):
+	mine = [t for t in TWEAKS if t["wbp"] == wbp]
+	if not mine:
+		return
+
+	def walk(w):
+		for t in mine:
+			if t["name"] != w.name:
+				continue
+			for d, edits in ((w.props, t["props"]), (w.slot, t["slot"])):
+				for k, v in edits.items():
+					if v is None:
+						d.pop(k, None)
+					else:
+						d[k] = v
+			if t["var"] is not None:
+				w.var = t["var"]
+			if t["collapsed"] is not None:
+				w.collapsed = t["collapsed"]
+		for c in w.children:
+			walk(c)
+
+	walk(root)
 
 
 def save(root, wbp, out_dir, folder=None, suffix="", parent=None, design=None):
@@ -341,6 +374,7 @@ def save(root, wbp, out_dir, folder=None, suffix="", parent=None, design=None):
 	suffix — фрагмент для вставки в существующий виджет (кнопка «В UE» для него недоступна)."""
 	folder = folder or WIDGET_DIR
 	path = os.path.join(out_dir, "%s%s.paste.txt" % (wbp, suffix))
+	_apply_tweaks(root, wbp + suffix)
 	text = export(root, wbp, folder)
 	SAVED.append({"wbp": wbp + suffix, "folder": folder, "path": path, "text": text,
 				  "asset": "%s/%s" % (folder, wbp), "fragment": bool(suffix), "parent": parent, "design": design})

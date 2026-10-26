@@ -95,14 +95,42 @@ def smoke(cfg, report):
 			out["specs"][s["file"]] = [w["wbp"] for w in r.get("widgets", [])] if r.get("ok") else r.get("error")
 	out["shaders"] = len(get("/api/shaders"))
 	out["design"] = get("/api/design").get("ok", False)
-	ui = {p: urllib.request.urlopen(url + p, timeout=30).status for p in ("", "slate.js", "shaders.js", "fonts.css")}
+	ui = {p: urllib.request.urlopen(url + p, timeout=30).status
+		  for p in ("", "app.js", "slate.js", "shaders.js", "props.js", "uevalue.js", "fonts.css")}
 	out["ui"] = ui
+	out["edit"] = smoke_edit()
+	agent = get("/api/agent/status")   # маршрут ИИ отвечает; Claude Code на CI не установлен — это не ошибка
+	out["agent"] = {"found": agent["ok"], "path": agent.get("path", "")}
+	base = getattr(sys, "_MEIPASS", None)
+	out["agent_kit"] = not base or os.path.isfile(os.path.join(base, "umgstudio", "agent_kit", "umg-widgets", "SKILL.md"))
 	ok = out["sources"] > 0 and out["specs"] and all(isinstance(v, list) for v in out["specs"].values()) \
-		and out["shaders"] > 0 and out["design"] and all(v == 200 for v in ui.values())
+		and out["shaders"] > 0 and out["design"] and all(v == 200 for v in ui.values()) and out["edit"] is True \
+		and out["agent_kit"]
 	out["ok"] = bool(ok)
 	with open(report, "w", encoding="utf-8") as f:
 		json.dump(out, f, ensure_ascii=False, indent=1)
 	return 0 if ok else 1
+
+
+def smoke_edit():
+	"""Правка свойств в спецификации на фабриках (строка tweak) собирается в exe и попадает в текст вставки."""
+	import shutil
+	import tempfile
+	from . import specedit
+	tmp = tempfile.mkdtemp(prefix="umgstudio-smoke-")
+	try:
+		src = os.path.join(REPO, "examples", "UMGPaste", "pickup_banner.py")
+		dst = os.path.join(tmp, "pickup_banner.py")
+		shutil.copy(src, dst)
+		specedit.edit_file(dst, "WBP_PickupBanner", [{"name": "Title", "props": {"RenderOpacity": "0.500000"}}])
+		r = server.Studio([tmp]).run_spec(dst)
+		if not r.get("ok"):
+			return r.get("error", "не собралась")[-500:]
+		return True if "RenderOpacity=0.500000" in r["widgets"][0]["text"] else "tweak не дошёл до текста вставки"
+	except Exception as e:  # noqa: BLE001
+		return repr(e)
+	finally:
+		shutil.rmtree(tmp, ignore_errors=True)
 
 
 def version():

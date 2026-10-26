@@ -21,6 +21,7 @@ def run(spec, write=False):
 	umg.WRITE = write
 	umg.SAVED.clear()
 	umg.STATES.clear()
+	umg.TWEAKS.clear()
 	umg.TEXT_NAMESPACE = "Widgets"
 	log = io.StringIO()
 	spec = os.path.abspath(spec)

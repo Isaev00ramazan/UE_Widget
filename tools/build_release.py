@@ -26,6 +26,8 @@ def pyinstaller():
 		   "--specpath", BUILD, "--paths", os.path.join(ROOT, "studio"),
 		   "--add-data", os.path.join(pkg, "web") + sep + "umgstudio/web",
 		   "--add-data", os.path.join(pkg, "umg.py") + sep + "umgstudio",
+		   # скилл umg-widgets для ИИ (Claude Code) — программа кладёт его в рабочую папку спецификаций
+		   "--add-data", os.path.join(ROOT, "Skills", "umg-widgets") + sep + "umgstudio/agent_kit/umg-widgets",
 		   "--hidden-import", "umgstudio.runner",
 		   "--icon", os.path.join(ROOT, "assets", "UMGStudio.ico")]
 	# стандартные модули, которые могут понадобиться спецификациям экранов

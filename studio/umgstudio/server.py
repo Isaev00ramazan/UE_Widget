@@ -19,6 +19,10 @@
 	POST /api/spec-from-copy {src} — сделать спецификацию .py из copy.txt / paste.txt
 	POST /api/log {msg}          — ошибка интерфейса → %LOCALAPPDATA%/UMGStudio/log.txt
 	POST /api/build   {src}      — записать *.paste.txt спецификации (как `py <экран>.py`)
+	POST /api/edit {src, wbp, edits} — правки из панели свойств → в .py (specedit: прямо в W(...) или tweak(...))
+	POST /api/undo               — отменить последнюю правку (свойства или ИИ): вернуть файлы как были
+	GET  /api/agent/status       — Claude Code найден? журнал диалога; POST /api/agent/send {text, src, wbp, selected},
+								   /api/agent/stop, /api/agent/reset — ИИ (ответ идёт событиями SSE {"agent": …})
 	POST /api/clipboard {text}   — положить текст в буфер обмена (запасной путь, если браузер не дал)
 	GET  /api/diff?src=&wbp=     — отличия <WBP>.copy.txt (из UE) от источника
 	GET  /api/ue/status          — мост в редакторе UE (плагин ue/UMGStudio) на связи?
@@ -40,7 +44,8 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from . import clipboard, codegen, config, diff, t3d, ue_bridge
+from . import clipboard, codegen, config, diff, specedit, t3d, ue_bridge
+from .agent import Agent
 from .design import Design
 
 READY = threading.Event()   # интерфейс загрузился в окне
@@ -74,6 +79,8 @@ class Studio:
 		self.lock = threading.Lock()
 		self.clients = []
 		self.version = 0
+		self.history = []     # [{"label", "files": {путь: текст до правки}}] — «Отменить» (правки свойств и ИИ)
+		self.agent = Agent(self.broadcast)
 
 	# ─── источники ───
 	def sources(self):
@@ -90,7 +97,9 @@ class Studio:
 					if kind == "spec":
 						try:
 							with open(os.path.join(d, f), encoding="utf-8", errors="replace") as fh:
-								item["generated"] = codegen.MARK in fh.read(400)
+								text = fh.read()
+							item["generated"] = codegen.MARK in text[:400]
+							item["tweaks"] = specedit.has_tweaks(text)
 						except OSError:
 							pass
 					out.append(item)
@@ -249,6 +258,7 @@ class Studio:
 		st = cls(cfg["specs"], cfg["textures"], cfg["setup_hud"], cfg["assets"], cfg["design"], cfg["materials"],
 				 cfg["ue"], cfg["content"], cfg["work_dir"])
 		st.settings = cfg.get("settings")
+		st.agent.claude, st.agent.model = cfg.get("claude") or None, cfg.get("claude_model") or None
 		return st
 
 	def apply(self, settings):
@@ -262,6 +272,7 @@ class Studio:
 			self.ue_url, self.content, self.work_dir = cfg["ue"], cfg["content"], os.path.abspath(cfg["work_dir"])
 			self.settings = settings
 			self.cache = {}
+		self.agent.claude, self.agent.model = cfg["claude"] or None, cfg["claude_model"] or None
 		self.broadcast({"version": self.version, "files": [], "reload": False, "settings": True})
 		return cfg
 
@@ -300,10 +311,111 @@ class Studio:
 			self.spec_dirs.insert(0, d)
 		# umg.py рядом со спецификациями: их можно запускать и без программы (py экран.py)
 		umg_copy = os.path.join(d, "umg.py")
-		if not os.path.isfile(umg_copy):
-			import shutil
-			shutil.copy2(os.path.join(HERE, "umg.py"), umg_copy)
+		with open(os.path.join(HERE, "umg.py"), encoding="utf-8") as f:
+			ours = f.read()
+		try:
+			with open(umg_copy, encoding="utf-8") as f:
+				theirs = f.read()
+		except OSError:
+			theirs = None
+		# своя копия от прошлой версии программы — обновить (tweak и др.); чужой umg.py не трогаем
+		if theirs is None or (theirs != ours and "UMG Studio: каждый save()" in theirs):
+			with open(umg_copy, "w", encoding="utf-8") as f:
+				f.write(ours)
 		return d
+
+	# ─── правки из панели свойств и «Отменить» ───
+	def remember(self, label, files):
+		if files:
+			self.history.append({"label": label, "files": files})
+			del self.history[:-30]
+
+	def undo(self):
+		if not self.history:
+			return {"ok": False, "error": "Нечего отменять"}
+		h = self.history.pop()
+		for path, text in h["files"].items():
+			if text is None:
+				if os.path.isfile(path):
+					os.remove(path)
+				continue
+			with open(path, "w", encoding="utf-8", newline="") as f:
+				f.write(text)
+		return {"ok": True, "label": h["label"], "files": [os.path.basename(p) for p in h["files"]],
+				"next": self.history[-1]["label"] if self.history else None}
+
+	def edit(self, src, wbp, edits):
+		path = self.path_of(src)
+		if not path.endswith(".py"):
+			return {"ok": False, "error": "Это текст из UE/вставки — сначала «Сделать .py», править можно спецификацию"}
+		try:
+			old, report = specedit.edit_file(path, wbp, edits)
+		except SyntaxError as e:
+			return {"ok": False, "error": "Спецификация не разбирается как Python (%s, строка %s) — исправь файл" % (e.msg, e.lineno)}
+		names = sorted({e["name"] for e in edits})
+		self.remember("правка %s" % ", ".join(names[:3]) + ("…" if len(names) > 3 else ""), {path: old})
+		with open(path, encoding="utf-8") as f:
+			tweaks = specedit.has_tweaks(f.read())
+		return {"ok": True, "report": report, "tweaks": tweaks, "undo": self.history[-1]["label"]}
+
+	# ─── ИИ (Claude Code на компьютере пользователя) ───
+	def agent_kit(self, work):
+		"""Скилл umg-widgets для Claude Code в рабочей папке (.claude/skills), если там его ещё нет."""
+		dst = os.path.join(work, ".claude", "skills", "umg-widgets")
+		if os.path.isfile(os.path.join(dst, "SKILL.md")):
+			return
+		base = getattr(sys, "_MEIPASS", None)
+		src = os.path.join(base, "umgstudio", "agent_kit", "umg-widgets") if base else \
+			os.path.join(config.REPO, "Skills", "umg-widgets")
+		if os.path.isdir(src):
+			import shutil
+			shutil.copytree(src, dst, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+
+	def agent_send(self, text, src=None, wbp=None, selected=None):
+		ctx = {"selected": selected}
+		path = None
+		if src:
+			try:
+				path = self.path_of(src)
+			except (ValueError, IndexError):
+				path = None
+		work = os.path.dirname(path) if path and path.endswith(".py") else self.ensure_work_dir()
+		ctx["work_dir"] = work
+		local = os.path.join(work, "umg.py")
+		ctx["umg"] = local if os.path.isfile(local) else os.path.join(HERE, "umg.py")
+		if path:
+			ctx["file"] = os.path.relpath(path, work) if os.path.dirname(path) == work else path
+			ctx["wbp"] = wbp
+			with self.lock:
+				hit = self.cache.get(path)
+			if hit and not hit[1].get("ok"):
+				ctx["error"] = hit[1].get("error")
+			if path.endswith(".py"):
+				with open(path, encoding="utf-8", errors="replace") as f:
+					ctx["tweaks"] = specedit.has_tweaks(f.read())
+		self.agent_kit(work)
+		before = self._snapshot(work)
+
+		def done(changed):
+			after = self._snapshot(work)
+			files = {p: before.get(p) for p in set(before) | set(after) if before.get(p) != after.get(p)}
+			self.remember("ИИ: " + text.strip().splitlines()[0][:40], files)
+			return {"undo": bool(files), "files": sorted(os.path.basename(p) for p in files)}
+
+		return self.agent.send(text, ctx, done)
+
+	@staticmethod
+	def _snapshot(d):
+		out = {}
+		for f in os.listdir(d):
+			if f.endswith((".py", ".txt", ".json")):
+				p = os.path.join(d, f)
+				try:
+					with open(p, encoding="utf-8", errors="replace") as fh:
+						out[p] = fh.read()
+				except OSError:
+					pass
+		return out
 
 	def src_id(self, path):
 		path = os.path.abspath(path)
@@ -601,6 +713,9 @@ def make_handler(studio):
 					return self.send(200, studio.settings_info())
 				if u.path == "/api/shaders":
 					return self.send(200, studio.shaders())
+				if u.path == "/api/agent/status":
+					return self.send(200, dict(studio.agent.status(), log=studio.agent.log,
+											   undo=studio.history[-1]["label"] if studio.history else None))
 				if u.path == "/api/events":
 					return self.events()
 				return self.static(u.path)
@@ -633,6 +748,19 @@ def make_handler(studio):
 					msg = str(body.get("msg", ""))[:4000]
 					UI_LOG.append(msg)
 					window_log("UI: " + msg)
+					return self.send(200, {"ok": True})
+				if u.path == "/api/edit":
+					return self.send(200, studio.edit(body["src"], body["wbp"], body.get("edits") or []))
+				if u.path == "/api/undo":
+					return self.send(200, studio.undo())
+				if u.path == "/api/agent/send":
+					return self.send(200, studio.agent_send(body.get("text", ""), body.get("src"), body.get("wbp"),
+															body.get("selected")))
+				if u.path == "/api/agent/stop":
+					studio.agent.stop()
+					return self.send(200, {"ok": True})
+				if u.path == "/api/agent/reset":
+					studio.agent.reset()
 					return self.send(200, {"ok": True})
 				if u.path == "/api/clipboard":
 					return self.send(200, {"ok": clipboard.copy(body["text"])})

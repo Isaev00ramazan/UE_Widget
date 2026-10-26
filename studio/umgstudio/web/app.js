@@ -1,6 +1,8 @@
 // Интерфейс UMG Studio: список экранов, превью, Hierarchy, свойства, живое обновление.
 import { Engine, layoutRoot, resetLayout, fontOf, lin, hex, textOf, assetName, PX_PER_PT } from "./slate.js";
 import { GLMaterials } from "./shaders.js";
+import { valueOf } from "./uevalue.js";
+import { buildEditor } from "./props.js";
 
 const $ = (id) => document.getElementById(id);
 const S = {
@@ -8,6 +10,8 @@ const S = {
   vis: {}, texts: {}, stateName: null, selected: null,
   materials: {}, images: {}, nested: {}, gl: null,
   design: { ok: false, components: [] },
+  edits: {},          // несохранённые правки из панели свойств: "WBP::имя" → {wbp, name, props, slot, var, collapsed}
+  font: "/Game/UI/HUD/Fonts/F_HUD",
 };
 
 // ─── ошибки интерфейса → лог программы (%LOCALAPPDATA%/UMGStudio/log.txt) ───
@@ -56,7 +60,8 @@ async function loadSources() {
 }
 
 async function selectSource(id, keep = false) {
-  if (!keep) { S.vis = {}; S.texts = {}; S.stateName = null; S.selected = null; S.wbp = 0; }
+  if (!keep && id !== S.src && editCount() && !confirm("Несохранённые правки свойств пропадут. Перейти?")) return;
+  if (!keep) { S.vis = {}; S.texts = {}; S.stateName = null; S.selected = null; S.wbp = 0; S.edits = {}; }
   S.src = id;
   prefs.src = id; savePrefs();
   document.querySelectorAll("#sources button").forEach((b) => b.setAttribute("aria-current", String(b.dataset.id === id)));
@@ -65,14 +70,18 @@ async function selectSource(id, keep = false) {
   $("bBuild").disabled = !src || src.kind !== "spec";
   $("bMakeSpec").hidden = !src || src.kind === "spec";
   $("bRegen").hidden = !src || !src.generated;
+  $("bAiTweaks").hidden = !src || !src.tweaks;
   $("diffPane").hidden = true;
   S.result = await api("/api/render?src=" + encodeURIComponent(id));
   if (keep && prefs.wbpName) {
     const i = (S.result.widgets || []).findIndex((w) => w.wbp === prefs.wbpName);
     if (i >= 0) S.wbp = i;
   }
+  reapplyEdits();
   renderTabs();
   await render();
+  updateEditBar();
+  aiContext();
 }
 
 function renderTabs() {
@@ -121,7 +130,7 @@ async function prepare(root) {
 
 // ─── превью ───
 let engine = null, root = null;
-async function render() {
+async function render(opts = {}) {
   const res = S.result;
   const err = $("error");
   const stage = $("stage");
@@ -150,7 +159,7 @@ async function render() {
   renderTree();
   renderStates(w.wbp);
   renderWarnings();
-  if (S.selected) select(S.selected, false);
+  if (S.selected) select(S.selected, false, opts.keepProps);
   applyDesign(w.wbp, size);
 }
 
@@ -280,15 +289,17 @@ function highlight(name, on) { const el = stageEl(name); if (el) el.classList.to
 
 function findNode(name) { let f = null; walk(root, (n) => { if (!f && n.name === name) f = n; }); return f; }
 
-function select(name, scroll = true) {
+function select(name, scroll = true, keepProps = false) {
   S.selected = name;
+  aiContext();
   document.querySelectorAll(".w.sel").forEach((e) => e.classList.remove("sel"));
   const el = stageEl(name); if (el) el.classList.add("sel");
   document.querySelectorAll(".row").forEach((r) => r.classList.toggle("sel", r.dataset.name === name));
   const row = document.querySelector(`.row[data-name="${CSS.escape(name)}"]`);
   if (row && scroll) row.scrollIntoView({ block: "nearest" });
   const n = findNode(name);
-  if (n) renderProps(n);
+  if (n && keepProps && $("pGeom")) $("pGeom").innerHTML = geomHtml(n);
+  else if (n) renderProps(n);
 }
 
 // ─── свойства (как пишет пользователь: значение в строке, HEX + линейный) ───
@@ -314,14 +325,25 @@ function pretty(k, v, n) {
   }
   return escapeHtml(typeof v === "object" ? JSON.stringify(v) : String(v));
 }
-function renderProps(n) {
-  const box = $("props");
+function geomHtml(n) {
   const r = n._r, d = n._d;
-  let h = `<h4>${escapeHtml(n.name)} <span class="hint">${escapeHtml(n.cls)}</span></h4><dl>`;
-  if (n.path && !n.path.startsWith("/Script/UMG.")) h += `<dt>Класс</dt><dd>${escapeHtml(n.path)}</dd>`;
+  let h = "";
   if (r) h += `<dt>Геометрия</dt><dd>x ${r.x.toFixed(1)}, y ${r.y.toFixed(1)}, ${r.w.toFixed(1)}×${r.h.toFixed(1)}</dd>`;
   if (d) h += `<dt>Desired</dt><dd>${d[0].toFixed(1)}×${d[1].toFixed(1)}</dd>`;
-  h += `<dt>Видимость</dt><dd>${escapeHtml(engine.visibility(n))}</dd></dl><h4>Свойства</h4><dl>`;
+  return h + `<dt>Видимость</dt><dd>${escapeHtml(engine.visibility(n))}</dd>`;
+}
+function renderProps(n) {
+  const box = $("props");
+  let h = `<h4>${escapeHtml(n.name)} <span class="hint">${escapeHtml(n.cls)}</span></h4><dl>`;
+  if (n.path && !n.path.startsWith("/Script/UMG.")) h += `<dt>Класс</dt><dd>${escapeHtml(n.path)}</dd>`;
+  h += `</dl><dl id="pGeom">${geomHtml(n)}</dl>`;
+  if (canEdit() && !n.missing) {
+    box.innerHTML = h;
+    box.append(buildEditor(n, { font: S.font, onEdit, onFlag }));
+    return;
+  }
+  if (!canEdit()) h += `<p class="hint">Править можно спецификацию .py: ${S.result && S.result.ok ? "для этого текста нажми «Сделать .py»" : "она сейчас не собралась"}.</p>`;
+  h += `<h4>Свойства</h4><dl>`;
   for (const [k, v] of Object.entries(n.props)) {
     if (k === "bExpandedInDesigner") continue;
     h += `<dt>${escapeHtml(k)}</dt><dd>${pretty(k, v, n)}</dd>`;
@@ -336,6 +358,201 @@ function renderProps(n) {
 }
 
 function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+// ─── правка свойств: сразу в превью, «Сохранить в .py» — в файл спецификации ───
+function canEdit() {
+  const src = S.sources.find((x) => x.id === S.src);
+  return !!(src && src.kind === "spec" && S.result && S.result.ok && currentWidget());
+}
+function sourceNode(name) {
+  const w = currentWidget();
+  let f = null;
+  if (w) walk(w.roots[0], (n) => { if (!f && n.name === name) f = n; });
+  return f;
+}
+function setRaw(where, n, key, raw) {
+  const raws = where === "props" ? n.raw : (n.slot.$raw = n.slot.$raw || {});
+  const vals = where === "props" ? n.props : n.slot;
+  if (raw === null) { delete raws[key]; delete vals[key]; } else { raws[key] = raw; vals[key] = valueOf(raw); }
+}
+function setFlag(n, flag, on) {
+  const key = flag === "var" ? "bIsVariable" : "Visibility";
+  setRaw("props", n, key, on ? (flag === "var" ? "True" : "Collapsed") : null);
+  if (flag === "collapsed") delete S.vis[n.name];
+}
+function editEntry(name) {
+  const w = currentWidget();
+  const id = w.wbp + "::" + name;
+  return (S.edits[id] = S.edits[id] || { wbp: w.wbp, name, props: {}, slot: {} });
+}
+function editCount() { return Object.values(S.edits).reduce((a, e) => a + Object.keys(e.props).length + Object.keys(e.slot).length + ("var" in e) + ("collapsed" in e), 0); }
+let rerender = 0;
+function scheduleRender(rebuild) {
+  cancelAnimationFrame(rerender);
+  rerender = requestAnimationFrame(() => render({ keepProps: !rebuild }));
+}
+function onEdit(where, key, raw, rebuild = false) {
+  const n = sourceNode(S.selected);
+  if (!n) return;
+  setRaw(where, n, key, raw);
+  editEntry(n.name)[where][key] = raw;
+  updateEditBar();
+  scheduleRender(rebuild);
+}
+function onFlag(flag, on) {
+  const n = sourceNode(S.selected);
+  if (!n) return;
+  setFlag(n, flag, on);
+  editEntry(n.name)[flag] = on;
+  updateEditBar();
+  scheduleRender(false);
+}
+function reapplyEdits() {
+  // файл перечитан (сохранение, ИИ, правка в редакторе) — несохранённые правки ложатся сверху
+  if (!S.result || !S.result.ok) return;
+  for (const e of Object.values(S.edits)) {
+    const w = S.result.widgets.find((x) => x.wbp === e.wbp);
+    if (!w) continue;
+    let n = null;
+    walk(w.roots[0], (x) => { if (!n && x.name === e.name) n = x; });
+    if (!n) continue;
+    for (const where of ["props", "slot"]) for (const [k, v] of Object.entries(e[where])) setRaw(where, n, k, v);
+    for (const f of ["var", "collapsed"]) if (f in e) setFlag(n, f, e[f]);
+  }
+}
+function updateEditBar() {
+  const n = editCount();
+  $("editBar").hidden = !n;
+  $("editCount").textContent = n ? `не сохранено: ${n}` : "";
+}
+async function saveEdits() {
+  if (!editCount()) return;
+  const byWbp = {};
+  for (const e of Object.values(S.edits)) (byWbp[e.wbp] = byWbp[e.wbp] || []).push(e);
+  const done = { inplace: [], tweak: [] };
+  let tweaks = false;
+  for (const [wbp, edits] of Object.entries(byWbp)) {
+    const r = await api("/api/edit", { src: S.src, wbp, edits });
+    if (!r.ok) return toast(r.error || "Не записалось", 7000);
+    done.inplace.push(...r.report.inplace); done.tweak.push(...r.report.tweak); tweaks = r.tweaks;
+  }
+  S.edits = {};
+  updateEditBar();
+  setUndo(true);
+  let msg = "Записано в .py";
+  if (done.inplace.length) msg += ` · прямо в вызовы: ${[...new Set(done.inplace)].join(", ")}`;
+  if (done.tweak.length) msg += ` · строками tweak(): ${[...new Set(done.tweak)].join(", ")} — «Встроить правки» в чате ИИ перенесёт их в код`;
+  toast(msg, done.tweak.length ? 8000 : 4000);
+  $("bAiTweaks").hidden = !tweaks;
+  if (tweaks && !AI.open) aiToggle(true);
+}
+async function dropEdits() {
+  S.edits = {};
+  updateEditBar();
+  await selectSource(S.src, true);
+}
+$("bSaveEdits").onclick = saveEdits;
+$("bDropEdits").onclick = dropEdits;
+window.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); saveEdits(); }
+});
+function setUndo(on, label) {
+  $("bUndo").hidden = !on;
+  if (label) $("bUndo").title = "Отменить: " + label;
+}
+$("bUndo").onclick = async () => {
+  const r = await api("/api/undo", {});
+  if (!r.ok) { setUndo(false); return toast(r.error, 3000); }
+  toast(`Отменено: ${r.label} (${r.files.join(", ")})`, 4000);
+  setUndo(!!r.next, r.next);
+};
+
+// ─── ИИ: Claude Code на этом компьютере ───
+const AI = { open: false, status: null, running: false };
+function aiToggle(open = !AI.open) {
+  AI.open = open;
+  prefs.ai = open; savePrefs();
+  $("aiPanel").hidden = !open;
+  document.querySelector(".main").classList.toggle("ai-open", open);
+  $("bAi").setAttribute("aria-pressed", String(open));
+  if (open) { aiStatus(); aiContext(); setTimeout(() => $("aiInput").focus(), 0); }
+  if (root) fit(stageSize());
+}
+async function aiStatus() {
+  const r = await api("/api/agent/status");
+  AI.status = r;
+  const st = $("aiStatus");
+  st.className = "ai-status" + (r.ok ? "" : " bad");
+  st.textContent = r.ok ? `Claude Code ${r.version || ""}`.trim() : r.error;
+  st.title = r.path || "";
+  $("bAiSend").disabled = !r.ok;
+  if (!$("aiLog").childElementCount && r.log && r.log.length) r.log.forEach(aiItem);
+  aiRunning(r.running);
+  setUndo(!!r.undo, r.undo);
+}
+function aiContext() {
+  const box = $("aiCtx");
+  if (!box) return;
+  const src = S.sources.find((x) => x.id === S.src);
+  const w = currentWidget();
+  const parts = [];
+  if (src) parts.push(`Экран: <b>${escapeHtml(src.file)}</b>${w ? " · " + escapeHtml(w.wbp) : ""}`);
+  if (S.selected && $("cAiSel").checked) parts.push(`элемент: <b>${escapeHtml(S.selected)}</b>`);
+  box.querySelector("span").innerHTML = parts.join(" · ") || "ничего не открыто";
+}
+function aiRunning(on) {
+  AI.running = on;
+  $("bAiStop").hidden = !on;
+  $("bAiSend").disabled = on || !(AI.status && AI.status.ok);
+  $("aiPanel").classList.toggle("busy", on);
+}
+const TOOL = { Read: "читает", Edit: "правит", Write: "пишет", MultiEdit: "правит", Glob: "ищет файлы", Grep: "ищет", Skill: "скилл" };
+function mdLite(t) {
+  return escapeHtml(t).replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+}
+function aiItem(it) {
+  const log = $("aiLog");
+  const div = document.createElement("div");
+  if (it.kind === "user") { div.className = "ai-msg me"; div.textContent = it.text; aiRunning(true); }
+  else if (it.kind === "text") { div.className = "ai-msg"; div.innerHTML = mdLite(it.text); }
+  else if (it.kind === "tool") { div.className = "ai-tool"; div.textContent = `${TOOL[it.name] || it.name} ${it.target || ""}`; }
+  else if (it.kind === "done") {
+    div.className = "ai-done" + (it.error ? " bad" : "");
+    div.textContent = it.error ? it.error : `Готово за ${it.seconds} с` + (it.files && it.files.length ? ` · изменены: ${it.files.join(", ")}` : " · файлы не менялись");
+    if (it.undo && !it.error) {
+      const b = document.createElement("button");
+      b.className = "mini"; b.textContent = "Отменить";
+      b.onclick = () => $("bUndo").click();
+      div.append(" ", b);
+      setUndo(true, "ИИ");
+    }
+    aiRunning(false);
+  }
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+async function aiSend(text) {
+  text = (text || "").trim();
+  if (!text || AI.running) return;
+  if (editCount() && confirm("Сначала сохранить несохранённые правки свойств в .py? (иначе ИИ их не увидит)")) await saveEdits();
+  let selected = null;
+  if (S.selected && $("cAiSel").checked) {
+    const n = sourceNode(S.selected);
+    if (n) selected = { name: n.name, cls: n.cls, props: n.raw, slot: n.slot && n.slot.$raw };
+  }
+  const w = currentWidget();
+  const r = await api("/api/agent/send", { text, src: S.src, wbp: w ? w.wbp : null, selected });
+  if (!r.ok) return aiItem({ kind: "done", error: r.error });
+  $("aiInput").value = "";
+}
+$("bAi").onclick = () => aiToggle();
+$("bAiClose").onclick = () => aiToggle(false);
+$("aiForm").addEventListener("submit", (e) => { e.preventDefault(); aiSend($("aiInput").value); });
+$("aiInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); aiSend($("aiInput").value); } });
+$("bAiStop").onclick = () => api("/api/agent/stop", {});
+$("bAiNew").onclick = async () => { await api("/api/agent/reset", {}); $("aiLog").innerHTML = ""; aiRunning(false); toast("Новый диалог", 1500); };
+$("bAiTweaks").onclick = () => aiSend("Встрой правки tweak(...) из панели свойств в вызовы W()/фабрик этих элементов и удали строки tweak.");
+$("cAiSel").addEventListener("change", aiContext);
 
 // ─── действия ───
 $("bCopy").onclick = async () => {
@@ -540,6 +757,7 @@ function listen() {
   const es = new EventSource("/api/events");
   es.onmessage = async (e) => {
     const msg = JSON.parse(e.data);
+    if (msg.agent) return aiItem(msg.agent);
     if (msg.reload) return location.reload();
     if (msg.settings) return reloadProjectData();
     S.nested = {};
@@ -574,6 +792,8 @@ async function start() {
   const first = S.sources.find((s) => s.id === prefs.src) || S.sources.find((s) => s.kind === "spec") || S.sources[0];
   if (first) await selectSource(first.id, true);
   listen();
+  api("/api/settings").then((i) => { if (i.content && i.content.font) S.font = i.content.font; });
+  if (prefs.ai) aiToggle(true); else api("/api/agent/status").then((r) => setUndo(!!r.undo, r.undo));
   ueStatus();
   setInterval(ueStatus, 5000);
 }

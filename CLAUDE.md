@@ -11,15 +11,18 @@
 | `studio/umgstudio/t3d.py` | разбор текста буфера UMG (paste/copy) → дерево IR |
 | `studio/umgstudio/runner.py`, `server.py`, `__main__.py`, `window.py` | запуск спецификаций, локальный сервер, окно |
 | `studio/umgstudio/config.py` | настройки проекта (`umgstudio.json`): папки на диске, пути Content (`umg.set_content`) |
+| `studio/umgstudio/specedit.py` | правки из панели свойств → `.py`: прямо в словарь `W(...)` или строкой `tweak(...)` |
+| `studio/umgstudio/agent.py` | ИИ в программе: Claude Code пользователя (`claude -p --output-format stream-json`), запрос через stdin |
 | `studio/umgstudio/codegen.py` | спецификация `.py` из дерева UE (copy.txt) — round-trip без отличий |
-| `studio/umgstudio/web/` | интерфейс: `slate.js` (раскладка по правилам Slate), `materials.js` (двойники мастер-материалов), `app.js` |
+| `studio/umgstudio/web/` | интерфейс: `slate.js` (раскладка по правилам Slate), `materials.js` (двойники мастер-материалов), `props.js` + `uevalue.js` (правка свойств), `app.js` |
 | `design/<Имя>/` | снимок дизайн-системы Claude Design (токены, шрифты, компоненты) — источник вида и шрифтов |
 | `examples/UMGPaste/` | эталонные спецификации и тексты (из проекта игры) — на них тесты |
 | `ue/UMGStudio/` | плагин редактора UE 5.8 (мост HTTP :30110): импорт/экспорт дерева WBP — не собирается здесь, проверять по сборке пользователя |
 | `ue/export_hud_assets.py` | выгрузка MI, текстур, списка ассетов из редактора |
 | `Materials/*.hlsl` | код UI-мастеров (превью переводит в GLSL, `web/shaders.js`) |
 | `UI/*.cpp` | C++ UI проекта (справка: VM_*, базы виджетов) |
-| `tests/mock_ue.py` | имитация плагина для тестов связи |
+| `tests/mock_ue.py`, `tests/fake_claude.py` | имитация плагина и Claude Code для тестов |
+| `tools/make_icon.py` | значок программы из `assets/logo.png` (маленькие кадры — BMP, иначе Проводник не покажет) |
 | `Skills/` | присланные пользователем скиллы и файлы проекта — справка, не править |
 
 ## Проверка

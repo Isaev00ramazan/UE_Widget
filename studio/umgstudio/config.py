@@ -14,6 +14,8 @@
 	design            снимок дизайн-системы Claude Design
 	ue                адрес моста в редакторе (плагин UMG Studio Bridge)
 	window            auto | webview | edge | browser
+	claude            путь к Claude Code (claude.exe / claude.cmd) для ИИ в программе; пусто — найти самому
+	claude_model      модель для ИИ (sonnet, opus…); пусто — как в Claude Code
 """
 import json
 import os
@@ -29,7 +31,7 @@ CONTENT_DEFAULTS = {
 	"textures_content": "/Game/UI/HUD/Textures",
 }
 KEYS = ("project", "specs", "widgets", "font", "materials_content", "textures_content", "materials", "setup_hud",
-		"assets", "textures", "design", "ue", "window", "port")
+		"assets", "textures", "design", "ue", "window", "port", "claude", "claude_model")
 LISTS = ("specs", "textures")
 
 
@@ -101,6 +103,8 @@ def resolve(s):
 	cfg["ue"] = s.get("ue") or "http://127.0.0.1:30110"
 	cfg["window"] = s.get("window") or "auto"
 	cfg["port"] = int(s.get("port") or 8765)
+	cfg["claude"] = s.get("claude") or ""
+	cfg["claude_model"] = s.get("claude_model") or ""
 	cfg["project"] = proj
 	cfg["content"] = {k: (s.get(k) or v).rstrip("/") for k, v in CONTENT_DEFAULTS.items()}
 	return cfg

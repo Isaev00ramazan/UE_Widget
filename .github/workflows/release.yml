@@ -8,7 +8,7 @@ on:
       version:
         description: "Версия (станет тегом), например v0.3.1"
         required: true
-        default: "v0.3.1"
+        default: "v0.4.0"
       prerelease:
         description: "Пометить как пре-релиз"
         type: boolean
@@ -36,6 +36,25 @@ jobs:
 
       - name: Сборка
         run: python tools/build_release.py ${{ inputs.version }}
+
+      - name: Значок exe — наш логотип
+        shell: pwsh
+        run: |
+          # значок, который покажет Проводник: из ресурсов exe (32×32) — сравниваем с кадром 32×32 из assets/UMGStudio.ico
+          Add-Type -AssemblyName System.Drawing
+          $exe = (Resolve-Path "build/dist/UMGStudio/UMGStudio.exe").Path
+          $a = [System.Drawing.Icon]::ExtractAssociatedIcon($exe).ToBitmap()
+          $b = (New-Object System.Drawing.Icon((Resolve-Path "assets/UMGStudio.ico").Path, 32, 32)).ToBitmap()
+          $sum = 0; $n = 0; $opaque = 0
+          for ($y = 0; $y -lt 32; $y++) { for ($x = 0; $x -lt 32; $x++) {
+            $p = $a.GetPixel($x, $y); $q = $b.GetPixel($x, $y)
+            $sum += [math]::Abs($p.R - $q.R) + [math]::Abs($p.G - $q.G) + [math]::Abs($p.B - $q.B) + [math]::Abs($p.A - $q.A)
+            if ($p.A -gt 0) { $opaque++ }
+            $n++ } }
+          $avg = $sum / $n
+          $a.Save("$PWD\exe-icon.png")
+          "значок exe: средняя разница с логотипом $([math]::Round($avg, 1)) на пиксель, непрозрачных $opaque из $n"
+          if ($avg -gt 24 -or $opaque -lt 50) { throw "у UMGStudio.exe не наш значок" }
 
       - name: Проверка собранного exe
         shell: pwsh

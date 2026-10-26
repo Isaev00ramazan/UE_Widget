@@ -12,6 +12,8 @@
   <div class="brand"><img src="favicon.png" alt="" width="22" height="22">UMG <b>Studio</b></div>
   <div class="crumbs"><span id="srcTitle">—</span><nav id="wbpTabs" class="tabs" aria-label="Виджеты источника"></nav></div>
   <div class="actions">
+    <button id="bUndo" title="Отменить последнюю правку (свойства или ИИ) — файлы вернутся как были" hidden>↶ Отменить</button>
+    <button id="bAi" aria-pressed="false" title="ИИ (Claude Code на этом компьютере): опиши, что поменять — он правит .py, превью обновится">✦ ИИ</button>
     <button id="bSettings" title="Проект: папка проекта UE, где хранить спецификации, пути виджетов/шрифта/материалов в Content">⚙ Проект</button>
     <span id="ueStatus" class="ue-status" title="Мост в редакторе UE (плагин UMG Studio Bridge)">UE: …</span>
     <button id="bPush" class="primary" title="Создать/обновить WBP в открытом редакторе UE: дерево, Is Variable, размер превью, родитель; компиляция и сохранение (резервная копия — Saved/UMGStudio/Backups)">В UE ▶</button>
@@ -100,8 +102,19 @@
   <aside class="panel">
     <div class="panel-tabs"><span>Hierarchy</span><button id="bShowAll" class="mini" title="Показать все Collapsed-элементы (проверка состояний)">Показать скрытые</button><button id="bReset" class="mini" title="Сбросить переключения видимости">Сброс</button></div>
     <div id="tree" class="tree" role="tree"></div>
-    <div class="panel-tabs"><span>Свойства</span></div>
+    <div class="panel-tabs"><span>Свойства</span><span id="editBar" class="edit-bar" hidden><b id="editCount"></b><button id="bSaveEdits" class="mini primary" title="Записать правки в спецификацию .py (Ctrl+S)">Сохранить</button><button id="bDropEdits" class="mini" title="Выбросить несохранённые правки">✕</button></span></div>
     <div id="props" class="props"><p class="hint">Выбери элемент в дереве или на экране.</p></div>
+  </aside>
+
+  <aside id="aiPanel" class="ai" hidden>
+    <div class="panel-tabs"><span>ИИ · Claude Code</span><button id="bAiNew" class="mini" title="Начать новый диалог (ИИ забудет предыдущие сообщения)">Новый</button><button id="bAiClose" class="mini" title="Скрыть">×</button></div>
+    <div id="aiStatus" class="ai-status">…</div>
+    <div id="aiLog" class="ai-log" aria-live="polite"></div>
+    <form id="aiForm" class="ai-form">
+      <div id="aiCtx" class="ai-ctx"><span></span><label class="chk" title="Передать ИИ выбранный элемент и его свойства"><input type="checkbox" id="cAiSel" checked> элемент</label></div>
+      <textarea id="aiInput" rows="3" placeholder="Что поменять? Например: сделай заголовок крупнее, а кнопки выровняй по центру. Enter — отправить, Shift+Enter — новая строка" aria-label="Запрос к ИИ"></textarea>
+      <div class="ai-actions"><button type="button" id="bAiTweaks" class="mini" title="Перенести строки tweak(...) из панели свойств в вызовы фабрик" hidden>Встроить правки в код</button><span class="sep"></span><button type="button" id="bAiStop" class="mini" hidden>Стоп</button><button id="bAiSend" class="primary">Отправить</button></div>
+    </form>
   </aside>
 </div>
 <dialog id="settingsDlg" class="settings">
@@ -133,6 +146,8 @@
     <fieldset>
       <legend>Связь и окно</legend>
       <label>Мост в редакторе<input name="ue"></label>
+      <label>Claude Code для ИИ (путь к claude.exe / claude.cmd; пусто — найти самому)<input name="claude" placeholder="claude"></label>
+      <label>Модель ИИ (sonnet, opus…; пусто — как в Claude Code)<input name="claude_model"></label>
       <label>Окно программы
         <select name="window"><option value="">авто (окно → Edge → браузер)</option><option value="webview">окно (WebView2)</option><option value="edge">Edge отдельным окном</option><option value="browser">браузер</option></select></label>
     </fieldset>
