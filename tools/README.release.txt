@@ -8,7 +8,8 @@ UMG Studio {version}
   1. Распакуйте папку UMGStudio куда угодно (не в Program Files — программа пишет файлы рядом с собой).
   2. Запустите UMGStudio.exe. Windows может предупредить о неизвестном издателе (файл не подписан):
      «Подробнее» → «Выполнить в любом случае».
-  Нужен WebView2 — он уже есть в Windows 10/11.
+  Окно — WebView2 (есть в Windows 10/11); если оно не открылось, программа откроется в Edge отдельным окном.
+  Что пошло не так — в %LOCALAPPDATA%\UMGStudio\log.txt.
 
 СВОИ ФАЙЛЫ ПРОЕКТА
   Скопируйте umgstudio.example.json в umgstudio.json (рядом с UMGStudio.exe) и поправьте пути:

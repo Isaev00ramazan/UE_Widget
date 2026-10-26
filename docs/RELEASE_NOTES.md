@@ -3,6 +3,12 @@
 Первая сборка для скачивания: **`UMGStudio-{version}-win64.zip`** — распаковать и запустить `UMGStudio.exe`
 (Python не нужен). Плагин редактора отдельно — **`UMGStudio-Plugin-{version}-UE5.8.zip`** (он же внутри основного архива, `ue\`).
 
+### Исправлено в v0.2.1
+- Программа падала при запуске из скачанного архива (`Failed to resolve Python.Runtime.Loader.Initialize`): Windows
+  помечает файлы из интернета, и .NET не грузил DLL окна. Теперь пометка снимается при запуске, а если окно pywebview
+  всё равно не открылось — программа открывается в Edge в режиме приложения (отдельное окно), в крайнем случае в браузере.
+  Причина сбоя пишется в `%LOCALAPPDATA%\UMGStudio\log.txt`. Режим окна можно задать в `umgstudio.json`: `"window": "edge"`.
+
 ### Что умеет
 - **Превью как в Designer**: раскладка по правилам Slate (Canvas, Box Auto/Fill, Overlay, SizeBox, Border, Grid, ScaleBox, Retainer, вложенные WBP), шрифт F_HUD из дизайн-системы + кириллица Fira, Size UE × 4/3 = px.
 - **Материалы — ваш HLSL**: `.hlsl` мастеров переводится в GLSL и считается на видеокарте тем же кодом, что в UE.

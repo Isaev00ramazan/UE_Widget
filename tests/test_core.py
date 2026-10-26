@@ -90,6 +90,27 @@ class Materials(unittest.TestCase):
 		self.assertNotIn("UV", m["M_UI_Panel"])
 
 
+class Window(unittest.TestCase):
+	@unittest.skipUnless(sys.platform == "win32", "потоки NTFS — только Windows")
+	def test_unblock_removes_zone_identifier(self):
+		import tempfile
+		from umgstudio import window
+		d = tempfile.mkdtemp()
+		dll = os.path.join(d, "x.dll")
+		with open(dll, "wb") as f:
+			f.write(b"MZ")
+		with open(dll + ":Zone.Identifier", "w") as f:
+			f.write("[ZoneTransfer]\nZoneId=3\n")
+		self.assertTrue(os.path.exists(dll + ":Zone.Identifier"))
+		self.assertEqual(window.unblock(d), 1)
+		self.assertFalse(os.path.exists(dll + ":Zone.Identifier"))
+
+	def test_unblock_noop_elsewhere(self):
+		from umgstudio import window
+		if sys.platform != "win32":
+			self.assertEqual(window.unblock(ROOT), 0)
+
+
 class DesignSnapshot(unittest.TestCase):
 	def test_tokens_and_components(self):
 		d = Design(os.path.join(ROOT, "design", "RacingHud"))

@@ -16,6 +16,7 @@ UMG Studio.
 	--design <папка>    снимок дизайн-системы Claude Design (по умолчанию design/RacingHud)
 	--materials <папка> .hlsl UI-мастеров (HUD_UE57_Kit/Materials; по умолчанию Materials/ в репозитории)
 	--ue <url>          мост в редакторе UE (плагин ue/UMGStudio), по умолчанию http://127.0.0.1:30110
+	--window <режим>    auto | webview | edge | browser — чем открывать окно (auto: webview → Edge --app → браузер)
 """
 import json
 import os
@@ -31,7 +32,7 @@ REPO = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else \
 
 
 def load_config(argv):
-	cfg = {"specs": [], "textures": [], "port": 8765, "setup_hud": None, "assets": None, "design": None, "materials": None, "ue": None}
+	cfg = {"specs": [], "textures": [], "port": 8765, "setup_hud": None, "assets": None, "design": None, "materials": None, "ue": None, "window": None}
 	for base in (os.getcwd(), REPO):
 		p = os.path.join(base, "umgstudio.json")
 		if os.path.isfile(p):
@@ -42,6 +43,8 @@ def load_config(argv):
 			cfg["port"] = data.get("port", cfg["port"])
 			if data.get("ue"):
 				cfg["ue"] = data["ue"]
+			if data.get("window"):
+				cfg["window"] = data["window"]
 			for k in ("setup_hud", "assets", "design", "materials"):
 				if data.get(k):
 					cfg[k] = os.path.join(base, data[k])
@@ -54,6 +57,8 @@ def load_config(argv):
 			cfg["port"] = int(next(it))
 		elif a == "--ue":
 			cfg["ue"] = next(it)
+		elif a == "--window":
+			cfg["window"] = next(it)
 		elif a in ("--setup-hud", "--assets", "--design", "--materials"):
 			cfg[a[2:].replace("-", "_")] = next(it)
 		else:
@@ -123,6 +128,22 @@ def smoke(cfg, report):
 	return 0 if ok else 1
 
 
+def check_window(report):
+	"""Окно pywebview на Windows: снять пометку «из интернета» и загрузить .NET-часть (pythonnet + WinForms), без окна."""
+	import traceback
+	from . import window
+	out = {"unblocked": window.unblock(os.path.dirname(sys.executable)) if getattr(sys, "frozen", False) else 0}
+	try:
+		import webview.platforms.winforms  # noqa: F401 — тянет clr (pythonnet) и сборки WebView2
+		out["ok"] = True
+	except Exception:  # noqa: BLE001
+		out["ok"] = False
+		out["error"] = traceback.format_exc()
+	with open(report, "w", encoding="utf-8") as f:
+		json.dump(out, f, ensure_ascii=False, indent=1)
+	return 0 if out["ok"] else 1
+
+
 def main(argv=None):
 	argv = sys.argv[1:] if argv is None else argv
 	if argv and argv[0] == "--run-spec":
@@ -146,19 +167,15 @@ def main(argv=None):
 		return print_tree(rest[1])
 	if cmd == "smoke":
 		return smoke(cfg, rest[1] if len(rest) > 1 else "smoke.json")
+	if cmd == "check-window":
+		return check_window(rest[1] if len(rest) > 1 else "check-window.json")
 	url = start_server(cfg)
 	print("UMG Studio:", url)
 	print("Спецификации:", *cfg["specs"], sep="\n  ")
 	if cmd == "app":
-		try:
-			import webview  # pywebview: окно на системном WebView2 (Windows) / WebKit
-		except ImportError:
-			print("pywebview не установлен — открываю в браузере (pip install pywebview)")
-		else:
-			webview.create_window("UMG Studio", url, width=1600, height=980, min_size=(1000, 640),
-								  background_color="#071114")
-			webview.start()
-			return 0
+		from . import window
+		window.open_window(url, cfg.get("window") or "auto")
+		return 0
 	webbrowser.open(url)
 	try:
 		threading.Event().wait()
