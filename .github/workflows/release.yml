@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Версия (станет тегом), например v0.2.2"
+        description: "Версия (станет тегом), например v0.2.3"
         required: true
-        default: "v0.2.2"
+        default: "v0.2.3"
       prerelease:
         description: "Пометить как пре-релиз"
         type: boolean
@@ -68,6 +68,20 @@ jobs:
           if (-not $p.WaitForExit(180000)) { $p.Kill(); throw "window check hung" }
           Get-Content check-window.json
           if ($p.ExitCode -ne 0) { throw "window check failed: $($p.ExitCode)" }
+
+      - name: Окно открывается и показывает интерфейс
+        shell: pwsh
+        run: |
+          # то же, что двойной клик по UMGStudio.exe: окно, загрузка интерфейса, затем самопроверка закрывает окно
+          $psi = New-Object System.Diagnostics.ProcessStartInfo
+          $psi.FileName = (Resolve-Path "build/dist/UMGStudio/UMGStudio.exe").Path
+          $psi.Arguments = "selftest-window `"$PWD\selftest-window.json`""
+          $psi.WorkingDirectory = $env:TEMP
+          $psi.UseShellExecute = $false
+          $p = [System.Diagnostics.Process]::Start($psi)
+          if (-not $p.WaitForExit(240000)) { $p.Kill(); Get-Content "$env:LOCALAPPDATA\UMGStudio\log.txt" -ErrorAction SilentlyContinue; throw "window selftest hung" }
+          Get-Content selftest-window.json
+          if ($p.ExitCode -ne 0) { throw "window selftest failed: $($p.ExitCode)" }
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2

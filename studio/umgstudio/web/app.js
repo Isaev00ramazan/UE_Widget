@@ -10,6 +10,13 @@ const S = {
   design: { ok: false, components: [] },
 };
 
+// ─── ошибки интерфейса → лог программы (%LOCALAPPDATA%/UMGStudio/log.txt) ───
+function reportError(msg) {
+  try { fetch("/api/log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ msg: String(msg) }) }); } catch (e) { /* сервер недоступен */ }
+}
+window.addEventListener("error", (e) => reportError(`${e.message} @ ${e.filename}:${e.lineno}`));
+window.addEventListener("unhandledrejection", (e) => reportError("promise: " + (e.reason && (e.reason.stack || e.reason.message) || e.reason)));
+
 // ─── настройки окна (только удобство: без localStorage всё работает) ───
 const PREFS_KEY = "umgstudio-prefs-v1";
 let prefs = {};
@@ -434,6 +441,11 @@ function listen() {
 }
 
 async function main() {
+  try { await start(); } catch (e) { reportError("main: " + (e.stack || e)); }
+  // окно программы ждёт этот сигнал: без него считает, что интерфейс не загрузился, и пробует другой способ
+  fetch("/api/ready?info=" + encodeURIComponent(navigator.userAgent.slice(0, 120)));
+}
+async function start() {
   const faces = ["500", "600", "700", "italic 600", "italic 700"];
   await Promise.all(faces.map((f) => document.fonts.load(`${f} 20px F_HUD`, "AaЖж0")));
   S.materials = await api("/api/materials");

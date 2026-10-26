@@ -6,6 +6,7 @@ UMG Studio.
 	py -m umgstudio build <экран.py>     — записать *.paste.txt (как `py <экран>.py`)
 	py -m umgstudio tree <файл>          — дерево спецификации / paste.txt / copy.txt в консоль
 	py -m umgstudio smoke [отчёт.json]   — проверка сборки без окна (код возврата 0 — всё собирается)
+	py -m umgstudio selftest-window [отчёт.json] — открыть окно, дождаться интерфейса, закрыть
 
 Папки берутся из umgstudio.json (рядом с UMGStudio.bat или в текущей папке) или из ключей:
 	--specs <папка>     спецификации и тексты вставки/копии (можно несколько раз)
@@ -128,6 +129,37 @@ def smoke(cfg, report):
 	return 0 if ok else 1
 
 
+def version():
+	p = os.path.join(REPO, "VERSION")
+	if os.path.isfile(p):
+		with open(p, encoding="utf-8") as f:
+			return f.read().strip()
+	return "dev"
+
+
+def selftest_window(cfg, report):
+	"""Открыть настоящее окно (как при запуске), дождаться загрузки интерфейса, закрыть. Код 0 — интерфейс загрузился."""
+	import time
+	from . import window
+	url = start_server(cfg)
+	out = {"url": url, "version": version()}
+
+	def closer():
+		out["ready"] = server.READY.wait(120)
+		time.sleep(2)
+		window.close_any()
+
+	threading.Thread(target=closer, daemon=True).start()
+	out["kind"] = window.open_window(url, cfg.get("window") or "auto", server.READY, timeout=45, browser_fallback=False)
+	out["ready"] = server.READY.is_set()
+	out["ui_errors"] = list(server.UI_LOG)
+	with open(window.log_path(), encoding="utf-8") as f:
+		out["log"] = f.read().splitlines()[-30:]
+	with open(report, "w", encoding="utf-8") as f:
+		json.dump(out, f, ensure_ascii=False, indent=1)
+	return 0 if out["ready"] and not out["ui_errors"] else 1
+
+
 def check_window(report):
 	"""Окно pywebview на Windows: снять пометку «из интернета» и загрузить .NET-часть (pythonnet + WinForms), без окна."""
 	import traceback
@@ -171,6 +203,8 @@ def main(argv=None):
 		return print_tree(rest[1])
 	if cmd == "smoke":
 		return smoke(cfg, rest[1] if len(rest) > 1 else "smoke.json")
+	if cmd == "selftest-window":
+		return selftest_window(cfg, rest[1] if len(rest) > 1 else "selftest-window.json")
 	if cmd == "check-window":
 		return check_window(rest[1] if len(rest) > 1 else "check-window.json")
 	url = start_server(cfg)
@@ -178,7 +212,13 @@ def main(argv=None):
 	print("Спецификации:", *cfg["specs"], sep="\n  ")
 	if cmd == "app":
 		from . import window
-		window.open_window(url, cfg.get("window") or "auto")
+		window.log("запуск %s (%s), интерфейс %s" % (version(), "exe" if getattr(sys, "frozen", False) else "исходники", url))
+		try:
+			window.open_window(url, cfg.get("window") or "auto", server.READY)
+		except Exception:  # noqa: BLE001
+			import traceback
+			window.log("сбой окна:\n" + traceback.format_exc())
+			raise
 		return 0
 	webbrowser.open(url)
 	try:

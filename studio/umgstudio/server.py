@@ -12,6 +12,8 @@
 	GET  /design/<путь>          — файлы снимка дизайна (шрифты, bundle.css, сцена)
 	GET  /fonts.css              — F_HUD: шрифты из дизайна + Fira Sans Condensed для кириллицы (как в UE)
 	GET  /api/events             — SSE: «файлы поменялись»
+	GET  /api/ready              — интерфейс загрузился (окно программы проверяет, что оно не пустое)
+	POST /api/log {msg}          — ошибка интерфейса → %LOCALAPPDATA%/UMGStudio/log.txt
 	POST /api/build   {src}      — записать *.paste.txt спецификации (как `py <экран>.py`)
 	POST /api/clipboard {text}   — положить текст в буфер обмена (запасной путь, если браузер не дал)
 	GET  /api/diff?src=&wbp=     — отличия <WBP>.copy.txt (из UE) от источника
@@ -35,6 +37,9 @@ from urllib.parse import parse_qs, urlparse
 
 from . import clipboard, diff, t3d, ue_bridge
 from .design import Design
+
+READY = threading.Event()   # интерфейс загрузился в окне
+UI_LOG = []                 # ошибки интерфейса (для самопроверки сборки)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WEB = os.path.join(HERE, "web")
@@ -279,6 +284,11 @@ class Studio:
 			q.put(msg)
 
 
+def window_log(msg):
+	from . import window
+	window.log(msg)
+
+
 FIRA = [("500", "normal"), ("600", "normal"), ("700", "normal"), ("600", "italic"), ("700", "italic")]
 
 
@@ -328,6 +338,11 @@ def make_handler(studio):
 			u = urlparse(self.path)
 			q = {k: v[0] for k, v in parse_qs(u.query).items()}
 			try:
+				if u.path == "/api/ready":
+					if not READY.is_set():
+						window_log("интерфейс загрузился: %s" % q.get("info", ""))
+					READY.set()
+					return self.send(200, {"ok": True})
 				if u.path == "/api/sources":
 					return self.send(200, {"sources": studio.sources(), "dirs": studio.spec_dirs})
 				if u.path == "/api/render":
@@ -383,6 +398,11 @@ def make_handler(studio):
 						return self.send(200, fn(body["src"], body["wbp"]))
 					except ValueError as e:
 						return self.send(200, {"ok": False, "error": str(e)})
+				if u.path == "/api/log":
+					msg = str(body.get("msg", ""))[:4000]
+					UI_LOG.append(msg)
+					window_log("UI: " + msg)
+					return self.send(200, {"ok": True})
 				if u.path == "/api/clipboard":
 					return self.send(200, {"ok": clipboard.copy(body["text"])})
 				return self.send(404, {"error": "нет такого метода"})
