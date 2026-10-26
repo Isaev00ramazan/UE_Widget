@@ -1,8 +1,10 @@
 {
-  "specs": ["D:/MadWater/SourceArt/UI/HUD/UMGPaste"],
-  "textures": ["D:/MadWater/Saved/UMGStudio/Textures"],
-  "assets": "D:/MadWater/Saved/UMGStudio/hud_assets.json",
-  "setup_hud": "D:/MadWater/Scripts/ue_setup_hud.py",
+  "specs": ["D:/MOD Dropbox/MAD WATER/PROJECT/MadWater_5.8/SourceArt/UI/HUD/UMGPaste"],
+  "textures": ["D:/MOD Dropbox/MAD WATER/PROJECT/MadWater_5.8/Saved/UMGStudio/Textures"],
+  "assets": "D:/MOD Dropbox/MAD WATER/PROJECT/MadWater_5.8/Saved/UMGStudio/hud_assets.json",
+  "setup_hud": "D:/MOD Dropbox/MAD WATER/PROJECT/MadWater_5.8/Scripts/ue_setup_hud.py",
+  "materials": "D:/MOD Dropbox/MAD WATER/PROJECT/MadWater_5.8/SourceArt/UI/HUD/HUD_UE57_Kit/Materials",
   "design": "design/RacingHud",
+  "ue": "http://127.0.0.1:30110",
   "port": 8765
 }

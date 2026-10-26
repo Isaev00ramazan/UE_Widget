@@ -9,7 +9,8 @@
    обновляется при сохранении файла.
 2. **Сверка с макетом** — компонент из Claude Design поверх превью (прозрачность, «разница», «только макет», «рядом»).
 3. **Текст вставки** — кнопка «Скопировать для UE» кладёт его в буфер обмена: в Designer остаётся Ctrl+V.
-4. **Ассет в UE одной кнопкой** — плагин редактора (этап 2, см. [docs/ROADMAP.md](docs/ROADMAP.md)).
+4. **«В UE ▶»** — плагин редактора (`ue/UMGStudio`) сам создаёт/обновляет WBP, компилирует и сохраняет;
+   **«Забрать из UE»** и **«Сравнить с UE»** — обратная синхронизация. Статус: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Запуск (Windows)
 
@@ -17,6 +18,7 @@
 2. Чтобы работать с файлами проекта, а не с примерами: скопируйте `umgstudio.example.json` в `umgstudio.json`
    и поправьте пути (папка спецификаций, `ue_setup_hud.py`, выгрузка ассетов из UE).
 3. Значения MI и иконки для превью: в UE выполните `ue/export_hud_assets.py` (Tools → Execute Python Script).
+4. Плагин: `ue\install_plugin.bat "<папка проекта>"`, собрать проект — подробности в `ue/UMGStudio/README.md`.
 
 Без окна: `py -m umgstudio serve` (из папки `studio`) — интерфейс откроется в браузере.
 
@@ -25,7 +27,9 @@ UMGStudio.bat                окно программы
 studio/umgstudio/            ядро (umg.py, разбор UMG-текста), сервер, интерфейс web/
 design/RacingHud/            снимок дизайн-системы Claude Design (токены, шрифты, компоненты, сцена)
 examples/UMGPaste/           спецификации и тексты из проекта — эталоны для тестов
+ue/UMGStudio/                плагин редактора UE 5.8 (мост: «В UE», «Забрать из UE»)
 ue/export_hud_assets.py      выгрузка MI, текстур и списка ассетов из редактора
+Materials/                   .hlsl UI-мастеров — превью считает их на WebGL2
 tests/                       py -m unittest discover -s tests
 docs/                        ROADMAP, ARCHITECTURE, NEEDED
 ```

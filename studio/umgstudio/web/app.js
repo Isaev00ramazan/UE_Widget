@@ -1,11 +1,12 @@
 // Интерфейс UMG Studio: список экранов, превью, Hierarchy, свойства, живое обновление.
 import { Engine, layoutRoot, resetLayout, fontOf, lin, hex, textOf, assetName, PX_PER_PT } from "./slate.js";
+import { GLMaterials } from "./shaders.js";
 
 const $ = (id) => document.getElementById(id);
 const S = {
   sources: [], src: null, result: null, wbp: 0,
   vis: {}, texts: {}, stateName: null, selected: null,
-  materials: {}, images: {}, nested: {},
+  materials: {}, images: {}, nested: {}, gl: null,
   design: { ok: false, components: [] },
 };
 
@@ -55,6 +56,7 @@ async function selectSource(id, keep = false) {
   const src = S.sources.find((s) => s.id === id);
   $("srcTitle").textContent = src ? src.file : id;
   $("bBuild").disabled = !src || src.kind !== "spec";
+  $("diffPane").hidden = true;
   S.result = await api("/api/render?src=" + encodeURIComponent(id));
   if (keep && prefs.wbpName) {
     const i = (S.result.widgets || []).findIndex((w) => w.wbp === prefs.wbpName);
@@ -122,7 +124,7 @@ async function render() {
   if (!w) { stage.innerHTML = ""; $("tree").innerHTML = '<p class="hint" style="padding:8px 12px">Спецификация ничего не сохранила (нет save()).</p>'; return; }
   root = structuredClone(w.roots[0]);
   await prepare(root);
-  engine = new Engine({ vis: S.vis, texts: S.texts, nested: S.nested, images: S.images, materials: S.materials });
+  engine = new Engine({ vis: S.vis, texts: S.texts, nested: S.nested, images: S.images, materials: S.materials, gl: S.gl });
   const mode = $("selSize").value;
   const screen = { mode, w: mode === "custom" ? +$("inW").value : 1920, h: mode === "custom" ? +$("inH").value : 1080 };
   const size = layoutRoot(engine, root, screen);
@@ -315,7 +317,7 @@ function renderProps(n) {
   h += "</dl>";
   if (n.slot) {
     h += `<h4>Слот <span class="hint">${escapeHtml(n.slot.cls)}</span></h4><dl>`;
-    for (const [k, v] of Object.entries(n.slot)) if (k !== "cls") h += `<dt>${escapeHtml(k)}</dt><dd>${pretty(k, v, n)}</dd>`;
+    for (const [k, v] of Object.entries(n.slot)) if (k !== "cls" && !k.startsWith("$")) h += `<dt>${escapeHtml(k)}</dt><dd>${pretty(k, v, n)}</dd>`;
     h += "</dl>";
   }
   box.innerHTML = h;
@@ -334,6 +336,58 @@ $("bCopy").onclick = async () => {
   toast(ok ? `Скопировано: ${w.wbp} (${count} элементов). В Designer: выдели пустую Hierarchy или панель → Ctrl+V`
     : "Не удалось положить в буфер обмена");
 };
+// ─── редактор UE ───
+function currentWidget() { return S.result && S.result.ok && (S.result.widgets[S.wbp] || S.result.widgets[0]); }
+async function ueStatus() {
+  const r = await api("/api/ue/status");
+  const el = $("ueStatus");
+  el.className = "ue-status " + (r.ok ? "on" : "off");
+  el.textContent = r.ok ? `UE ${r.engine.split("-")[0]} · ${r.project}` : "UE: нет связи";
+  el.title = r.ok ? "Мост UMG Studio Bridge на связи" : r.error;
+  return r.ok;
+}
+function showMessages(title, lines) {
+  engine.warnings.push(title, ...lines);
+  renderWarnings();
+}
+$("bPush").onclick = async () => {
+  const w = currentWidget();
+  if (!w) return toast("Нечего отправлять: источник не собрался");
+  $("bPush").disabled = true; toast(`Отправляю ${w.wbp} в UE…`, 10000);
+  const r = await api("/api/ue/push", { src: S.src, wbp: w.wbp });
+  $("bPush").disabled = false;
+  if (r.offline) { ueStatus(); return toast(r.error, 6000); }
+  const head = r.ok ? `${w.wbp} ${r.created ? "создан" : "обновлён"} в UE: ${r.widgets} элементов, корень ${r.root}`
+    : `${w.wbp}: ${r.error}`;
+  toast(head + (r.backup ? " · копия в Saved/UMGStudio/Backups" : ""), 6000);
+  showMessages("UE: " + head, (r.messages || []).filter((m) => !m.startsWith("Инфо")));
+};
+$("bPull").onclick = async () => {
+  const w = currentWidget();
+  if (!w) return;
+  const r = await api("/api/ue/pull", { src: S.src, wbp: w.wbp });
+  if (!r.ok) return toast(r.error, 6000);
+  toast(`Забрал ${w.wbp} из UE → ${r.path.split(/[\\/]/).pop()}`, 4000);
+  showDiff();
+};
+async function showDiff() {
+  const w = currentWidget();
+  if (!w) return;
+  const r = await api(`/api/diff?src=${encodeURIComponent(S.src)}&wbp=${encodeURIComponent(w.wbp)}`);
+  const pane = $("diffPane"), body = $("diffBody");
+  pane.hidden = false;
+  if (!r.ok) { $("diffTitle").textContent = "Сравнение с UE"; body.innerHTML = `<p class="hint">${escapeHtml(r.error)}</p>`; return; }
+  $("diffTitle").textContent = r.items.length ? `${r.copy}: отличий ${r.items.length} — в UE правда, перенеси их в спецификацию` : `${r.copy}: совпадает со спецификацией`;
+  const KIND = { added: "есть только в UE", removed: "нет в UE", class: "класс", parent: "родитель", order: "порядок", prop: "свойство", slot: "слот" };
+  body.innerHTML = r.items.length ? "<table><tr><th>Элемент</th><th>Что</th><th>Спецификация</th><th>UE</th></tr>" + r.items.map((d) =>
+    `<tr data-name="${escapeHtml(d.name)}"><td>${escapeHtml(d.name)}</td><td class="k-${d.kind}">${KIND[d.kind]}${d.key ? " " + escapeHtml(d.key) : ""}${d.cls ? " · " + escapeHtml(d.cls) : ""}</td>` +
+    `<td class="v">${escapeHtml(d.spec ?? "—")}</td><td class="v">${escapeHtml(d.ue ?? (d.kind === "added" ? "в " + (d.parent || "?") : "—"))}</td></tr>`).join("") + "</table>" : "";
+  body.querySelectorAll("tr[data-name]").forEach((tr) => (tr.onclick = () => select(tr.dataset.name)));
+  if (root) fit(stageSize());
+}
+$("bDiff").onclick = showDiff;
+$("bDiffClose").onclick = () => { $("diffPane").hidden = true; if (root) fit(stageSize()); };
+
 $("bBuild").onclick = async () => {
   const r = await api("/api/build", { src: S.src });
   toast(r.ok ? "Записано:\n" + r.written.map((p) => p.split(/[\\/]/).pop()).join(", ") : "Ошибка: " + r.error, 5000);
@@ -365,6 +419,10 @@ function listen() {
     const msg = JSON.parse(e.data);
     if (msg.reload) return location.reload();
     S.nested = {};
+    if (msg.files.some((f) => /\.(hlsl|json)$/.test(f) || f === "ue_setup_hud.py")) {
+      S.materials = await api("/api/materials");
+      S.gl = new GLMaterials(await api("/api/shaders"));
+    }
     if (msg.files.some((f) => /\.(html|css|md|json)$/.test(f))) {
       S.design = await api("/api/design"); if (!S.design.ok) S.design.components = [];
       designLoaded = { over: "", side: "" };
@@ -379,6 +437,7 @@ async function main() {
   const faces = ["500", "600", "700", "italic 600", "italic 700"];
   await Promise.all(faces.map((f) => document.fonts.load(`${f} 20px F_HUD`, "AaЖж0")));
   S.materials = await api("/api/materials");
+  S.gl = new GLMaterials(await api("/api/shaders"));
   S.design = await api("/api/design");
   if (!S.design.ok) S.design.components = [];
   fillDesignSelect();
@@ -386,5 +445,7 @@ async function main() {
   const first = S.sources.find((s) => s.id === prefs.src) || S.sources.find((s) => s.kind === "spec") || S.sources[0];
   if (first) await selectSource(first.id, true);
   listen();
+  ueStatus();
+  setInterval(ueStatus, 5000);
 }
 main();

@@ -6,6 +6,7 @@
 	GET  /api/wbp?name=WBP_X     — IR виджета по имени (для вложенных user_widget)
 	GET  /api/texture?name=T_X   — PNG текстуры из папок textures (404 — превью рисует заглушку)
 	GET  /api/materials          — параметры мастеров (MATERIALS из ue_setup_hud.py) и MI (выгрузка из UE)
+	GET  /api/shaders            — код .hlsl мастеров и их входы (превью переводит в GLSL и считает на WebGL2)
 	GET  /api/design             — снимок дизайн-системы Claude Design: компоненты, README, карточки
 	GET  /design/view/<Компонент> — preview.html компонента с токенами и bundle.css (для наложения на превью)
 	GET  /design/<путь>          — файлы снимка дизайна (шрифты, bundle.css, сцена)
@@ -13,6 +14,11 @@
 	GET  /api/events             — SSE: «файлы поменялись»
 	POST /api/build   {src}      — записать *.paste.txt спецификации (как `py <экран>.py`)
 	POST /api/clipboard {text}   — положить текст в буфер обмена (запасной путь, если браузер не дал)
+	GET  /api/diff?src=&wbp=     — отличия <WBP>.copy.txt (из UE) от источника
+	GET  /api/ue/status          — мост в редакторе UE (плагин ue/UMGStudio) на связи?
+	POST /api/ue/push {src, wbp} — «В UE»: создать/обновить WBP из текста вставки, скомпилировать, сохранить
+	POST /api/ue/pull {src, wbp} — «Забрать из UE»: дерево WBP → <WBP>.copy.txt рядом со спецификацией
+	POST /api/ue/open {src, wbp} — открыть WBP в редакторе
 """
 import ast
 import json
@@ -26,7 +32,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from . import clipboard, t3d
+from . import clipboard, diff, t3d, ue_bridge
 from .design import Design
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -41,8 +47,11 @@ def wbp_of(filename):
 
 
 class Studio:
-	def __init__(self, spec_dirs, texture_dirs=(), setup_hud=None, assets_dump=None, design=None):
+	def __init__(self, spec_dirs, texture_dirs=(), setup_hud=None, assets_dump=None, design=None, materials_dir=None,
+				 ue_url=ue_bridge.DEFAULT_URL):
 		self.design = Design(design)
+		self.ue_url = ue_url
+		self.materials_dir = materials_dir
 		self.spec_dirs = [os.path.abspath(d) for d in spec_dirs]
 		self.texture_dirs = [os.path.abspath(d) for d in texture_dirs]
 		self.setup_hud = setup_hud
@@ -146,11 +155,75 @@ class Studio:
 				out["instances"] = json.load(f).get("materials", {})
 		return out
 
+	def shaders(self):
+		"""{M_UI_X: {"code": тело Custom-ноды, "inputs": [[имя, тип, по умолчанию]]}} — только мастера с .hlsl."""
+		out = {}
+		if not (self.setup_hud and os.path.isfile(self.setup_hud) and self.materials_dir):
+			return out
+		for name, inputs in read_material_table(self.setup_hud).items():
+			p = os.path.join(self.materials_dir, name + ".hlsl")
+			if os.path.isfile(p):
+				with open(p, encoding="utf-8") as f:
+					out[name] = {"code": f.read(), "inputs": [[n, k, list(v) if isinstance(v, tuple) else v] for n, k, v in inputs]}
+		return out
+
+	# ─── редактор UE ───
+	def widget(self, src, wbp):
+		res = self.render(src)
+		if not res.get("ok"):
+			raise ValueError("Источник не собрался: " + (res.get("error") or "")[-400:])
+		for w in res["widgets"]:
+			if w["wbp"] == wbp:
+				asset = w.get("asset") or ue_bridge.asset_from_text(w["text"])
+				if not asset:
+					raise ValueError("Не понял путь ассета для %s" % wbp)
+				return w, asset
+		raise ValueError("В источнике нет %s" % wbp)
+
+	def ue_push(self, src, wbp):
+		w, asset = self.widget(src, wbp)
+		if w.get("fragment"):
+			return {"ok": False, "error": "%s — фрагмент (save(..., suffix=…)): его вставляют в готовый виджет руками" % wbp}
+		body = {"asset": asset, "text": w["text"], "backup": True}
+		if w.get("parent"):
+			body["parent"] = w["parent"]
+		body.update(ue_bridge.design_options(w.get("design")))
+		return ue_bridge.call(self.ue_url, "/umgstudio/import", body)
+
+	def ue_pull(self, src, wbp):
+		_, asset = self.widget(src, wbp)
+		r = ue_bridge.call(self.ue_url, "/umgstudio/export", {"asset": asset})
+		if not r.get("ok"):
+			return r
+		folder = os.path.dirname(self.path_of(src))
+		path = os.path.join(folder, wbp + ".copy.txt")
+		with open(path, "w", encoding="utf-8", newline="") as f:
+			f.write(r["text"])
+		return {"ok": True, "path": path, "asset": asset}
+
+	def diff(self, src, wbp):
+		w, _ = self.widget(src, wbp)
+		path = os.path.join(os.path.dirname(self.path_of(src)), wbp + ".copy.txt")
+		if not os.path.isfile(path):
+			return {"ok": False, "error": "Нет %s.copy.txt — нажми «Забрать из UE» (или Ctrl+C корня в Hierarchy и сохрани в файл)" % wbp}
+		if os.path.abspath(path) == os.path.abspath(self.path_of(src)):
+			return {"ok": False, "error": "Это и есть копия из UE — сравнивать её надо со спецификацией или paste.txt"}
+		with open(path, encoding="utf-8-sig") as f:
+			copy_roots = t3d.parse(f.read())
+		if not copy_roots or not w["roots"]:
+			return {"ok": False, "error": "Пустое дерево"}
+		items = diff.diff(w["roots"][0], copy_roots[0])
+		return {"ok": True, "copy": os.path.basename(path), "items": items}
+
+	def ue_open(self, src, wbp):
+		_, asset = self.widget(src, wbp)
+		return ue_bridge.call(self.ue_url, "/umgstudio/open", {"asset": asset})
+
 	# ─── слежение за файлами ───
 	def watch(self, interval=0.4):
 		def snapshot():
 			snap = {}
-			dirs = self.spec_dirs + [WEB, HERE]
+			dirs = self.spec_dirs + [WEB, HERE] + ([self.materials_dir] if self.materials_dir else [])
 			if self.design.ok:
 				dirs += [self.design.root] + [os.path.join(self.design.root, "components", c)
 											  for c in os.listdir(os.path.join(self.design.root, "components"))]
@@ -158,7 +231,7 @@ class Studio:
 				if not os.path.isdir(d):
 					continue
 				for f in os.listdir(d):
-					if f.endswith((".py", ".txt", ".js", ".css", ".html")):
+					if f.endswith((".py", ".txt", ".js", ".css", ".html", ".hlsl", ".json", ".md")):
 						p = os.path.join(d, f)
 						try:
 							snap[p] = os.path.getmtime(p)
@@ -198,16 +271,20 @@ def fonts_css(studio):
 	return "\n".join(rules)
 
 
-def read_masters(path):
+def read_material_table(path):
 	"""Таблица MATERIALS из Scripts/ue_setup_hud.py без запуска скрипта (он импортирует unreal)."""
 	with open(path, encoding="utf-8") as f:
 		tree = ast.parse(f.read())
 	for node in tree.body:
 		if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "MATERIALS" for t in node.targets):
-			table = ast.literal_eval(node.value)
-			return {m: {n: (list(v) if isinstance(v, tuple) else v) for n, kind, v in params
-						if kind in ("scalar", "vector")} for m, params in table.items()}
+			return ast.literal_eval(node.value)
 	return {}
+
+
+def read_masters(path):
+	"""{мастер: {параметр: значение по умолчанию}} — только scalar и vector."""
+	return {m: {n: (list(v) if isinstance(v, tuple) else v) for n, kind, v in params if kind in ("scalar", "vector")}
+			for m, params in read_material_table(path).items()}
 
 
 def make_handler(studio):
@@ -255,6 +332,15 @@ def make_handler(studio):
 					return self.static(u.path[len("/design"):], studio.design.root)
 				if u.path == "/fonts.css":
 					return self.send(200, fonts_css(studio), "text/css; charset=utf-8")
+				if u.path == "/api/diff":
+					try:
+						return self.send(200, studio.diff(q["src"], q["wbp"]))
+					except ValueError as e:
+						return self.send(200, {"ok": False, "error": str(e)})
+				if u.path == "/api/ue/status":
+					return self.send(200, ue_bridge.call(studio.ue_url, "/umgstudio/ping", timeout=1.5))
+				if u.path == "/api/shaders":
+					return self.send(200, studio.shaders())
 				if u.path == "/api/events":
 					return self.events()
 				return self.static(u.path)
@@ -271,6 +357,12 @@ def make_handler(studio):
 					r = studio.run_spec(path, write=True)
 					return self.send(200, {"ok": r.get("ok"), "error": r.get("error"),
 										   "written": [w["path"] for w in r.get("widgets", [])]})
+				if u.path in ("/api/ue/push", "/api/ue/pull", "/api/ue/open"):
+					fn = {"push": studio.ue_push, "pull": studio.ue_pull, "open": studio.ue_open}[u.path.rsplit("/", 1)[1]]
+					try:
+						return self.send(200, fn(body["src"], body["wbp"]))
+					except ValueError as e:
+						return self.send(200, {"ok": False, "error": str(e)})
 				if u.path == "/api/clipboard":
 					return self.send(200, {"ok": clipboard.copy(body["text"])})
 				return self.send(404, {"error": "нет такого метода"})

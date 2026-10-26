@@ -312,10 +312,14 @@ SAVED = []
 STATES = []
 
 
-def save(root, wbp, out_dir, folder=WIDGET_DIR, suffix=""):
+def save(root, wbp, out_dir, folder=WIDGET_DIR, suffix="", parent=None, design=None):
+	"""parent — C++-база для кнопки «В UE» ('/Script/MadWater.HUDDriveWidget'); design — размер превью в Designer:
+	(1920, 1080) = Custom, 'screen' = Fill Screen, 'desired' = Desired. В текст вставки не попадают.
+	suffix — фрагмент для вставки в существующий виджет (кнопка «В UE» для него недоступна)."""
 	path = os.path.join(out_dir, "%s%s.paste.txt" % (wbp, suffix))
 	text = export(root, wbp, folder)
-	SAVED.append({"wbp": wbp + suffix, "folder": folder, "path": path, "text": text})
+	SAVED.append({"wbp": wbp + suffix, "folder": folder, "path": path, "text": text,
+				  "asset": "%s/%s" % (folder, wbp), "fragment": bool(suffix), "parent": parent, "design": design})
 	if not WRITE:
 		return path
 	with open(path, "w", encoding="utf-8", newline="\r\n") as f:

@@ -183,7 +183,7 @@ def parse_objects(text):
 
 
 def _slot_ir(cls, props):
-	d = {"cls": short_cls(cls)}
+	d = {"cls": short_cls(cls), "$raw": {k: v for k, v in props}}
 	for k, v in props:
 		d[k] = parse_value(v)
 	return d

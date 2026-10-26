@@ -13,6 +13,8 @@ UMG Studio.
 	--setup-hud <файл>  Scripts/ue_setup_hud.py — параметры мастер-материалов для превью
 	--assets <файл>     hud_assets.json — выгрузка MI из UE (ue/export_hud_assets.py)
 	--design <папка>    снимок дизайн-системы Claude Design (по умолчанию design/RacingHud)
+	--materials <папка> .hlsl UI-мастеров (HUD_UE57_Kit/Materials; по умолчанию Materials/ в репозитории)
+	--ue <url>          мост в редакторе UE (плагин ue/UMGStudio), по умолчанию http://127.0.0.1:30110
 """
 import json
 import os
@@ -26,7 +28,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 
 def load_config(argv):
-	cfg = {"specs": [], "textures": [], "port": 8765, "setup_hud": None, "assets": None, "design": None}
+	cfg = {"specs": [], "textures": [], "port": 8765, "setup_hud": None, "assets": None, "design": None, "materials": None, "ue": None}
 	for base in (os.getcwd(), REPO):
 		p = os.path.join(base, "umgstudio.json")
 		if os.path.isfile(p):
@@ -35,7 +37,9 @@ def load_config(argv):
 			for k in ("specs", "textures"):
 				cfg[k] += [os.path.join(base, d) for d in data.get(k, [])]
 			cfg["port"] = data.get("port", cfg["port"])
-			for k in ("setup_hud", "assets", "design"):
+			if data.get("ue"):
+				cfg["ue"] = data["ue"]
+			for k in ("setup_hud", "assets", "design", "materials"):
 				if data.get(k):
 					cfg[k] = os.path.join(base, data[k])
 			break
@@ -45,7 +49,9 @@ def load_config(argv):
 			cfg[a[2:]].append(next(it))
 		elif a == "--port":
 			cfg["port"] = int(next(it))
-		elif a in ("--setup-hud", "--assets", "--design"):
+		elif a == "--ue":
+			cfg["ue"] = next(it)
+		elif a in ("--setup-hud", "--assets", "--design", "--materials"):
 			cfg[a[2:].replace("-", "_")] = next(it)
 		else:
 			rest.append(a)
@@ -53,13 +59,16 @@ def load_config(argv):
 		cfg["specs"] = [os.path.join(REPO, "examples", "UMGPaste")]
 	if not cfg["design"]:
 		cfg["design"] = os.path.join(REPO, "design", "RacingHud")
+	if not cfg["materials"]:
+		cfg["materials"] = os.path.join(REPO, "Materials")
 	if not cfg["setup_hud"]:
 		cfg["setup_hud"] = os.path.join(REPO, "Skills", "ue_setup_hud.py")
 	return cfg, rest
 
 
 def start_server(cfg):
-	studio = server.Studio(cfg["specs"], cfg["textures"], cfg["setup_hud"], cfg["assets"], cfg["design"])
+	studio = server.Studio(cfg["specs"], cfg["textures"], cfg["setup_hud"], cfg["assets"], cfg["design"], cfg["materials"],
+						   cfg["ue"] or "http://127.0.0.1:30110")
 	httpd = server.serve(studio, cfg["port"])
 	threading.Thread(target=httpd.serve_forever, daemon=True).start()
 	return "http://127.0.0.1:%d/" % httpd.server_address[1]

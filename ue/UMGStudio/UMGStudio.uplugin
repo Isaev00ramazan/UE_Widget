@@ -1,0 +1,19 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "UMG Studio Bridge",
+	"Description": "Связь с UMG Studio: создаёт и обновляет Widget Blueprint из текста вставки, выгружает дерево обратно.",
+	"Category": "Editor",
+	"CreatedBy": "MadWater",
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "UMGStudio",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+	]
+}

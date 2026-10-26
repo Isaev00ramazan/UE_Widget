@@ -1,0 +1,54 @@
+Begin Object Class=/Script/UMG.Border Name="Border_46" ExportPath="/Script/UMG.Border'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Border_46'"
+   Begin Object Class=/Script/UMG.BorderSlot Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Border_46.BorderSlot_0'"
+   End Object
+   Begin Object Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Border_46.BorderSlot_0'"
+      Padding=(Left=5.000000,Right=5.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Border'Border_46'"
+      Content="/Script/UMG.Overlay'Overlay_0'"
+   End Object
+   HorizontalAlignment=HAlign_Center
+   VerticalAlignment=VAlign_Center
+   Padding=(Left=5.000000,Right=5.000000)
+   Background=(DrawAs=RoundedBox,ImageSize=(X=22.000000,Y=20.000000),OutlineSettings=(CornerRadii=(X=3.000000,Y=3.000000,Z=3.000000,W=3.000000),Color=(SpecifiedColor=(R=0.514918,G=0.830770,B=0.830770,A=0.200000)),Width=1.000000,RoundingType=FixedRadius))
+   BrushColor=(R=0.002400,G=0.008000,B=0.011000,A=0.860000)
+   Slots(0)="/Script/UMG.BorderSlot'BorderSlot_0'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_0" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_0'"
+   WidgetName="Border_46"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="Overlay_0" ExportPath="/Script/UMG.Overlay'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Overlay_0'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Overlay_0.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Overlay_0.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Overlay_0.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Overlay_0'"
+      Content="/Script/UMG.Image'KeyIcon'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.Overlay_0.OverlaySlot_0'"
+      Parent="/Script/UMG.Overlay'Overlay_0'"
+      Content="/Script/UMG.TextBlock'KeyText'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   bIsVariable=True
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMG.TextBlock Name="KeyText" ExportPath="/Script/UMG.TextBlock'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.KeyText'"
+   Text=NSLOCTEXT("[BDFDEF4AA260B17D185886F12809987A]", "BF4C09C04B54D6548096BE88E28E54C0", "Shift")
+   ColorAndOpacity=(SpecifiedColor=(R=0.391573,G=0.514918,B=0.527115,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/UI/HUD/Fonts/F_HUD.F_HUD'",TypefaceFontName="Medium",Size=10.500000,LetterSpacing=60)
+   bIsVariable=True
+   DisplayLabel="KeyText"
+End Object
+Begin Object Class=/Script/UMG.Image Name="KeyIcon" ExportPath="/Script/UMG.Image'/Game/UI/HUD/Widgets/WBP_Key.WBP_Key:WidgetTree.KeyIcon'"
+   Brush=(ImageSize=(X=16.000000,Y=16.000000))
+   Visibility=Collapsed
+   DisplayLabel="KeyIcon"
+End Object

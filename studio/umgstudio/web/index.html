@@ -11,7 +11,11 @@
   <div class="brand">UMG <b>Studio</b></div>
   <div class="crumbs"><span id="srcTitle">—</span><nav id="wbpTabs" class="tabs" aria-label="Виджеты источника"></nav></div>
   <div class="actions">
-    <button id="bCopy" class="primary" title="Текст вставки в буфер обмена — в Designer: пустая Hierarchy → Ctrl+V">Скопировать для UE</button>
+    <span id="ueStatus" class="ue-status" title="Мост в редакторе UE (плагин UMG Studio Bridge)">UE: …</span>
+    <button id="bPush" class="primary" title="Создать/обновить WBP в открытом редакторе UE: дерево, Is Variable, размер превью, родитель; компиляция и сохранение (резервная копия — Saved/UMGStudio/Backups)">В UE ▶</button>
+    <button id="bPull" title="Выгрузить дерево WBP из UE в &lt;WBP&gt;.copy.txt рядом со спецификацией">Забрать из UE</button>
+    <button id="bDiff" title="Чем вёрстка в UE (copy.txt) отличается от спецификации">Сравнить с UE</button>
+    <button id="bCopy" title="Текст вставки в буфер обмена — в Designer: пустая Hierarchy → Ctrl+V">Скопировать</button>
     <button id="bBuild" title="Записать *.paste.txt спецификации (как py экран.py)">Записать paste.txt</button>
   </div>
 </header>
@@ -71,6 +75,10 @@
     <div id="designPane" class="design-pane" hidden>
       <iframe id="designSide" title="Макет из Claude Design"></iframe>
       <div id="designReadme" class="design-readme"></div>
+    </div>
+    <div id="diffPane" class="diff-pane" hidden>
+      <div class="diff-head"><span id="diffTitle">Отличия</span><button id="bDiffClose" class="mini">Закрыть</button></div>
+      <div id="diffBody" class="diff-body"></div>
     </div>
     <div id="states" class="states" hidden></div>
     <div id="warnings" class="warnings" hidden></div>

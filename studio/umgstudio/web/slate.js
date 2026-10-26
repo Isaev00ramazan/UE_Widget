@@ -136,6 +136,7 @@ export class Engine {
     this.nested = opts.nested || {};       // WBP_X → корень IR вложенного виджета
     this.images = opts.images || {};       // T_X → HTMLImageElement | null
     this.materials = opts.materials || {}; // данные мастеров и MI (см. materials.js)
+    this.gl = opts.gl || null;             // GLMaterials: точные копии мастеров из .hlsl (shaders.js)
     this.measureCtx = document.createElement("canvas").getContext("2d");
     this.warnings = [];
   }
@@ -342,6 +343,10 @@ export class Engine {
             place(it.c, x, pos + y, cw, ch);
           }
           pos += slot;
+        }
+        if (pos > along + 0.5 && info.length) {
+          this.warnings.push(`${n.name}: содержимое ${Math.round(pos)} px не влезает в ${Math.round(along)} px по ${horiz ? "ширине" : "высоте"} — ` +
+            `Auto-элементы Slate не сжимает, последние вылезут за край (дай Fill одному из них или уменьши размеры)`);
         }
         return;
       }
@@ -558,6 +563,20 @@ export class Engine {
       cv.className = "fill";
       const k = 2;
       cv.width = Math.max(1, Math.round(r.w * k)); cv.height = Math.max(1, Math.round(r.h * k));
+      if (this.gl && this.gl.has(info.master)) {
+        const params = Object.assign({}, info.params);
+        // Size из выгрузки MI — как есть (несовпадение видно, как в игре); без выгрузки — фактический размер Image
+        if (!info.size) {
+          const def = params.Size;
+          params.Size = Array.isArray(def) ? [r.w, r.h, 0, 0] : r.w;
+        }
+        if (this.gl.draw(cv, info.master, params, r.w, r.h, k)) {
+          el.classList.add(info.known ? "exact" : "approx-params");
+          el.appendChild(cv);
+          return;
+        }
+        this.warnings.push(`${info.master}: шейдер не собрался — показано приближение (подробности в консоли)`);
+      }
       const ok = drawMaterial(cv.getContext("2d"), info, r.w, r.h, k, tint);
       if (!ok) { el.classList.add("ph-mat"); el.innerHTML = `<span class="ph-label">${res.name}</span>`; return; }
       if (!info.exact) el.classList.add("approx");
