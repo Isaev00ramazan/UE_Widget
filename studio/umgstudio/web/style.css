@@ -155,7 +155,7 @@ dialog.settings::backdrop { background: rgba(0, 0, 0, .55); }
 .edit-bar { display: flex; gap: 6px; align-items: center; flex: none !important; text-transform: none; letter-spacing: 0; }
 .edit-bar b { color: var(--combat); font-weight: 600; }
 button.primary.mini { padding: 2px 8px; }
-#bUndo { color: var(--combat); }
+#bUndo, #bRedo { color: var(--combat); }
 .pe-flags { display: flex; gap: 14px; margin: 6px 0 2px; color: var(--muted); }
 .pe-row { border-top: 1px solid var(--line); padding: 3px 0; }
 .pe-head { display: flex; align-items: center; gap: 6px; min-height: 24px; }

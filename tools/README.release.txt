@@ -24,7 +24,8 @@ UMG Studio {version}
   Claude Code: https://claude.com/claude-code — установить, один раз запустить claude в терминале и войти.
   Codex: npm install -g @openai/codex, затем один раз codex login.
   Открыл экран, а в UE виджет уже другой — над превью полоска с отличиями и кнопка «Взять из UE в .py».
-  «↶ Отменить» возвращает файлы как до последней правки.
+  Ctrl+Z — отменить, Ctrl+Shift+Z — вернуть (несохранённые правки, затем файлы); кнопки «↶ Отменить» / «↷ Вернуть».
+  Поле «Виджеты» в «⚙ Проект» пустое — новый WBP создаётся в папке, открытой в Content Browser.
 
 КНОПКА «В UE» (плагин редактора)
   ue\install_plugin.bat "D:\MOD Dropbox\MAD WATER\PROJECT\MadWater_5.8"

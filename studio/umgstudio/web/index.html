@@ -12,7 +12,8 @@
   <div class="brand"><img src="favicon.png" alt="" width="22" height="22">UMG <b>Studio</b></div>
   <div class="crumbs"><span id="srcTitle">—</span><nav id="wbpTabs" class="tabs" aria-label="Виджеты источника"></nav></div>
   <div class="actions">
-    <button id="bUndo" title="Отменить последнюю правку (свойства или ИИ) — файлы вернутся как были" hidden>↶ Отменить</button>
+    <button id="bUndo" title="Отменить последнюю правку (Ctrl+Z)" hidden>↶ Отменить</button>
+    <button id="bRedo" title="Вернуть отменённое (Ctrl+Shift+Z)" hidden>↷ Вернуть</button>
     <button id="bAi" aria-pressed="false" title="ИИ (Claude Code или Codex на этом компьютере): опиши, что поменять — он правит .py, превью обновится">✦ ИИ</button>
     <button id="bSettings" title="Проект: папка проекта UE, где хранить спецификации, пути виджетов/шрифта/материалов в Content">⚙ Проект</button>
     <span id="ueStatus" class="ue-status" title="Мост в редакторе UE (плагин UMG Studio Bridge)">UE: …</span>
@@ -139,7 +140,7 @@
     </fieldset>
     <fieldset>
       <legend>Пути в Content (UE)</legend>
-      <label>Виджеты: save() по умолчанию и новые WBP<input name="widgets"></label>
+      <label>Виджеты: папка новых WBP и save() без folder= (пусто — папка, открытая в Content Browser)<input name="widgets"></label>
       <label>Шрифт текста (Font)<input name="font"></label>
       <label>Материалы MI (MAT.format)<input name="materials_content"></label>
       <label>Текстуры (TEX.format)<input name="textures_content"></label>

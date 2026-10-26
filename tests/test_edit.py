@@ -125,6 +125,23 @@ class EditAndUndo(unittest.TestCase):
 		self.assertEqual(self.read(), before)
 		self.assertFalse(self.st.undo()["ok"])
 
+	def test_undo_redo(self):
+		before = self.read()
+		self.st.edit("0/wb_key.py", "WBP_Key", [{"name": "KeyText", "props": {"Justification": "Right"}}])
+		after = self.read()
+		self.assertEqual(self.st.history_state()["redo"], None)
+		self.assertTrue(self.st.undo()["ok"])
+		self.assertEqual(self.read(), before)
+		r = self.st.redo()
+		self.assertTrue(r["ok"], r)
+		self.assertEqual(self.read(), after)
+		self.assertFalse(self.st.redo()["ok"])
+		self.st.undo()
+		# новая правка после отмены — «вернуть» больше нечего
+		self.st.edit("0/wb_key.py", "WBP_Key", [{"name": "KeyText", "props": {"Justification": "Center"}}])
+		self.assertIsNone(self.st.history_state()["redo"])
+		self.assertFalse(self.st.redo()["ok"])
+
 	def test_text_source_not_editable(self):
 		shutil.copy(os.path.join(EX, "WBP_Key.copy.txt"), self.tmp)
 		r = self.st.edit("0/WBP_Key.copy.txt", "WBP_Key", [{"name": "KeyText", "props": {"Justification": "Right"}}])

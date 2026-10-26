@@ -124,6 +124,42 @@ class NewProject(unittest.TestCase):
 		self.assertTrue(self.st.undo()["ok"])
 		self.assertNotEqual(self.st.ue_compare(r["src"], "WBP_Key")["items"], [])
 
+	def test_new_widget_goes_to_content_browser_folder(self):
+		# папка виджетов в настройках не задана — новый WBP создаётся в папке, открытой в Content Browser,
+		# и эта папка записывается в save(…, folder=…)
+		self.st.adopt_project(self.proj)
+		work = self.st.ensure_work_dir()
+		shutil.copy(os.path.join(EX, "pickup_banner.py"), work)
+		src = self.st.src_id(os.path.join(work, "pickup_banner.py"))
+		mock_ue.CONTENT_PATH = "/Game/UI/New"
+		try:
+			r = self.st.ue_push(src, "WBP_PickupBanner")
+			self.assertTrue(r["ok"], r)
+			self.assertIn("/Game/UI/New/WBP_PickupBanner", mock_ue.STORE)
+			self.assertIn("/Game/UI/New", r["folderNote"])
+			with open(os.path.join(work, "pickup_banner.py"), encoding="utf-8") as f:
+				self.assertIn("folder='/Game/UI/New'", f.read())
+			mock_ue.CONTENT_PATH = "/Game/Other"
+			self.assertTrue(self.st.ue_push(src, "WBP_PickupBanner")["ok"])
+			self.assertNotIn("/Game/Other/WBP_PickupBanner", mock_ue.STORE)
+			self.assertEqual(self.st.ue_compare(src, "WBP_PickupBanner")["items"], [])
+		finally:
+			mock_ue.CONTENT_PATH = "/Game"
+
+	def test_widgets_folder_setting_wins(self):
+		self.st.adopt_project(self.proj)
+		s = dict(self.st.settings, widgets="/Game/UI/Fixed")
+		self.st.save_settings(s)
+		work = self.st.ensure_work_dir()
+		shutil.copy(os.path.join(EX, "pickup_banner.py"), work)
+		src = self.st.src_id(os.path.join(work, "pickup_banner.py"))
+		mock_ue.CONTENT_PATH = "/Game/UI/New"
+		try:
+			self.assertTrue(self.st.ue_push(src, "WBP_PickupBanner")["ok"])
+			self.assertIn("/Game/UI/Fixed/WBP_PickupBanner", mock_ue.STORE)
+		finally:
+			mock_ue.CONTENT_PATH = "/Game"
+
 	def test_texture_from_ue(self):
 		png = b"\x89PNG\r\n\x1a\nfake"
 		mock_ue.TEXTURES["/Game/Art/T_Mage"] = png

@@ -318,3 +318,20 @@ _TWEAK_LINE = re.compile(r"^tweak\(", re.M)
 
 def has_tweaks(text):
 	return bool(_TWEAK_LINE.search(text))
+
+
+def set_save_folder(text, wbp, folder):
+	"""save(root, "WBP_X", …) без folder= → с folder='/Game/…' (куда WBP создан в UE). Иначе текст как был."""
+	tree = ast.parse(text)
+	for node in ast.walk(tree):
+		if not (isinstance(node, ast.Call) and _fname(node) == "save"):
+			continue
+		name = _arg(node, "wbp", 1)
+		if not (isinstance(name, ast.Constant) and name.value == wbp):
+			continue
+		if _arg(node, "folder", 3) is not None:
+			return text
+		p = _Patch(text)
+		_insert_kw(p, node, "folder=%r" % folder)
+		return p.result()
+	return text

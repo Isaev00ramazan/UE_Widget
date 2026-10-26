@@ -6,11 +6,16 @@
 //   POST /umgstudio/export  {asset}          → {"ok", "text", "parent", "designSizeMode", "designSize"}
 //   GET  /umgstudio/texture?asset=/Game/…/T_X&max=1024 → PNG (превью текстур в программе)
 //   POST /umgstudio/open    {asset}
+//   GET  /umgstudio/contentpath              → {"ok", "path"} — папка, открытая в Content Browser (/Game/…):
+//                                              туда программа создаёт новый WBP, если папка виджетов не задана
 //
 // Порт: [UMGStudio] Port=30110 в Config/DefaultEditorPerProjectUserSettings.ini (по умолчанию 30110).
 // Запросы обрабатываются на игровом потоке (HTTPServer тикает там же) — API редактора можно звать напрямую.
 
+#include "ContentBrowserItemPath.h"
+#include "ContentBrowserModule.h"
 #include "Dom/JsonObject.h"
+#include "IContentBrowserSingleton.h"
 #include "HttpPath.h"
 #include "HttpRouteHandle.h"
 #include "HttpServerModule.h"
@@ -93,6 +98,7 @@ public:
 		Bind(TEXT("/umgstudio/export"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleExport);
 		Bind(TEXT("/umgstudio/open"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleOpen);
 		Bind(TEXT("/umgstudio/texture"), EHttpServerRequestVerbs::VERB_GET, &FUMGStudioModule::HandleTexture);
+		Bind(TEXT("/umgstudio/contentpath"), EHttpServerRequestVerbs::VERB_GET, &FUMGStudioModule::HandleContentPath);
 		Http.StartAllListeners();
 		UE_LOG(LogUMGStudio, Display, TEXT("[UMGStudio] мост слушает http://127.0.0.1:%d/umgstudio"), Port);
 	}
@@ -129,7 +135,7 @@ private:
 		Object->SetStringField(TEXT("engine"), FEngineVersion::Current().ToString());
 		Object->SetStringField(TEXT("project"), FApp::GetProjectName());
 		Object->SetStringField(TEXT("projectDir"), FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()));
-		Object->SetNumberField(TEXT("version"), 3);
+		Object->SetNumberField(TEXT("version"), 4);
 		Reply(OnComplete, Object);
 		return true;
 	}
@@ -234,6 +240,23 @@ private:
 			return true;
 		}
 		OnComplete(FHttpServerResponse::Create(MoveTemp(Png), TEXT("image/png")));
+		return true;
+	}
+
+	bool HandleContentPath(const FHttpServerRequest& Request, const FHttpResultCallback& OnComplete)
+	{
+		// папка, которая сейчас открыта в Content Browser; внутренний путь — /Game/…, а не /All/Game/…
+		FContentBrowserModule& ContentBrowser = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
+		const FContentBrowserItemPath Current = ContentBrowser.Get().GetCurrentPath();
+		const FString Path = Current.HasInternalPath() ? Current.GetInternalPathString() : FString();
+		const TSharedRef<FJsonObject> Out = MakeShared<FJsonObject>();
+		Out->SetBoolField(TEXT("ok"), !Path.IsEmpty());
+		Out->SetStringField(TEXT("path"), Path);
+		if (Path.IsEmpty())
+		{
+			Out->SetStringField(TEXT("error"), TEXT("В Content Browser не открыта папка проекта"));
+		}
+		Reply(OnComplete, Out);
 		return true;
 	}
 

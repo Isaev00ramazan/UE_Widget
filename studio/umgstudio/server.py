@@ -20,7 +20,7 @@
 	POST /api/log {msg}          — ошибка интерфейса → %LOCALAPPDATA%/UMGStudio/log.txt
 	POST /api/build   {src}      — записать *.paste.txt спецификации (как `py <экран>.py`)
 	POST /api/edit {src, wbp, edits} — правки из панели свойств → в .py (specedit: прямо в W(...) или tweak(...))
-	POST /api/undo               — отменить последнюю правку (свойства или ИИ): вернуть файлы как были
+	POST /api/undo, /api/redo    — отменить последнюю правку (свойства, ИИ, «Взять из UE») / вернуть её (Ctrl+Z / Ctrl+Shift+Z)
 	GET  /api/agent/status       — ИИ (Claude Code / Codex) найден? выбор моделей, журнал диалога;
 								   POST /api/agent/send {text, src, wbp, selected}, /api/agent/config {engine, model},
 								   /api/agent/stop, /api/agent/reset — ответ идёт событиями SSE {"agent": …}
@@ -96,6 +96,7 @@ class Studio:
 		self.clients = []
 		self.version = 0
 		self.history = []     # [{"label", "files": {путь: текст до правки}}] — «Отменить» (правки свойств и ИИ)
+		self.redo_stack = []  # то же для «Вернуть» (Ctrl+Shift+Z)
 		self.agent = Agent(self.broadcast)
 
 	# ─── источники ───
@@ -360,20 +361,44 @@ class Studio:
 		if files:
 			self.history.append({"label": label, "files": files})
 			del self.history[:-30]
+			self.redo_stack = []   # новая правка — «вернуть» больше нечего
 
-	def undo(self):
-		if not self.history:
-			return {"ok": False, "error": "Нечего отменять"}
-		h = self.history.pop()
-		for path, text in h["files"].items():
+	@staticmethod
+	def _swap(files):
+		"""Записать сохранённые тексты; вернуть, что было в файлах до этого (для обратного шага)."""
+		now = {}
+		for path, text in files.items():
+			try:
+				with open(path, encoding="utf-8", newline="") as f:
+					now[path] = f.read()
+			except OSError:
+				now[path] = None
 			if text is None:
 				if os.path.isfile(path):
 					os.remove(path)
 				continue
 			with open(path, "w", encoding="utf-8", newline="") as f:
 				f.write(text)
-		return {"ok": True, "label": h["label"], "files": [os.path.basename(p) for p in h["files"]],
-				"next": self.history[-1]["label"] if self.history else None}
+		return now
+
+	def history_state(self):
+		return {"undo": self.history[-1]["label"] if self.history else None,
+				"redo": self.redo_stack[-1]["label"] if self.redo_stack else None}
+
+	def undo(self):
+		if not self.history:
+			return dict(self.history_state(), ok=False, error="Нечего отменять")
+		h = self.history.pop()
+		self.redo_stack.append({"label": h["label"], "files": self._swap(h["files"])})
+		return dict(self.history_state(), ok=True, label=h["label"], files=[os.path.basename(p) for p in h["files"]],
+					next=self.history[-1]["label"] if self.history else None)
+
+	def redo(self):
+		if not self.redo_stack:
+			return dict(self.history_state(), ok=False, error="Нечего возвращать")
+		h = self.redo_stack.pop()
+		self.history.append({"label": h["label"], "files": self._swap(h["files"])})
+		return dict(self.history_state(), ok=True, label=h["label"], files=[os.path.basename(p) for p in h["files"]])
 
 	def edit(self, src, wbp, edits):
 		path = self.path_of(src)
@@ -554,20 +579,54 @@ class Studio:
 		for w in res["widgets"]:
 			if w["wbp"] == wbp:
 				asset = w.get("asset") or ue_bridge.asset_from_text(w["text"])
+				if w.get("auto_folder"):
+					# папка не задана — WBP с этим именем, если он уже есть в проекте (в любой папке)
+					asset = self.ue_asset_by_name(wbp) or asset
 				if not asset:
 					raise ValueError("Не понял путь ассета для %s" % wbp)
 				return w, asset
 		raise ValueError("В источнике нет %s" % wbp)
 
+	def ue_asset_by_name(self, wbp):
+		r = ue_bridge.call(self.ue_url, "/umgstudio/list", timeout=10)
+		found = [w["asset"] for w in r.get("widgets", []) if w.get("name") == wbp] if r.get("ok") else []
+		return found[0] if len(found) == 1 else None
+
 	def ue_push(self, src, wbp):
 		w, asset = self.widget(src, wbp)
 		if w.get("fragment"):
 			return {"ok": False, "error": "%s — фрагмент (save(..., suffix=…)): его вставляют в готовый виджет руками" % wbp}
+		note, folder_from_cb = "", None
+		if w.get("auto_folder") and not self.ue_asset_by_name(wbp):
+			# новый WBP и папка в настройках не задана — в папку, открытую в Content Browser
+			cb = ue_bridge.call(self.ue_url, "/umgstudio/contentpath", timeout=5)
+			path = (cb.get("path") or "").rstrip("/") if cb.get("ok") else ""
+			if path.startswith("/Game"):
+				folder_from_cb = path
+				asset = "%s/%s" % (path, wbp)
+			elif cb.get("status") == 404:
+				note = "Плагин старой версии не сообщает папку Content Browser — WBP создан в %s (обнови плагин)" % asset.rsplit("/", 1)[0]
+			else:
+				note = "В Content Browser не открыта папка /Game — WBP создан в %s" % asset.rsplit("/", 1)[0]
 		body = {"asset": asset, "text": w["text"], "backup": True}
 		if w.get("parent"):
 			body["parent"] = w["parent"]
 		body.update(ue_bridge.design_options(w.get("design")))
-		return ue_bridge.call(self.ue_url, "/umgstudio/import", body)
+		r = ue_bridge.call(self.ue_url, "/umgstudio/import", body)
+		if r.get("ok") and folder_from_cb:
+			# папку — в спецификацию: следующие «В UE ▶» и сверка идут в тот же WBP
+			path = self.path_of(src)
+			if path.endswith(".py"):
+				with open(path, encoding="utf-8") as f:
+					old = f.read()
+				new = specedit.set_save_folder(old, wbp, folder_from_cb)
+				if new != old:
+					write_if_changed(path, new)
+			note = "Папка из Content Browser: %s" % folder_from_cb
+		if note:
+			r.setdefault("messages", []).insert(0, note)
+			r["folderNote"] = note
+		return r
 
 	def ue_pull(self, src, wbp):
 		_, asset = self.widget(src, wbp)
@@ -783,9 +842,10 @@ def make_handler(studio):
 					return self.send(200, studio.settings_info())
 				if u.path == "/api/shaders":
 					return self.send(200, studio.shaders())
+				if u.path == "/api/history":
+					return self.send(200, studio.history_state())
 				if u.path == "/api/agent/status":
-					return self.send(200, dict(studio.agent.status(), log=studio.agent.log,
-											   undo=studio.history[-1]["label"] if studio.history else None))
+					return self.send(200, dict(studio.agent.status(), log=studio.agent.log, **studio.history_state()))
 				if u.path == "/api/events":
 					return self.events()
 				return self.static(u.path)
@@ -824,6 +884,8 @@ def make_handler(studio):
 					return self.send(200, studio.edit(body["src"], body["wbp"], body.get("edits") or []))
 				if u.path == "/api/undo":
 					return self.send(200, studio.undo())
+				if u.path == "/api/redo":
+					return self.send(200, studio.redo())
 				if u.path == "/api/agent/send":
 					return self.send(200, studio.agent_send(body.get("text", ""), body.get("src"), body.get("wbp"),
 															body.get("selected")))

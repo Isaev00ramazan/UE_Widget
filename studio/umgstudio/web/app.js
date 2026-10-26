@@ -61,7 +61,7 @@ async function loadSources() {
 
 async function selectSource(id, keep = false) {
   if (!keep && id !== S.src && editCount() && !confirm("Несохранённые правки свойств пропадут. Перейти?")) return;
-  if (!keep) { S.vis = {}; S.texts = {}; S.stateName = null; S.selected = null; S.wbp = 0; S.edits = {}; }
+  if (!keep) { S.vis = {}; S.texts = {}; S.stateName = null; S.selected = null; S.wbp = 0; S.edits = {}; LOCAL.undo = []; LOCAL.redo = []; }
   S.src = id;
   prefs.src = id; savePrefs();
   document.querySelectorAll("#sources button").forEach((b) => b.setAttribute("aria-current", String(b.dataset.id === id)));
@@ -392,19 +392,58 @@ function scheduleRender(rebuild) {
   cancelAnimationFrame(rerender);
   rerender = requestAnimationFrame(() => render({ keepProps: !rebuild }));
 }
+// история несохранённых правок панели (Ctrl+Z / Ctrl+Shift+Z); шаг — {name, where, key, prev, next, had, prevEdit}
+const LOCAL = { undo: [], redo: [] };
+function curValue(n, where, key) {
+  if (where === "flag") return key === "var" ? n.raw.bIsVariable === "True" : n.raw.Visibility === "Collapsed";
+  const raws = where === "props" ? n.raw : (n.slot && n.slot.$raw) || {};
+  return key in raws ? raws[key] : null;
+}
+function entrySlot(e, where) { return where === "flag" ? e : e[where]; }
+function record(n, where, key, next) {
+  const e = editEntry(n.name), box = entrySlot(e, where);
+  const last = LOCAL.undo[LOCAL.undo.length - 1];
+  // ввод в одно поле подряд (каждая буква, стрелки числа) — один шаг
+  if (last && last.name === n.name && last.where === where && last.key === key && Date.now() - last.t < 900) {
+    last.next = next; last.t = Date.now();
+  } else {
+    LOCAL.undo.push({ name: n.name, where, key, prev: curValue(n, where, key), next, had: key in box, prevEdit: box[key], t: Date.now() });
+    if (LOCAL.undo.length > 200) LOCAL.undo.shift();
+  }
+  LOCAL.redo = [];
+  box[key] = next;
+}
+function applyValue(n, where, key, v) {
+  if (where === "flag") setFlag(n, key, !!v); else setRaw(where, n, key, v);
+}
+function localStep(from, to, undo) {
+  const st = from.pop();
+  if (!st) return false;
+  const n = sourceNode(st.name);
+  if (n) applyValue(n, st.where, st.key, undo ? st.prev : st.next);
+  const e = editEntry(st.name), box = entrySlot(e, st.where);
+  if (undo) { if (st.had) box[st.key] = st.prevEdit; else delete box[st.key]; } else box[st.key] = st.next;
+  st.t = 0;   // следующий ввод — новый шаг
+  to.push(st);
+  if (st.name !== S.selected && n) S.selected = st.name;
+  updateEditBar();
+  scheduleRender(true);
+  toast(`${undo ? "Отменено" : "Возвращено"}: ${st.name} · ${st.key}`, 1600);
+  return true;
+}
 function onEdit(where, key, raw, rebuild = false) {
   const n = sourceNode(S.selected);
   if (!n) return;
+  record(n, where, key, raw);
   setRaw(where, n, key, raw);
-  editEntry(n.name)[where][key] = raw;
   updateEditBar();
   scheduleRender(rebuild);
 }
 function onFlag(flag, on) {
   const n = sourceNode(S.selected);
   if (!n) return;
+  record(n, "flag", flag, on);
   setFlag(n, flag, on);
-  editEntry(n.name)[flag] = on;
   updateEditBar();
   scheduleRender(false);
 }
@@ -438,8 +477,9 @@ async function saveEdits() {
     done.inplace.push(...r.report.inplace); done.tweak.push(...r.report.tweak); tweaks = r.tweaks;
   }
   S.edits = {};
+  LOCAL.undo = []; LOCAL.redo = [];
   updateEditBar();
-  setUndo(true);
+  syncHistory();
   let msg = "Записано в .py";
   if (done.inplace.length) msg += ` · прямо в вызовы: ${[...new Set(done.inplace)].join(", ")}`;
   if (done.tweak.length) msg += ` · строками tweak(): ${[...new Set(done.tweak)].join(", ")} — «Встроить правки» в чате ИИ перенесёт их в код`;
@@ -449,23 +489,52 @@ async function saveEdits() {
 }
 async function dropEdits() {
   S.edits = {};
+  LOCAL.undo = []; LOCAL.redo = [];
   updateEditBar();
   await selectSource(S.src, true);
 }
 $("bSaveEdits").onclick = saveEdits;
 $("bDropEdits").onclick = dropEdits;
+// Ctrl+Z — отменить, Ctrl+Shift+Z / Ctrl+Y — вернуть: сначала несохранённые правки панели, потом файлы (сохранённые
+// правки, ИИ, «Взять из UE»). В текстовом поле — обычная отмена ввода браузера.
 window.addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); saveEdits(); }
+  if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+  const k = e.code;   // по физической клавише — работает и в русской раскладке
+  if (k === "KeyS") { e.preventDefault(); saveEdits(); return; }
+  if (k !== "KeyZ" && k !== "KeyY") return;
+  const t = e.target;
+  if (t && (t.tagName === "TEXTAREA" || (t.tagName === "INPUT" && /^(text|search|)$/.test(t.type)))) return;
+  e.preventDefault();
+  if (k === "KeyZ" && !e.shiftKey) undoAny(); else redoAny();
 });
-function setUndo(on, label) {
-  $("bUndo").hidden = !on;
-  if (label) $("bUndo").title = "Отменить: " + label;
+async function undoAny() {
+  if (localStep(LOCAL.undo, LOCAL.redo, true)) return;
+  if (!$("bUndo").hidden) return $("bUndo").click();
+  toast("Нечего отменять", 1500);
 }
+async function redoAny() {
+  if (localStep(LOCAL.redo, LOCAL.undo, false)) return;
+  if (!$("bRedo").hidden) return $("bRedo").click();
+  toast("Нечего возвращать", 1500);
+}
+function showHistory(h) {
+  $("bUndo").hidden = !h.undo;
+  $("bUndo").title = h.undo ? `Отменить: ${h.undo} (Ctrl+Z)` : "";
+  $("bRedo").hidden = !h.redo;
+  $("bRedo").title = h.redo ? `Вернуть: ${h.redo} (Ctrl+Shift+Z)` : "";
+}
+async function syncHistory() { showHistory(await api("/api/history")); }
 $("bUndo").onclick = async () => {
   const r = await api("/api/undo", {});
-  if (!r.ok) { setUndo(false); return toast(r.error, 3000); }
-  toast(`Отменено: ${r.label} (${r.files.join(", ")})`, 4000);
-  setUndo(!!r.next, r.next);
+  showHistory(r);
+  if (!r.ok) return toast(r.error, 2000);
+  toast(`Отменено: ${r.label} (${r.files.join(", ")})`, 3000);
+};
+$("bRedo").onclick = async () => {
+  const r = await api("/api/redo", {});
+  showHistory(r);
+  if (!r.ok) return toast(r.error, 2000);
+  toast(`Возвращено: ${r.label} (${r.files.join(", ")})`, 3000);
 };
 
 // ─── ИИ: Claude Code на этом компьютере ───
@@ -490,7 +559,7 @@ async function aiStatus() {
   $("bAiSend").disabled = !r.ok;
   if (!$("aiLog").childElementCount && r.log && r.log.length) r.log.forEach(aiItem);
   aiRunning(r.running);
-  setUndo(!!r.undo, r.undo);
+  showHistory(r);
 }
 // выбор ИИ: Claude Code (по умолчанию / Opus / Sonnet / Haiku / своя) или Codex
 function modelKey(engine, model) { return engine + ":" + (model || ""); }
@@ -551,7 +620,7 @@ function aiItem(it) {
       b.className = "mini"; b.textContent = "Отменить";
       b.onclick = () => $("bUndo").click();
       div.append(" ", b);
-      setUndo(true, "ИИ");
+      syncHistory();
     }
     aiRunning(false);
   }
@@ -674,7 +743,7 @@ async function openSettings() {
   const ph = {
     project: "не задана — возьмётся из открытого редактора", specs: res.specs.join("\n"), materials: res.materials,
     setup_hud: res.setup_hud, assets: res.assets || "", textures: res.textures.join("\n"), design: res.design,
-    widgets: info.defaults.widgets, font: info.defaults.font, materials_content: info.defaults.materials_content,
+    widgets: "пусто — папка, открытая в Content Browser", font: info.defaults.font, materials_content: info.defaults.materials_content,
     textures_content: info.defaults.textures_content, ue: res.ue,
   };
   for (const el of form.elements) {
@@ -730,6 +799,7 @@ $("bPush").onclick = async () => {
     : `${w.wbp}: ${r.error}`;
   toast(head + (r.backup ? " · копия в Saved/UMGStudio/Backups" : ""), 6000);
   if (r.ok) $("ueSync").hidden = true;
+  if (r.folderNote) toast(head + " · " + r.folderNote, 7000);
   showMessages("UE: " + head, (r.messages || []).filter((m) => !m.startsWith("Инфо")));
 };
 $("bPull").onclick = async () => {
@@ -808,11 +878,11 @@ async function adoptFromUe() {
   const w = currentWidget();
   if (!w) return;
   if (editCount() && !confirm("Несохранённые правки свойств пропадут. Взять значения из UE?")) return;
-  S.edits = {}; updateEditBar();
+  S.edits = {}; LOCAL.undo = []; LOCAL.redo = []; updateEditBar();
   const r = await api("/api/ue/adopt", { src: S.src, wbp: w.wbp });
   if (!r.ok) return toast(r.error, 7000);
   $("ueSync").hidden = true;
-  setUndo(!!r.undo, r.undo);
+  syncHistory();
   toast(`Из UE в .py: ${r.applied} знач.` + (r.structural ? ` · ещё ${r.structural} отличий в составе дерева — «Пересоздать .py из UE» или ИИ` : ""), 6000);
   if (!$("diffPane").hidden) setTimeout(showDiff, 800);
 }
@@ -884,7 +954,7 @@ async function start() {
   if (first) await selectSource(first.id, true);
   listen();
   api("/api/settings").then((i) => { if (i.content && i.content.font) S.font = i.content.font; });
-  if (prefs.ai) aiToggle(true); else api("/api/agent/status").then((r) => setUndo(!!r.undo, r.undo));
+  if (prefs.ai) aiToggle(true); else syncHistory();
   ueStatus();
   setInterval(ueStatus, 5000);
 }

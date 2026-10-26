@@ -16,6 +16,7 @@ STORE = {}
 PROJECT_DIR = None   # тест подставляет временную папку проекта
 META = {}            # asset → {"parent", "designSizeMode", "designSize"}
 TEXTURES = {}        # asset → PNG bytes
+CONTENT_PATH = "/Game"   # папка, открытая в Content Browser
 
 
 class H(BaseHTTPRequestHandler):
@@ -36,6 +37,8 @@ class H(BaseHTTPRequestHandler):
 		if self.path == "/umgstudio/list":
 			return self.reply({"ok": True, "widgets": [{"asset": a, "name": a.rsplit("/", 1)[1],
 														"parent": META.get(a, {}).get("parent", "/Script/UMG.UserWidget")} for a in sorted(STORE)]})
+		if self.path == "/umgstudio/contentpath":
+			return self.reply({"ok": True, "path": CONTENT_PATH})
 		if self.path.startswith("/umgstudio/texture?"):
 			from urllib.parse import parse_qs, urlparse
 			asset = parse_qs(urlparse(self.path).query).get("asset", [""])[0]

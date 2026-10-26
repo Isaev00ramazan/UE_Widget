@@ -3,7 +3,7 @@
 
 	project           папка проекта UE (где .uproject) — подставляется сама из открытого редактора
 	specs             папки спецификаций (.py) и текстов (paste/copy); первая — рабочая: туда пишутся новые файлы
-	widgets           Content-папка виджетов: save() по умолчанию, новые WBP        (/Game/UI/HUD/Widgets)
+	widgets           Content-папка виджетов: save() по умолчанию, новые WBP; пусто — папка, открытая в Content Browser
 	font              шрифт текста в text()                                         (/Game/UI/HUD/Fonts/F_HUD)
 	materials_content Content-папка MI для MAT.format(...)                          (/Game/UI/HUD/Materials)
 	textures_content  Content-папка текстур для TEX.format(...)                     (/Game/UI/HUD/Textures)
@@ -112,6 +112,8 @@ def resolve(s):
 	cfg["ai_engine"] = s.get("ai_engine") or "claude"
 	cfg["project"] = proj
 	cfg["content"] = {k: (s.get(k) or v).rstrip("/") for k, v in CONTENT_DEFAULTS.items()}
+	# папка виджетов не задана — новые WBP создаются в папке, открытой в Content Browser (плагин её сообщает)
+	cfg["content"]["widgets_auto"] = not s.get("widgets")
 	return cfg
 
 

@@ -8,7 +8,7 @@ on:
       version:
         description: "Версия (станет тегом), например v0.3.1"
         required: true
-        default: "v0.4.1"
+        default: "v0.4.2"
       prerelease:
         description: "Пометить как пре-релиз"
         type: boolean

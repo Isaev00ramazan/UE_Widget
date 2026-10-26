@@ -32,9 +32,14 @@ FACES = {"Medium", "SemiBold", "Bold", "SemiBoldItalic", "BoldItalic"}
 TEXT_NAMESPACE = "Widgets"
 
 
-def set_content(widgets=None, font=None, materials_content=None, textures_content=None):
+# UMG Studio: папка виджетов в настройках не задана — новый WBP без folder= создаётся в папке, открытой в Content Browser
+WIDGET_AUTO = False
+
+
+def set_content(widgets=None, font=None, materials_content=None, textures_content=None, widgets_auto=False):
 	"""Пути Content другого проекта (UMG Studio → «⚙ Проект»): папка виджетов, шрифт, MI, текстуры."""
-	global WIDGET_DIR, FONT, MAT, TEX
+	global WIDGET_DIR, FONT, MAT, TEX, WIDGET_AUTO
+	WIDGET_AUTO = bool(widgets_auto)
 	if widgets:
 		WIDGET_DIR = widgets.rstrip("/")
 	if font:
@@ -372,12 +377,14 @@ def save(root, wbp, out_dir, folder=None, suffix="", parent=None, design=None):
 	"""parent — C++-база для кнопки «В UE» ('/Script/MadWater.HUDDriveWidget'); design — размер превью в Designer:
 	(1920, 1080) = Custom, 'screen' = Fill Screen, 'desired' = Desired. В текст вставки не попадают.
 	suffix — фрагмент для вставки в существующий виджет (кнопка «В UE» для него недоступна)."""
+	auto_folder = folder is None and WIDGET_AUTO
 	folder = folder or WIDGET_DIR
 	path = os.path.join(out_dir, "%s%s.paste.txt" % (wbp, suffix))
 	_apply_tweaks(root, wbp + suffix)
 	text = export(root, wbp, folder)
 	SAVED.append({"wbp": wbp + suffix, "folder": folder, "path": path, "text": text,
-				  "asset": "%s/%s" % (folder, wbp), "fragment": bool(suffix), "parent": parent, "design": design})
+				  "asset": "%s/%s" % (folder, wbp), "fragment": bool(suffix), "parent": parent, "design": design,
+				  "auto_folder": auto_folder})
 	if not WRITE:
 		return path
 	with open(path, "w", encoding="utf-8", newline="\r\n") as f:
