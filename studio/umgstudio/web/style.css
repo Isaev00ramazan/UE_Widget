@@ -123,3 +123,30 @@ input[type=number] { width: 70px; }
 .diff-body tr { cursor: pointer; }
 .diff-body tr:hover td { background: var(--panel); }
 .k-added { color: var(--race); } .k-removed { color: var(--hp); } .k-prop, .k-slot { color: var(--combat); }
+
+/* проект UE: список виджетов и настройки */
+.ue-block { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.side-head button { margin-left: auto; }
+.side-input { display: block; width: calc(100% - 24px); margin: 2px 12px 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 6px; font-size: 12px; }
+.ue-list { max-height: 240px; overflow: auto; }
+.ue-list button { display: flex; gap: 6px; align-items: baseline; width: 100%; text-align: left; border: 0; border-radius: 0; background: none; padding: 3px 12px; color: var(--muted); font-size: 12px; }
+.ue-list button:hover { background: var(--panel); color: var(--ink); }
+.ue-list .dot { color: var(--race); width: 8px; flex: none; }
+.ue-list .path { color: var(--faint); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ue-list .msg { padding: 4px 12px; color: var(--faint); font-size: 12px; }
+.ue-path { display: flex; align-items: center; gap: 4px; padding-right: 12px; }
+.ue-path .side-input { flex: 1; min-width: 0; width: auto; margin-right: 0; }
+.ue-path button { flex: none; }
+.ue-status.warn { color: var(--combat); }
+dialog.settings { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 16px 20px; }
+dialog.settings::backdrop { background: rgba(0, 0, 0, .55); }
+.settings h2 { margin: 0 0 4px; font-size: 18px; }
+.settings fieldset { border: 1px solid var(--line); border-radius: 4px; margin: 10px 0; padding: 8px 12px; }
+.settings legend { color: var(--race); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 0 4px; }
+.settings label { display: block; margin: 6px 0; color: var(--muted); font-size: 12px; }
+.settings input, .settings textarea, .settings select { display: block; width: 100%; margin-top: 3px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 7px; font: 12px var(--mono); color: var(--ink); }
+.settings input.bad { border-color: var(--hp); }
+.settings input.good { border-color: rgba(84, 230, 198, .5); }
+.settings .row2 { display: flex; gap: 6px; align-items: center; }
+.settings .row2 input { flex: 1; }
+.dlg-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }

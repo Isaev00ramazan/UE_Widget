@@ -13,6 +13,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 from umgstudio import t3d  # noqa: E402
 
 STORE = {}
+PROJECT_DIR = None   # тест подставляет временную папку проекта
+META = {}            # asset → {"parent", "designSizeMode", "designSize"}
 
 
 class H(BaseHTTPRequestHandler):
@@ -29,7 +31,10 @@ class H(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 		if self.path == "/umgstudio/ping":
-			return self.reply({"ok": True, "engine": "5.8.0-mock", "project": "MadWater"})
+			return self.reply({"ok": True, "engine": "5.8.0-mock", "project": "MadWater", "projectDir": PROJECT_DIR or "", "version": 2})
+		if self.path == "/umgstudio/list":
+			return self.reply({"ok": True, "widgets": [{"asset": a, "name": a.rsplit("/", 1)[1],
+														"parent": META.get(a, {}).get("parent", "/Script/UMG.UserWidget")} for a in sorted(STORE)]})
 		self.send_error(404)
 
 	def do_POST(self):
@@ -47,7 +52,10 @@ class H(BaseHTTPRequestHandler):
 		if self.path == "/umgstudio/export":
 			if body.get("asset") not in STORE:
 				return self.reply({"ok": False, "error": "Нет Widget Blueprint %s" % body.get("asset")})
-			return self.reply({"ok": True, "asset": body["asset"], "text": STORE[body["asset"]]})
+			m = META.get(body["asset"], {})
+			return self.reply({"ok": True, "asset": body["asset"], "text": STORE[body["asset"]],
+							   "parent": m.get("parent", "/Script/UMG.UserWidget"),
+							   "designSizeMode": m.get("designSizeMode", "FillScreen"), "designSize": m.get("designSize", [1920, 1080])})
 		if self.path == "/umgstudio/open":
 			return self.reply({"ok": body.get("asset") in STORE})
 		self.send_error(404)
@@ -60,6 +68,15 @@ def start(port=30111):
 
 
 if __name__ == "__main__":
-	start(int(sys.argv[1]) if len(sys.argv) > 1 else 30111)
+	# python tests/mock_ue.py [порт] [папка проекта] [--seed] — --seed кладёт в «проект» WBP_Key и WBP_Drive из examples
+	args = [a for a in sys.argv[1:] if not a.startswith("--")]
+	if len(args) > 1:
+		PROJECT_DIR = os.path.abspath(args[1]) + os.sep
+	if "--seed" in sys.argv:
+		ex = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "examples", "UMGPaste")
+		for name, asset in (("WBP_Key.copy.txt", "/Game/UI/HUD/Widgets/WBP_Key"), ("WBP_Drive.copy.txt", "/Game/UI/WBP_Drive")):
+			with open(os.path.join(ex, name), encoding="utf-8-sig") as f:
+				STORE[asset] = f.read()
+	start(int(args[0]) if args else 30111)
 	print("mock UE bridge on", sys.argv[1] if len(sys.argv) > 1 else 30111)
 	threading.Event().wait()

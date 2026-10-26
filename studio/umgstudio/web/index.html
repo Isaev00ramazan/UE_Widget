@@ -12,17 +12,28 @@
   <div class="brand"><img src="favicon.png" alt="" width="22" height="22">UMG <b>Studio</b></div>
   <div class="crumbs"><span id="srcTitle">—</span><nav id="wbpTabs" class="tabs" aria-label="Виджеты источника"></nav></div>
   <div class="actions">
+    <button id="bSettings" title="Проект: папка проекта UE, где хранить спецификации, пути виджетов/шрифта/материалов в Content">⚙ Проект</button>
     <span id="ueStatus" class="ue-status" title="Мост в редакторе UE (плагин UMG Studio Bridge)">UE: …</span>
     <button id="bPush" class="primary" title="Создать/обновить WBP в открытом редакторе UE: дерево, Is Variable, размер превью, родитель; компиляция и сохранение (резервная копия — Saved/UMGStudio/Backups)">В UE ▶</button>
     <button id="bPull" title="Выгрузить дерево WBP из UE в &lt;WBP&gt;.copy.txt рядом со спецификацией">Забрать из UE</button>
     <button id="bDiff" title="Чем вёрстка в UE (copy.txt) отличается от спецификации">Сравнить с UE</button>
     <button id="bCopy" title="Текст вставки в буфер обмена — в Designer: пустая Hierarchy → Ctrl+V">Скопировать</button>
     <button id="bBuild" title="Записать *.paste.txt спецификации (как py экран.py)">Записать paste.txt</button>
+    <button id="bMakeSpec" title="Сделать спецификацию .py из этого текста — дальше правишь .py и жмёшь «В UE»" hidden>Сделать .py</button>
   </div>
 </header>
 
 <div class="main">
   <aside class="side">
+    <div id="ueBlock" class="ue-block" hidden>
+      <div class="side-head"><span>В проекте UE</span><button id="bUeRefresh" class="mini" title="Обновить список">↻</button></div>
+      <input id="ueFilter" class="side-input" type="search" placeholder="Поиск виджета…" aria-label="Поиск виджета в проекте UE">
+      <div id="ueList" class="ue-list"></div>
+      <div class="ue-path">
+        <input id="uePath" class="side-input" placeholder="/Game/…/WBP_Имя" aria-label="Путь виджета в UE" title="Content Browser: ПКМ по виджету → Copy Reference, вставь сюда">
+        <button id="bUeFetch" class="mini" title="Забрать этот виджет: copy.txt + спецификация .py">Забрать</button>
+      </div>
+    </div>
     <div class="side-head">Экраны</div>
     <div id="sources" class="sources"></div>
   </aside>
@@ -92,6 +103,41 @@
     <div id="props" class="props"><p class="hint">Выбери элемент в дереве или на экране.</p></div>
   </aside>
 </div>
+<dialog id="settingsDlg" class="settings">
+  <form method="dialog" id="settingsForm">
+    <h2>Проект</h2>
+    <p class="hint" id="setFile"></p>
+    <fieldset>
+      <legend>Проект UE</legend>
+      <label>Папка проекта (где .uproject)
+        <span class="row2"><input name="project" data-kind="dir"><button type="button" id="bTakeProject" class="mini">Взять из открытого UE</button></span></label>
+      <p class="hint">Пустые поля ниже считаются от папки проекта. Новые файлы программа кладёт в рабочую папку.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Папки на диске</legend>
+      <label>Спецификации (.py, copy/paste.txt) — по одной на строку, первая рабочая<textarea name="specs" rows="2" data-list="1"></textarea></label>
+      <label>.hlsl мастер-материалов<input name="materials"></label>
+      <label>Scripts/ue_setup_hud.py (параметры мастеров)<input name="setup_hud"></label>
+      <label>Выгрузка MI (hud_assets.json)<input name="assets"></label>
+      <label>PNG текстур — по одной папке на строку<textarea name="textures" rows="2" data-list="1"></textarea></label>
+      <label>Дизайн-система (снимок Claude Design)<input name="design"></label>
+    </fieldset>
+    <fieldset>
+      <legend>Пути в Content (UE)</legend>
+      <label>Виджеты: save() по умолчанию и новые WBP<input name="widgets"></label>
+      <label>Шрифт текста (Font)<input name="font"></label>
+      <label>Материалы MI (MAT.format)<input name="materials_content"></label>
+      <label>Текстуры (TEX.format)<input name="textures_content"></label>
+    </fieldset>
+    <fieldset>
+      <legend>Связь и окно</legend>
+      <label>Мост в редакторе<input name="ue"></label>
+      <label>Окно программы
+        <select name="window"><option value="">авто (окно → Edge → браузер)</option><option value="webview">окно (WebView2)</option><option value="edge">Edge отдельным окном</option><option value="browser">браузер</option></select></label>
+    </fieldset>
+    <div class="dlg-actions"><button value="cancel" formnovalidate>Отмена</button><button id="bSettingsSave" class="primary" value="save">Сохранить</button></div>
+  </form>
+</dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script type="module" src="app.js"></script>
 </body>

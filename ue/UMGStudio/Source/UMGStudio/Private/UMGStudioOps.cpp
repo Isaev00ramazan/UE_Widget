@@ -1,6 +1,8 @@
 #include "UMGStudioOps.h"
 
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
+#include "Engine/Blueprint.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/PanelWidget.h"
@@ -322,6 +324,59 @@ bool UMGStudio::ExportWidgetText(const FString& AssetPath, FString& OutText, FSt
 	TArray<UWidget*> Roots{ BP->WidgetTree->RootWidget };
 	FWidgetBlueprintEditorUtils::ExportWidgetsToText(Roots, OutText);
 	return true;
+}
+
+bool UMGStudio::ExportWidget(const FString& AssetPath, FString& OutText, FString& OutParent, FString& OutDesignMode,
+	FVector2D& OutDesignSize, FString& OutError)
+{
+	if (!ExportWidgetText(AssetPath, OutText, OutError))
+	{
+		return false;
+	}
+	UWidgetBlueprint* BP = LoadWidgetBlueprint(AssetPath);
+	OutParent = BP && BP->ParentClass ? BP->ParentClass->GetPathName() : FString();
+	OutDesignMode.Reset();
+	OutDesignSize = FVector2D::ZeroVector;
+	UObject* CDO = BP && BP->GeneratedClass ? BP->GeneratedClass->GetDefaultObject() : nullptr;
+	if (CDO)
+	{
+		if (FProperty* Mode = CDO->GetClass()->FindPropertyByName(TEXT("DesignSizeMode")))
+		{
+			Mode->ExportTextItem_Direct(OutDesignMode, Mode->ContainerPtrToValuePtr<void>(CDO), nullptr, CDO, PPF_None);
+		}
+		if (FStructProperty* Size = CastField<FStructProperty>(CDO->GetClass()->FindPropertyByName(TEXT("DesignTimeSize"))))
+		{
+			OutDesignSize = *Size->ContainerPtrToValuePtr<FVector2D>(CDO);
+		}
+	}
+	return true;
+}
+
+TArray<UMGStudio::FWidgetAssetInfo> UMGStudio::ListWidgets()
+{
+	TArray<FWidgetAssetInfo> Out;
+	IAssetRegistry& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+	TArray<FAssetData> Assets;
+	Registry.GetAssetsByClass(UWidgetBlueprint::StaticClass()->GetClassPathName(), Assets, /*bSearchSubClasses*/ false);
+	for (const FAssetData& Asset : Assets)
+	{
+		const FString Package = Asset.PackageName.ToString();
+		if (!Package.StartsWith(TEXT("/Game/")))
+		{
+			continue;
+		}
+		FWidgetAssetInfo Info;
+		Info.Asset = Package;
+		Info.Name = Asset.AssetName.ToString();
+		FString ParentTag;
+		if (Asset.GetTagValue(FBlueprintTags::ParentClassPath, ParentTag))
+		{
+			Info.Parent = FPackageName::ExportTextPathToObjectPath(ParentTag);
+		}
+		Out.Add(MoveTemp(Info));
+	}
+	Out.Sort([](const FWidgetAssetInfo& A, const FWidgetAssetInfo& B) { return A.Asset < B.Asset; });
+	return Out;
 }
 
 bool UMGStudio::OpenWidgetEditor(const FString& AssetPath)

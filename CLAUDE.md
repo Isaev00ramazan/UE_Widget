@@ -1,6 +1,6 @@
 # UMG Studio — правила для агента
 
-Программа для вёрстки виджетов UMG по спецификации и переноса в Unreal Engine (проект MadWater, UE 5.7).
+Программа для вёрстки виджетов UMG по спецификации и переноса в Unreal Engine 5.8 (MadWater и любые другие проекты).
 Пользователь общается по-русски; ответы и комментарии в коде — по-русски.
 
 ## Где что
@@ -9,7 +9,9 @@
 |---|---|
 | `studio/umgstudio/umg.py` | библиотека спецификаций (тот же API, что `umg.py` скилла umg-widgets) — **вывод paste.txt не менять без эталонов** |
 | `studio/umgstudio/t3d.py` | разбор текста буфера UMG (paste/copy) → дерево IR |
-| `studio/umgstudio/runner.py`, `server.py`, `__main__.py` | запуск спецификаций, локальный сервер, окно |
+| `studio/umgstudio/runner.py`, `server.py`, `__main__.py`, `window.py` | запуск спецификаций, локальный сервер, окно |
+| `studio/umgstudio/config.py` | настройки проекта (`umgstudio.json`): папки на диске, пути Content (`umg.set_content`) |
+| `studio/umgstudio/codegen.py` | спецификация `.py` из дерева UE (copy.txt) — round-trip без отличий |
 | `studio/umgstudio/web/` | интерфейс: `slate.js` (раскладка по правилам Slate), `materials.js` (двойники мастер-материалов), `app.js` |
 | `design/<Имя>/` | снимок дизайн-системы Claude Design (токены, шрифты, компоненты) — источник вида и шрифтов |
 | `examples/UMGPaste/` | эталонные спецификации и тексты (из проекта игры) — на них тесты |

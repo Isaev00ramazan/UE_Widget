@@ -18,6 +18,8 @@ def call(base, path, body=None, timeout=60):
 	try:
 		with urllib.request.urlopen(req, timeout=timeout) as r:
 			return json.loads(r.read().decode("utf-8"))
+	except urllib.error.HTTPError as e:
+		return {"ok": False, "status": e.code, "error": "Мост ответил %d на %s" % (e.code, path)}
 	except urllib.error.URLError as e:
 		return {"ok": False, "offline": True, "error": "Редактор UE не отвечает (%s). Открыт ли проект с плагином UMG Studio Bridge?" % getattr(e, "reason", e)}
 	except (OSError, ValueError) as e:

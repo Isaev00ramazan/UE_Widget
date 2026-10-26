@@ -31,6 +31,24 @@ PT = 0.75
 FACES = {"Medium", "SemiBold", "Bold", "SemiBoldItalic", "BoldItalic"}
 TEXT_NAMESPACE = "Widgets"
 
+
+def set_content(widgets=None, font=None, materials_content=None, textures_content=None):
+	"""Пути Content другого проекта (UMG Studio → «⚙ Проект»): папка виджетов, шрифт, MI, текстуры."""
+	global WIDGET_DIR, FONT, MAT, TEX
+	if widgets:
+		WIDGET_DIR = widgets.rstrip("/")
+	if font:
+		FONT = "/Script/Engine.Font'%s.%s'" % (font, font.rstrip("/").rsplit("/", 1)[-1])
+	if materials_content:
+		MAT = "/Script/Engine.MaterialInstanceConstant'%s/{0}.{0}'" % materials_content.rstrip("/")
+	if textures_content:
+		TEX = "/Script/Engine.Texture2D'%s/{0}.{0}'" % textures_content.rstrip("/")
+
+
+if os.environ.get("UMGSTUDIO_CONTENT"):
+	import json as _json
+	set_content(**_json.loads(os.environ["UMGSTUDIO_CONTENT"]))
+
 # ─── цвета дизайн-системы (линейные) ───
 INK = (0.896269, 0.921582, 0.887923, 1)
 MUTED = (0.391573, 0.514918, 0.527115, 1)
@@ -107,8 +125,11 @@ def q(s):
 class W:
 	"""cls — имя класса UMG ('TextBlock') или полный путь BP-класса ('/Game/UI/HUD/Widgets/WBP_Key.WBP_Key_C')."""
 
-	def __init__(self, cls, name, props=None, slot=None, children=None, var=False, collapsed=False, label=None):
+	def __init__(self, cls, name, props=None, slot=None, children=None, var=False, collapsed=False, label=None,
+				 slot_cls=None):
+		"""slot_cls — класс слотов детей, если панели нет в SLOT_OF (WidgetSwitcher, свои панели…)."""
 		self.cls, self.name = cls, name
+		self.slot_cls = slot_cls
 		self.props = dict(props or {})
 		self.slot = dict(slot or {})
 		self.children = list(children or [])
@@ -123,7 +144,7 @@ class W:
 	@property
 	def slot_class(self):
 		short = self.cls.rsplit(".", 1)[-1]
-		return SLOT_OF.get(short)
+		return self.slot_cls or SLOT_OF.get(short)
 
 
 # ─── фабрики виджетов ───
@@ -216,8 +237,9 @@ def retainer(name, mat, retain, child, slot=None, var=False, tex_param="Texture"
 	return W("RetainerBox", name, p, slot, [child], var=var)
 
 
-def user_widget(name, wbp, props=None, slot=None, var=False, collapsed=False, folder=WIDGET_DIR):
+def user_widget(name, wbp, props=None, slot=None, var=False, collapsed=False, folder=None):
 	"""Экземпляр своего WBP (например WBP_Key). props — его Instance Editable переменные как есть."""
+	folder = folder or WIDGET_DIR
 	return W("%s/%s.%s_C" % (folder, wbp, wbp), name, props, slot, var=var, collapsed=collapsed)
 
 
@@ -257,7 +279,8 @@ def grid(row, column, h=None, v=None):
 
 
 # ─── экспорт ───
-def export(root, wbp, folder=WIDGET_DIR):
+def export(root, wbp, folder=None):
+	folder = folder or WIDGET_DIR
 	base = "%s/%s.%s:WidgetTree" % (folder, wbp, wbp)
 	out = []
 	seen = set()
@@ -312,10 +335,11 @@ SAVED = []
 STATES = []
 
 
-def save(root, wbp, out_dir, folder=WIDGET_DIR, suffix="", parent=None, design=None):
+def save(root, wbp, out_dir, folder=None, suffix="", parent=None, design=None):
 	"""parent — C++-база для кнопки «В UE» ('/Script/MadWater.HUDDriveWidget'); design — размер превью в Designer:
 	(1920, 1080) = Custom, 'screen' = Fill Screen, 'desired' = Desired. В текст вставки не попадают.
 	suffix — фрагмент для вставки в существующий виджет (кнопка «В UE» для него недоступна)."""
+	folder = folder or WIDGET_DIR
 	path = os.path.join(out_dir, "%s%s.paste.txt" % (wbp, suffix))
 	text = export(root, wbp, folder)
 	SAVED.append({"wbp": wbp + suffix, "folder": folder, "path": path, "text": text,

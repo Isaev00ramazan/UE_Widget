@@ -1,8 +1,9 @@
 // UMG Studio Bridge: локальный HTTP в редакторе, через него программа UMG Studio заливает и забирает виджеты.
 //
-//   GET  /umgstudio/ping                     → {"ok", "engine", "project"}
+//   GET  /umgstudio/ping                     → {"ok", "engine", "project", "projectDir", "version"}
+//   GET  /umgstudio/list                     → {"ok", "widgets": [{asset, name, parent}]} — все WBP проекта
 //   POST /umgstudio/import  {asset, text, parent?, designSizeMode?, designSize?, backup?, open?}
-//   POST /umgstudio/export  {asset}          → {"ok", "text"}
+//   POST /umgstudio/export  {asset}          → {"ok", "text", "parent", "designSizeMode", "designSize"}
 //   POST /umgstudio/open    {asset}
 //
 // Порт: [UMGStudio] Port=30110 в Config/DefaultEditorPerProjectUserSettings.ini (по умолчанию 30110).
@@ -18,6 +19,7 @@
 #include "Misc/App.h"
 #include "Misc/ConfigCacheIni.h"
 #include "Misc/EngineVersion.h"
+#include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -85,6 +87,7 @@ public:
 			return;
 		}
 		Bind(TEXT("/umgstudio/ping"), EHttpServerRequestVerbs::VERB_GET, &FUMGStudioModule::HandlePing);
+		Bind(TEXT("/umgstudio/list"), EHttpServerRequestVerbs::VERB_GET, &FUMGStudioModule::HandleList);
 		Bind(TEXT("/umgstudio/import"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleImport);
 		Bind(TEXT("/umgstudio/export"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleExport);
 		Bind(TEXT("/umgstudio/open"), EHttpServerRequestVerbs::VERB_POST, &FUMGStudioModule::HandleOpen);
@@ -123,7 +126,27 @@ private:
 		Object->SetBoolField(TEXT("ok"), true);
 		Object->SetStringField(TEXT("engine"), FEngineVersion::Current().ToString());
 		Object->SetStringField(TEXT("project"), FApp::GetProjectName());
+		Object->SetStringField(TEXT("projectDir"), FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()));
+		Object->SetNumberField(TEXT("version"), 2);
 		Reply(OnComplete, Object);
+		return true;
+	}
+
+	bool HandleList(const FHttpServerRequest& Request, const FHttpResultCallback& OnComplete)
+	{
+		TArray<TSharedPtr<FJsonValue>> Items;
+		for (const UMGStudio::FWidgetAssetInfo& Info : UMGStudio::ListWidgets())
+		{
+			const TSharedRef<FJsonObject> Item = MakeShared<FJsonObject>();
+			Item->SetStringField(TEXT("asset"), Info.Asset);
+			Item->SetStringField(TEXT("name"), Info.Name);
+			Item->SetStringField(TEXT("parent"), Info.Parent);
+			Items.Add(MakeShared<FJsonValueObject>(Item));
+		}
+		const TSharedRef<FJsonObject> Out = MakeShared<FJsonObject>();
+		Out->SetBoolField(TEXT("ok"), true);
+		Out->SetArrayField(TEXT("widgets"), Items);
+		Reply(OnComplete, Out);
 		return true;
 	}
 
@@ -171,13 +194,14 @@ private:
 	bool HandleExport(const FHttpServerRequest& Request, const FHttpResultCallback& OnComplete)
 	{
 		const TSharedPtr<FJsonObject> In = ParseJson(BodyOf(Request));
-		FString Asset, Text, Error;
+		FString Asset, Text, Error, Parent, DesignMode;
+		FVector2D DesignSize = FVector2D::ZeroVector;
 		if (!In.IsValid() || !In->TryGetStringField(TEXT("asset"), Asset))
 		{
 			ReplyError(OnComplete, TEXT("Нужно поле asset"));
 			return true;
 		}
-		if (!UMGStudio::ExportWidgetText(Asset, Text, Error))
+		if (!UMGStudio::ExportWidget(Asset, Text, Parent, DesignMode, DesignSize, Error))
 		{
 			ReplyError(OnComplete, Error);
 			return true;
@@ -186,6 +210,10 @@ private:
 		Out->SetBoolField(TEXT("ok"), true);
 		Out->SetStringField(TEXT("asset"), Asset);
 		Out->SetStringField(TEXT("text"), Text);
+		Out->SetStringField(TEXT("parent"), Parent);
+		Out->SetStringField(TEXT("designSizeMode"), DesignMode);
+		TArray<TSharedPtr<FJsonValue>> Size{ MakeShared<FJsonValueNumber>(DesignSize.X), MakeShared<FJsonValueNumber>(DesignSize.Y) };
+		Out->SetArrayField(TEXT("designSize"), Size);
 		Reply(OnComplete, Out);
 		return true;
 	}

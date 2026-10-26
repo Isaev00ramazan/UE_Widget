@@ -63,6 +63,7 @@ async function selectSource(id, keep = false) {
   const src = S.sources.find((s) => s.id === id);
   $("srcTitle").textContent = src ? src.file : id;
   $("bBuild").disabled = !src || src.kind !== "spec";
+  $("bMakeSpec").hidden = !src || src.kind === "spec";
   $("diffPane").hidden = true;
   S.result = await api("/api/render?src=" + encodeURIComponent(id));
   if (keep && prefs.wbpName) {
@@ -91,7 +92,7 @@ function walk(n, fn) { fn(n); n.children.forEach((c) => walk(c, fn)); }
 async function prepare(root) {
   const need = new Set(), tex = new Set();
   const scan = (r) => walk(r, (n) => {
-    if (n.path && n.path.startsWith("/") && !n.path.startsWith("/Script/")) need.add(n.path.split(".").pop().replace(/_C$/, ""));
+    if (n.path && n.path.startsWith("/") && !n.path.startsWith("/Script/")) need.add(n.path);
     for (const k of ["Brush", "Background"]) {
       const a = n.props[k] && assetName(n.props[k].ResourceObject);
       if (a && a.kind === "Texture2D") tex.add(a.name);
@@ -99,10 +100,12 @@ async function prepare(root) {
   });
   scan(root);
   for (let depth = 0; depth < 4 && need.size; depth++) {
-    const todo = [...need].filter((nm) => !(nm in S.nested));
+    // путь класса /Game/…/WBP_X.WBP_X_C: имя — для поиска на диске, пакет — чтобы взять из открытого UE
+    const todo = [...need].filter((p) => !(p.split(".").pop().replace(/_C$/, "") in S.nested));
     need.clear();
-    await Promise.all(todo.map(async (nm) => {
-      const r = await fetch("/api/wbp?name=" + encodeURIComponent(nm));
+    await Promise.all(todo.map(async (path) => {
+      const nm = path.split(".").pop().replace(/_C$/, ""), asset = path.split(".")[0];
+      const r = await fetch(`/api/wbp?name=${encodeURIComponent(nm)}&asset=${encodeURIComponent(asset)}`);
       S.nested[nm] = r.ok ? (await r.json()).roots[0] : null;
       if (S.nested[nm]) scan(S.nested[nm]);
     }));
@@ -345,13 +348,114 @@ $("bCopy").onclick = async () => {
 };
 // ─── редактор UE ───
 function currentWidget() { return S.result && S.result.ok && (S.result.widgets[S.wbp] || S.result.widgets[0]); }
+let ueOnline = false, lastProjectDir = "";
 async function ueStatus() {
   const r = await api("/api/ue/status");
   const el = $("ueStatus");
-  el.className = "ue-status " + (r.ok ? "on" : "off");
+  el.className = "ue-status " + (r.ok ? (r.otherProject ? "on warn" : "on") : "off");
   el.textContent = r.ok ? `UE ${r.engine.split("-")[0]} · ${r.project}` : "UE: нет связи";
-  el.title = r.ok ? "Мост UMG Studio Bridge на связи" : r.error;
+  el.title = r.ok ? (r.otherProject ? `Открыт другой проект (${r.projectDir}), чем в «⚙ Проект»` : "Мост UMG Studio Bridge на связи") : r.error;
+  lastProjectDir = r.projectDir || "";
+  if (r.adopted) toast(`Проект ${r.project} подключён: спецификации — ${r.projectDir}UMGStudio`, 6000);
+  const was = ueOnline;
+  ueOnline = !!r.ok;
+  $("ueBlock").hidden = !ueOnline;
+  if (ueOnline && (!was || r.adopted)) loadUeList();
   return r.ok;
+}
+
+// ─── виджеты открытого проекта UE ───
+let ueWidgets = [];
+async function loadUeList() {
+  const box = $("ueList");
+  box.innerHTML = '<div class="msg">Загружаю…</div>';
+  const r = await api("/api/ue/list");
+  if (!r.ok) { ueWidgets = []; box.innerHTML = `<div class="msg">${escapeHtml(r.error)}</div>`; return; }
+  ueWidgets = r.widgets;
+  renderUeList();
+}
+function renderUeList() {
+  const f = $("ueFilter").value.trim().toLowerCase();
+  const list = ueWidgets.filter((w) => !f || w.asset.toLowerCase().includes(f));
+  const box = $("ueList");
+  if (!ueWidgets.length) { box.innerHTML = '<div class="msg">В проекте нет Widget Blueprint</div>'; return; }
+  box.innerHTML = "";
+  for (const w of list) {
+    const b = document.createElement("button");
+    b.title = w.asset + (w.spec ? "\nЕсть спецификация — откроется она" : "\nЗабрать: copy.txt + спецификация .py");
+    b.innerHTML = `<span class="dot">${w.spec ? "●" : ""}</span><span>${escapeHtml(w.name)}<div class="path">${escapeHtml(w.asset.replace(/\/[^/]+$/, ""))}</div></span>`;
+    b.onclick = () => (w.spec ? openSource(w.spec) : fetchFromUe(w.asset));
+    box.appendChild(b);
+  }
+}
+async function openSource(id) { await loadSources(); await selectSource(id); }
+async function fetchFromUe(asset) {
+  toast("Забираю " + asset + "…", 8000);
+  const r = await api("/api/ue/fetch", { asset });
+  if (!r.ok) return toast(r.error, 7000);
+  toast(r.created ? `Готово: ${r.path.split(/[\\/]/).pop()} — правь .py и жми «В UE ▶»` : "Спецификация уже есть — открываю её (copy.txt обновлён)", 6000);
+  await openSource(r.src);
+  loadUeList();
+}
+$("ueFilter").addEventListener("input", renderUeList);
+$("bUeRefresh").onclick = loadUeList;
+$("bUeFetch").onclick = () => { const p = $("uePath").value.trim(); if (p) fetchFromUe(p); };
+$("uePath").addEventListener("keydown", (e) => { if (e.key === "Enter") $("bUeFetch").click(); });
+$("bMakeSpec").onclick = async () => {
+  const r = await api("/api/spec-from-copy", { src: S.src });
+  if (!r.ok) return toast(r.error, 6000);
+  toast("Спецификация: " + r.path.split(/[\\/]/).pop(), 5000);
+  await openSource(r.src);
+};
+
+// ─── настройки проекта ───
+async function openSettings() {
+  const info = await api("/api/settings");
+  const form = $("settingsForm"), s = info.settings, res = info.resolved;
+  $("setFile").textContent = "Файл настроек: " + info.file;
+  const ph = {
+    project: "не задана — возьмётся из открытого редактора", specs: res.specs.join("\n"), materials: res.materials,
+    setup_hud: res.setup_hud, assets: res.assets || "", textures: res.textures.join("\n"), design: res.design,
+    widgets: info.defaults.widgets, font: info.defaults.font, materials_content: info.defaults.materials_content,
+    textures_content: info.defaults.textures_content, ue: res.ue,
+  };
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    const v = s[el.name];
+    el.value = Array.isArray(v) ? v.join("\n") : v ?? "";
+    if (el.placeholder !== undefined && ph[el.name] !== undefined) el.placeholder = ph[el.name];
+    const ex = info.exists[el.name === "specs" ? "work_dir" : el.name];
+    el.classList.toggle("bad", ex === false && !!(v && v.length));
+    el.classList.toggle("good", ex === true && !!(v && v.length));
+  }
+  $("settingsDlg").showModal();
+}
+$("bSettings").onclick = openSettings;
+$("bTakeProject").onclick = () => {
+  if (!lastProjectDir) return toast("Редактор UE не на связи — открой проект с плагином", 4000);
+  $("settingsForm").elements.project.value = lastProjectDir;
+};
+$("settingsDlg").addEventListener("close", async () => {
+  if ($("settingsDlg").returnValue !== "save") return;
+  const form = $("settingsForm"), out = {};
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    out[el.name] = el.dataset.list ? el.value.split(/\n+/).map((x) => x.trim()).filter(Boolean) : el.value.trim();
+  }
+  const info = await api("/api/settings", { settings: out });
+  toast("Настройки сохранены: " + info.file, 4000);
+  await reloadProjectData();
+});
+async function reloadProjectData() {
+  S.nested = {}; S.images = {};
+  S.materials = await api("/api/materials");
+  S.gl = new GLMaterials(await api("/api/shaders"));
+  S.design = await api("/api/design"); if (!S.design.ok) S.design.components = [];
+  fillDesignSelect();
+  await loadSources();
+  const first = S.sources.find((x) => x.id === S.src) || S.sources.find((x) => x.kind === "spec") || S.sources[0];
+  if (first) await selectSource(first.id, first.id === S.src);
+  if (ueOnline) loadUeList();
 }
 function showMessages(title, lines) {
   engine.warnings.push(title, ...lines);
@@ -425,6 +529,7 @@ function listen() {
   es.onmessage = async (e) => {
     const msg = JSON.parse(e.data);
     if (msg.reload) return location.reload();
+    if (msg.settings) return reloadProjectData();
     S.nested = {};
     if (msg.files.some((f) => /\.(hlsl|json)$/.test(f) || f === "ue_setup_hud.py")) {
       S.materials = await api("/api/materials");

@@ -44,5 +44,19 @@ namespace UMGStudio
 	/** Дерево WBP целиком в формате буфера UMG (как Ctrl+C корня в Hierarchy). false — нет ассета. */
 	bool ExportWidgetText(const FString& AssetPath, FString& OutText, FString& OutError);
 
+	/** То же + родитель (путь класса) и размер превью в Designer (DesignSizeMode / DesignTimeSize как текст UE) */
+	bool ExportWidget(const FString& AssetPath, FString& OutText, FString& OutParent, FString& OutDesignMode,
+		FVector2D& OutDesignSize, FString& OutError);
+
+	struct FWidgetAssetInfo
+	{
+		FString Asset;   // /Game/UI/WBP_X
+		FString Name;    // WBP_X
+		FString Parent;  // путь родительского класса из тега ассета
+	};
+
+	/** Все Widget Blueprint проекта (/Game/…), без Editor Utility Widget */
+	TArray<FWidgetAssetInfo> ListWidgets();
+
 	bool OpenWidgetEditor(const FString& AssetPath);
 }

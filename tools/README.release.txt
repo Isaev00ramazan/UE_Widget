@@ -11,13 +11,11 @@ UMG Studio {version}
   Окно — WebView2 (есть в Windows 10/11); если оно не открылось, программа откроется в Edge отдельным окном.
   Что пошло не так — в %LOCALAPPDATA%\UMGStudio\log.txt.
 
-СВОИ ФАЙЛЫ ПРОЕКТА
-  Скопируйте umgstudio.example.json в umgstudio.json (рядом с UMGStudio.exe) и поправьте пути:
-    specs     — папка спецификаций и paste/copy-текстов (SourceArt/UI/HUD/UMGPaste)
-    materials — .hlsl UI-мастеров (HUD_UE57_Kit/Materials)
-    setup_hud — Scripts/ue_setup_hud.py (параметры мастеров)
-    assets, textures — выгрузка из UE (ue/export_hud_assets.py → Saved/UMGStudio)
-  Без umgstudio.json программа открывает примеры из папки examples.
+СВОЙ ПРОЕКТ
+  Кнопка «⚙ Проект» в окне: папка проекта UE, папка спецификаций, пути виджетов/шрифта/материалов в Content и т.д.
+  Если открыт редактор с плагином, проект подхватится сам: файлы — в <Проект>\UMGStudio.
+  Слева «В проекте UE» — виджеты проекта: клик забирает виджет и создаёт его спецификацию .py.
+  Настройки хранятся в umgstudio.json рядом с UMGStudio.exe. Без проекта открываются примеры из examples.
 
 КНОПКА «В UE» (плагин редактора)
   ue\install_plugin.bat "D:\MOD Dropbox\MAD WATER\PROJECT\MadWater_5.8"

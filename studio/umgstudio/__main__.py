@@ -18,6 +18,7 @@ UMG Studio.
 	--materials <папка> .hlsl UI-мастеров (HUD_UE57_Kit/Materials; по умолчанию Materials/ в репозитории)
 	--ue <url>          мост в редакторе UE (плагин ue/UMGStudio), по умолчанию http://127.0.0.1:30110
 	--window <режим>    auto | webview | edge | browser — чем открывать окно (auto: webview → Edge --app → браузер)
+	--project <папка>   папка проекта UE (остальные пути — от неё; всё это задаётся и в окне: «⚙ Проект»)
 """
 import json
 import os
@@ -25,59 +26,34 @@ import sys
 import threading
 import webbrowser
 
-from . import server, t3d
+from . import config, server, t3d
 
 # Корень с design/, examples/, Materials/…: папка exe в сборке, корень репозитория при запуске из исходников
-REPO = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else \
-	os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+REPO = config.REPO
 
 
 def load_config(argv):
-	cfg = {"specs": [], "textures": [], "port": 8765, "setup_hud": None, "assets": None, "design": None, "materials": None, "ue": None, "window": None}
-	for base in (os.getcwd(), REPO):
-		p = os.path.join(base, "umgstudio.json")
-		if os.path.isfile(p):
-			with open(p, encoding="utf-8") as f:
-				data = json.load(f)
-			for k in ("specs", "textures"):
-				cfg[k] += [os.path.join(base, d) for d in data.get(k, [])]
-			cfg["port"] = data.get("port", cfg["port"])
-			if data.get("ue"):
-				cfg["ue"] = data["ue"]
-			if data.get("window"):
-				cfg["window"] = data["window"]
-			for k in ("setup_hud", "assets", "design", "materials"):
-				if data.get(k):
-					cfg[k] = os.path.join(base, data[k])
-			break
+	"""umgstudio.json (настройки проекта, см. config.py) + ключи командной строки поверх."""
+	st = config.load_settings()
 	rest, it = [], iter(argv)
 	for a in it:
 		if a in ("--specs", "--textures"):
-			cfg[a[2:]].append(next(it))
+			st[a[2:]] = list(st.get(a[2:]) or []) + [os.path.abspath(next(it))]
 		elif a == "--port":
-			cfg["port"] = int(next(it))
-		elif a == "--ue":
-			cfg["ue"] = next(it)
-		elif a == "--window":
-			cfg["window"] = next(it)
-		elif a in ("--setup-hud", "--assets", "--design", "--materials"):
-			cfg[a[2:].replace("-", "_")] = next(it)
+			st["port"] = int(next(it))
+		elif a in ("--ue", "--window"):
+			st[a[2:]] = next(it)
+		elif a in ("--project", "--setup-hud", "--assets", "--design", "--materials"):
+			st[a[2:].replace("-", "_")] = os.path.abspath(next(it))
 		else:
 			rest.append(a)
-	if not cfg["specs"]:
-		cfg["specs"] = [os.path.join(REPO, "examples", "UMGPaste")]
-	if not cfg["design"]:
-		cfg["design"] = os.path.join(REPO, "design", "RacingHud")
-	if not cfg["materials"]:
-		cfg["materials"] = os.path.join(REPO, "Materials")
-	if not cfg["setup_hud"]:
-		cfg["setup_hud"] = os.path.join(REPO, "Skills", "ue_setup_hud.py")
+	cfg = config.resolve(st)
+	cfg["settings"] = st
 	return cfg, rest
 
 
 def start_server(cfg):
-	studio = server.Studio(cfg["specs"], cfg["textures"], cfg["setup_hud"], cfg["assets"], cfg["design"], cfg["materials"],
-						   cfg["ue"] or "http://127.0.0.1:30110")
+	studio = server.Studio.from_config(cfg)
 	httpd = server.serve(studio, cfg["port"])
 	threading.Thread(target=httpd.serve_forever, daemon=True).start()
 	return "http://127.0.0.1:%d/" % httpd.server_address[1]

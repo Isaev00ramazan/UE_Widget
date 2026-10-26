@@ -11,7 +11,7 @@ public class UMGStudio : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 			"UMG", "UMGEditor", "UnrealEd", "Kismet", "AssetTools", "Slate", "SlateCore",
-			"HTTPServer", "Json", "JsonUtilities"
+			"HTTPServer", "Json", "JsonUtilities", "AssetRegistry"
 		});
 	}
 }

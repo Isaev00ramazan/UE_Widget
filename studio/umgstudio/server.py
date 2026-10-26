@@ -13,6 +13,10 @@
 	GET  /fonts.css              — F_HUD: шрифты из дизайна + Fira Sans Condensed для кириллицы (как в UE)
 	GET  /api/events             — SSE: «файлы поменялись»
 	GET  /api/ready              — интерфейс загрузился (окно программы проверяет, что оно не пустое)
+	GET  /api/settings, POST /api/settings {settings} — настройки проекта (umgstudio.json)
+	GET  /api/ue/list            — все Widget Blueprint открытого проекта (новый плагин)
+	POST /api/ue/fetch {asset}   — забрать WBP по пути: copy.txt + спецификация .py в рабочую папку
+	POST /api/spec-from-copy {src} — сделать спецификацию .py из copy.txt / paste.txt
 	POST /api/log {msg}          — ошибка интерфейса → %LOCALAPPDATA%/UMGStudio/log.txt
 	POST /api/build   {src}      — записать *.paste.txt спецификации (как `py <экран>.py`)
 	POST /api/clipboard {text}   — положить текст в буфер обмена (запасной путь, если браузер не дал)
@@ -24,6 +28,7 @@
 """
 import ast
 import json
+import re
 import mimetypes
 import os
 import queue
@@ -35,7 +40,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from . import clipboard, diff, t3d, ue_bridge
+from . import clipboard, codegen, config, diff, t3d, ue_bridge
 from .design import Design
 
 READY = threading.Event()   # интерфейс загрузился в окне
@@ -54,7 +59,7 @@ def wbp_of(filename):
 
 class Studio:
 	def __init__(self, spec_dirs, texture_dirs=(), setup_hud=None, assets_dump=None, design=None, materials_dir=None,
-				 ue_url=ue_bridge.DEFAULT_URL):
+				 ue_url=ue_bridge.DEFAULT_URL, content=None, work_dir=None):
 		self.design = Design(design)
 		self.ue_url = ue_url
 		self.materials_dir = materials_dir
@@ -62,6 +67,9 @@ class Studio:
 		self.texture_dirs = [os.path.abspath(d) for d in texture_dirs]
 		self.setup_hud = setup_hud
 		self.assets_dump = assets_dump
+		self.content = content
+		self.work_dir = os.path.abspath(work_dir) if work_dir else (self.spec_dirs[0] if self.spec_dirs else None)
+		self.settings = None
 		self.cache = {}
 		self.lock = threading.Lock()
 		self.clients = []
@@ -76,7 +84,7 @@ class Studio:
 			for f in sorted(os.listdir(d)):
 				kind = "spec" if f.endswith(".py") else "copy" if f.endswith(".copy.txt") else \
 					"paste" if f.endswith(".paste.txt") else None
-				if kind and not f.startswith("__"):
+				if kind and not f.startswith("__") and f != "umg.py":
 					out.append({"id": "%d/%s" % (i, f), "kind": kind, "file": f, "dir": d,
 								"wbp": None if kind == "spec" else wbp_of(f)})
 		return out
@@ -97,6 +105,8 @@ class Studio:
 		Собранный exe запускает сам себя с --run-spec; результат — через временный файл (у оконного exe нет stdout)."""
 		env = dict(os.environ, PYTHONPATH=STUDIO_ROOT + os.pathsep + os.environ.get("PYTHONPATH", ""),
 				   PYTHONIOENCODING="utf-8")
+		if self.content:
+			env["UMGSTUDIO_CONTENT"] = config.content_env(self.content)
 		fd, out = tempfile.mkstemp(prefix="umgstudio-", suffix=".json")
 		os.close(fd)
 		if getattr(sys, "frozen", False):
@@ -162,6 +172,23 @@ class Studio:
 						return {"src": s["id"], "kind": kind, "roots": r["widgets"][0]["roots"]}
 		return None
 
+	def find_wbp_ue(self, asset):
+		"""Вложенного виджета нет на диске — взять дерево прямо из открытого редактора (файлы не пишутся)."""
+		if not asset or not asset.startswith("/Game/"):
+			return None
+		key = ("ue", asset)
+		with self.lock:
+			hit = self.cache.get(key)
+		if hit:
+			return hit
+		r = ue_bridge.call(self.ue_url, "/umgstudio/export", {"asset": asset}, timeout=5)
+		if not r.get("ok"):
+			return None
+		out = {"src": None, "kind": "ue", "asset": asset, "roots": t3d.parse(r["text"])}
+		with self.lock:
+			self.cache[key] = out
+		return out
+
 	def texture(self, name):
 		for d in self.texture_dirs:
 			for cand in (name + ".png", name.replace("T_", "", 1) + ".png"):
@@ -191,6 +218,155 @@ class Studio:
 				with open(p, encoding="utf-8") as f:
 					out[name] = {"code": f.read(), "inputs": [[n, k, list(v) if isinstance(v, tuple) else v] for n, k, v in inputs]}
 		return out
+
+	# ─── настройки проекта ───
+	@classmethod
+	def from_config(cls, cfg):
+		st = cls(cfg["specs"], cfg["textures"], cfg["setup_hud"], cfg["assets"], cfg["design"], cfg["materials"],
+				 cfg["ue"], cfg["content"], cfg["work_dir"])
+		st.settings = cfg.get("settings")
+		return st
+
+	def apply(self, settings):
+		"""Новые настройки без перезапуска: пути, папки, адрес моста; кэш превью сбрасывается."""
+		cfg = config.resolve(settings)
+		with self.lock:
+			self.spec_dirs = [os.path.abspath(d) for d in cfg["specs"]]
+			self.texture_dirs = [os.path.abspath(d) for d in cfg["textures"]]
+			self.setup_hud, self.assets_dump, self.materials_dir = cfg["setup_hud"], cfg["assets"], cfg["materials"]
+			self.design = Design(cfg["design"])
+			self.ue_url, self.content, self.work_dir = cfg["ue"], cfg["content"], os.path.abspath(cfg["work_dir"])
+			self.settings = settings
+			self.cache = {}
+		self.broadcast({"version": self.version, "files": [], "reload": False, "settings": True})
+		return cfg
+
+	def settings_info(self):
+		s = self.settings or config.load_settings()
+		cfg = config.resolve(s)
+		paths = {"project": cfg["project"], "work_dir": cfg["work_dir"], "setup_hud": cfg["setup_hud"],
+				 "assets": cfg["assets"], "materials": cfg["materials"], "design": cfg["design"]}
+		exists = {k: bool(v and os.path.exists(v)) for k, v in paths.items()}
+		return {"settings": s, "resolved": {k: v for k, v in cfg.items() if k != "content"}, "content": cfg["content"],
+				"exists": exists, "file": config.settings_path(), "defaults": config.CONTENT_DEFAULTS}
+
+	def save_settings(self, settings):
+		clean = {k: settings.get(k) for k in config.KEYS}
+		for k in config.LISTS:
+			v = clean.get(k)
+			clean[k] = [x for x in ([v] if isinstance(v, str) else (v or [])) if x]
+		config.save_settings(clean)
+		self.apply(clean)
+		return self.settings_info()
+
+	def adopt_project(self, project_dir):
+		"""Мост сообщил папку открытого проекта: если в настройках проект не задан — взять её (файлы — в <проект>/UMGStudio)."""
+		s = dict(self.settings or config.load_settings())
+		if s.get("project") or not project_dir:
+			return False
+		s["project"] = os.path.normpath(project_dir)
+		config.save_settings({k: s.get(k) for k in config.KEYS})
+		self.apply(s)
+		return True
+
+	def ensure_work_dir(self):
+		d = self.work_dir
+		os.makedirs(d, exist_ok=True)
+		if d not in self.spec_dirs:
+			self.spec_dirs.insert(0, d)
+		# umg.py рядом со спецификациями: их можно запускать и без программы (py экран.py)
+		umg_copy = os.path.join(d, "umg.py")
+		if not os.path.isfile(umg_copy):
+			import shutil
+			shutil.copy2(os.path.join(HERE, "umg.py"), umg_copy)
+		return d
+
+	def src_id(self, path):
+		path = os.path.abspath(path)
+		for i, d in enumerate(self.spec_dirs):
+			if os.path.dirname(path) == d:
+				return "%d/%s" % (i, os.path.basename(path))
+		return None
+
+	def spec_for(self, wbp):
+		"""Спецификация, которая сохраняет этот WBP (ищем save(…, "WBP_X") в .py рабочих папок)."""
+		pat = re.compile(r"""save\([^)]*['"]%s['"]""" % re.escape(wbp), re.S)
+		for d in self.spec_dirs:
+			if not os.path.isdir(d):
+				continue
+			for f in sorted(os.listdir(d)):
+				if f.endswith(".py") and f != "umg.py":
+					with open(os.path.join(d, f), encoding="utf-8", errors="replace") as fh:
+						if pat.search(fh.read()):
+							return os.path.join(d, f)
+		return None
+
+	def write_spec(self, text, wbp, asset, parent=None, design=None, source=""):
+		d = self.ensure_work_dir()
+		path = os.path.join(d, codegen.snake(wbp) + ".py")
+		n = 2
+		while os.path.exists(path):
+			path = os.path.join(d, "%s_%d.py" % (codegen.snake(wbp), n))
+			n += 1
+		folder = asset.rsplit("/", 1)[0]
+		code = codegen.spec_from_text(text, wbp, folder, parent=parent, design=design, source=source)
+		with open(path, "w", encoding="utf-8") as f:
+			f.write(code)
+		return path
+
+	def spec_from_copy(self, src):
+		path = self.path_of(src)
+		with open(path, encoding="utf-8-sig") as f:
+			text = f.read()
+		wbp = wbp_of(os.path.basename(path))
+		asset = ue_bridge.asset_from_text(text) or "%s/%s" % ((self.content or config.CONTENT_DEFAULTS)["widgets"], wbp)
+		spec = self.write_spec(text, wbp, asset, source=os.path.basename(path))
+		return {"ok": True, "src": self.src_id(spec), "path": spec}
+
+	def ue_list(self):
+		r = ue_bridge.call(self.ue_url, "/umgstudio/list", timeout=10)
+		if not r.get("ok"):
+			if r.get("status") == 404:
+				r["error"] = "Плагин старой версии не умеет показывать список виджетов — обнови его (ue\\install_plugin.bat) и пересобери проект. Пока можно забрать виджет по пути."
+			return r
+		for w in r["widgets"]:
+			spec = self.spec_for(w["name"])
+			w["spec"] = self.src_id(spec) if spec else None
+		return r
+
+	def ue_fetch(self, asset):
+		"""Забрать WBP из UE по пути: copy.txt в рабочую папку + спецификация .py, если её ещё нет."""
+		asset = asset.strip().split(".")[0]
+		if not asset.startswith("/Game/"):
+			return {"ok": False, "error": "Путь ассета вида /Game/Папка/WBP_Имя (в Content Browser: ПКМ → Copy Reference)"}
+		r = ue_bridge.call(self.ue_url, "/umgstudio/export", {"asset": asset})
+		if not r.get("ok"):
+			return r
+		wbp = asset.rsplit("/", 1)[1]
+		d = self.ensure_work_dir()
+		copy_path = os.path.join(d, wbp + ".copy.txt")
+		with open(copy_path, "w", encoding="utf-8", newline="") as f:
+			f.write(r["text"])
+		spec = self.spec_for(wbp)
+		created = False
+		if not spec:
+			design = None
+			mode, size = r.get("designSizeMode") or "", r.get("designSize") or [0, 0]
+			if mode in ("Custom", "CustomOnScreen") and size[0] > 0:
+				design = [round(size[0], 3), round(size[1], 3)]
+			elif mode in ("FillScreen",):
+				design = "screen"
+			elif mode in ("Desired", "DesiredOnScreen"):
+				design = "desired"
+			parent = r.get("parent") or None
+			if parent and parent.endswith(".UserWidget"):
+				parent = None
+			spec = self.write_spec(r["text"], wbp, asset, parent=parent, design=design, source="забран из UE")
+			created = True
+		with self.lock:
+			self.cache = {}
+		return {"ok": True, "src": self.src_id(spec), "copy": self.src_id(copy_path), "created": created,
+				"path": spec, "asset": asset}
 
 	# ─── редактор UE ───
 	def widget(self, src, wbp):
@@ -265,10 +441,14 @@ class Studio:
 			return snap
 
 		def loop():
-			prev = snapshot()
+			prev, prev_dirs = snapshot(), list(self.spec_dirs)
 			while True:
 				time.sleep(interval)
 				cur = snapshot()
+				if self.spec_dirs != prev_dirs:
+					# сменились папки (настройки проекта) — это не правка файлов, экран обновит событие settings
+					prev, prev_dirs = cur, list(self.spec_dirs)
+					continue
 				if cur != prev:
 					changed = sorted(p for p in set(cur) | set(prev) if cur.get(p) != prev.get(p))
 					prev = cur
@@ -348,7 +528,7 @@ def make_handler(studio):
 				if u.path == "/api/render":
 					return self.send(200, studio.render(q["src"]))
 				if u.path == "/api/wbp":
-					r = studio.find_wbp(q["name"])
+					r = studio.find_wbp(q["name"]) or studio.find_wbp_ue(q.get("asset", ""))
 					return self.send(200 if r else 404, r or {"error": "нет такого виджета"})
 				if u.path == "/api/texture":
 					p = studio.texture(q["name"])
@@ -373,7 +553,17 @@ def make_handler(studio):
 					except ValueError as e:
 						return self.send(200, {"ok": False, "error": str(e)})
 				if u.path == "/api/ue/status":
-					return self.send(200, ue_bridge.call(studio.ue_url, "/umgstudio/ping", timeout=1.5))
+					r = ue_bridge.call(studio.ue_url, "/umgstudio/ping", timeout=1.5)
+					if r.get("ok") and r.get("projectDir"):
+						r["adopted"] = studio.adopt_project(r["projectDir"])
+						proj = (studio.settings or {}).get("project")
+						r["otherProject"] = bool(proj) and os.path.normcase(os.path.normpath(proj)) != \
+							os.path.normcase(os.path.normpath(r["projectDir"]))
+					return self.send(200, r)
+				if u.path == "/api/ue/list":
+					return self.send(200, studio.ue_list())
+				if u.path == "/api/settings":
+					return self.send(200, studio.settings_info())
 				if u.path == "/api/shaders":
 					return self.send(200, studio.shaders())
 				if u.path == "/api/events":
@@ -398,6 +588,12 @@ def make_handler(studio):
 						return self.send(200, fn(body["src"], body["wbp"]))
 					except ValueError as e:
 						return self.send(200, {"ok": False, "error": str(e)})
+				if u.path == "/api/settings":
+					return self.send(200, studio.save_settings(body.get("settings") or {}))
+				if u.path == "/api/ue/fetch":
+					return self.send(200, studio.ue_fetch(body.get("asset", "")))
+				if u.path == "/api/spec-from-copy":
+					return self.send(200, studio.spec_from_copy(body["src"]))
 				if u.path == "/api/log":
 					msg = str(body.get("msg", ""))[:4000]
 					UI_LOG.append(msg)
